@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "681673326479",
+    "project_id": "inses-bdcd1",
+    "storage_bucket": "inses-bdcd1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681673326479:android:dc58611a2c5908c4f215fa",
+        "android_client_info": {
+          "package_name": "com.spiderlingz.inses"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "681673326479-t50l83gbg0129ujhfpnlgnicml3q3atq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC3ey7DXwnZWRibt9GNPUfMJqmbKXHys7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "681673326479-t50l83gbg0129ujhfpnlgnicml3q3atq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
