@@ -27,6 +27,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
 
   RegisterViewModel _viewmodel;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
 
   @override
   void initState() {
@@ -38,7 +40,11 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        child:  buildView(),
+          color: AppColors.WHITE,
+          child:  Form(
+            key: _formKey,
+            child: buildView(),
+          )
       ),
     );
   }
@@ -102,7 +108,9 @@ class _LoginState extends State<Login> {
                       fontSize: AppDimen.TEXT_SMALL,
                       radius: 5,
                       onPressed:(){
-                        App().setNavigation(context, AppRoutes.APP_REGISTER);
+                        if(_formKey.currentState.validate()) {
+                          App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+                        }
                       }),
                 ]
             )

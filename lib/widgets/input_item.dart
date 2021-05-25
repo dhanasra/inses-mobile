@@ -46,7 +46,7 @@ class InputItem extends StatelessWidget {
         margin: margin??EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 5),
         text: text,
         controller: controller,
-        isShadow: isShadow??true,
+        isShadow: isShadow??false,
         regExp: regExp,
         minLength: minLength,
         errorMaxLines: 3,

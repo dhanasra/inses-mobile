@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:inses_app/resources/app_colors.dart';
+import 'package:inses_app/resources/app_dimen.dart';
 
 class InputField extends StatefulWidget {
   final String text;
@@ -156,6 +158,11 @@ class _InputFieldState extends State<InputField> {
                     enabledBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     disabledBorder: InputBorder.none,
+                    errorStyle: TextStyle(
+                        fontFamily: widget.fontfamily,
+                        fontSize: AppDimen.TEXT_MICRO,
+                        fontWeight: FontWeight.w300,
+                        color: AppColors.WARNING_COLOR),
                     hintStyle: TextStyle(
                         fontFamily: widget.fontfamily,
                         fontSize: widget.fontSize,
@@ -168,13 +175,25 @@ class _InputFieldState extends State<InputField> {
                     errorMaxLines: widget.errorMaxLines,
                     errorStyle: TextStyle(
                         fontFamily: widget.fontfamily,
-                        fontSize: widget.fontSize,
-                        fontWeight: widget.fontWeight,
-                        color: widget.hintColor),
+                        fontSize: AppDimen.TEXT_MINI,
+                        fontWeight: FontWeight.w400,
+                        color: AppColors.WARNING_COLOR),
                     hintText:
                             widget.text,
                     contentPadding: widget.contentPadding ??
                         EdgeInsets.only(left: 10, right: 10),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: AppColors.WARNING_COLOR_LIGHT,
+                          width: widget.focusedBorderWidth),
+                      borderRadius: BorderRadius.circular(widget.radius),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: AppColors.WARNING_COLOR,
+                          width: widget.focusedBorderWidth),
+                      borderRadius: BorderRadius.circular(widget.radius),
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: widget.focusedBorderColor,

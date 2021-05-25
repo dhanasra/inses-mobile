@@ -14,6 +14,7 @@ import 'package:inses_app/views/splash.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'app_localizations.dart';
 import 'app_routes.dart';
 
@@ -69,6 +70,22 @@ class App extends StatelessWidget {
 
       return info;
     });
+  }
+
+  Future<bool> locationPermission() async{
+    var status = await Permission.location.status;
+    if (status.isDenied) {
+      if (await Permission.location.request().isGranted) {
+        return true;
+      }else{
+        if (await Permission.location.isPermanentlyDenied) {
+          openAppSettings();
+        }
+        return false;
+      }
+    }else{
+      return true;
+    }
   }
 
   Color randColor(int val) {

@@ -24,6 +24,7 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
 
   RegisterViewModel _viewmodel;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -35,7 +36,11 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        child:  buildView(),
+        color: AppColors.WHITE,
+        child:  Form(
+          key: _formKey,
+          child: buildView(),
+        )
       ),
     );
   }
@@ -58,15 +63,25 @@ class _RegisterState extends State<Register> {
           alignment: Alignment.centerLeft,
         ),
         InputItem(
+          focusNode: _viewmodel.nameFocus,
+          controller: _viewmodel.nameController,
+          autoFocus: true,
+          prefixIcon: Icon(Icons.person),
+          margin: EdgeInsets.only(top: 30,left: 20,right: 20),
+          text: 'Name',
+          emptyError: 'Name should not be empty',
+          isObscurred: false,
+        ),
+        InputItem(
           focusNode: _viewmodel.phoneFocus,
           controller: _viewmodel.phoneController,
-          autoFocus: true,
           prefixIcon: Icon(Icons.phone),
-          margin: EdgeInsets.only(top: 30,left: 20,right: 20),
+          autoFocus: false,
+          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
           text: 'Phone number',
           emptyError: 'Phone number should not be empty',
           lengthError: 'Enter a valid phone number',
-          patternError: 'Enter a valid email id',
+          patternError: 'Enter a valid phone number',
           minLength: 10,
           inputType: TextInputType.phone,
           isObscurred: false,
@@ -83,7 +98,6 @@ class _RegisterState extends State<Register> {
           lengthError: 'Password length should greater than 8',
           minLength: 8,
           isObscurred: true,
-          regExp:(RegExp(r'[0-9]')),
         ),
         Container(
             margin: EdgeInsets.only(top: 70,left: 20,right: 20),
@@ -99,7 +113,9 @@ class _RegisterState extends State<Register> {
                       fontSize: AppDimen.TEXT_SMALL,
                       radius: 5,
                       onPressed:(){
-                        App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+                          if(_formKey.currentState.validate()) {
+                            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+                          }
                       }),
                 ]
             )

@@ -1,16 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
+import 'package:inses_app/comps/border_container.dart';
+import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/input_field.dart';
 import 'package:inses_app/comps/primary_button.dart';
+import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/register_view_model.dart';
+import 'package:inses_app/widgets/double_color_button.dart';
 import 'package:inses_app/widgets/grey_micro.dart';
 import 'package:inses_app/widgets/input_item.dart';
+import 'package:inses_app/widgets/location_dialogue.dart';
+import 'package:inses_app/widgets/or_item.dart';
 import 'package:inses_app/widgets/sub_title.dart';
 
 class NameFields extends StatefulWidget {
@@ -22,20 +29,42 @@ class NameFields extends StatefulWidget {
 class _NameFieldsState extends State<NameFields> {
 
   RegisterViewModel _viewmodel;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
-
     _viewmodel = RegisterViewModel(App());
     super.initState();
+    Future.delayed(Duration.zero, () {
+      this.showDialogue();
+    });
+  }
+
+  showDialogue(){
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context){
+          return LocationDialogue(
+            title: "current location",
+            description: "Add your current location address",
+            text: "Yes",
+            onPressed:(){
+              _viewmodel.getPosition();
+              Navigator.of(context).pop();
+            }
+          );
+        }
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: Form(
+        key: _formKey,
         child: buildView(),
-      ),
+      )
     );
   }
 
@@ -50,24 +79,11 @@ class _NameFieldsState extends State<NameFields> {
         ),
         SubTitle(
           margin: EdgeInsets.only(left: 20,right: 20,top: 10),
-          text: 'Create Profile',
+          text: 'Add Location',
         ),
         GreyMicro(
           text: 'Book your services at any time with low cost',
           alignment: Alignment.centerLeft,
-        ),
-        InputItem(
-          focusNode: _viewmodel.phoneFocus,
-          controller: _viewmodel.phoneController,
-          autoFocus: true,
-          isShadow:false,
-          prefixIcon: Icon(Icons.person),
-          margin: EdgeInsets.only(top: 30,left: 20,right: 20),
-          text: 'Name',
-          emptyError: 'Phone number should not be empty',
-          lengthError: 'Enter a valid phone number',
-          patternError: 'Enter a valid email id',
-          isObscurred: false,
         ),
         InputField(
             text: 'Address',
@@ -119,6 +135,27 @@ class _NameFieldsState extends State<NameFields> {
                       onPressed:(){
                         App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                       }),
+                ]
+            )
+        ),
+        Or(),
+        Container(
+            padding: EdgeInsets.only(left: 15,right: 15),
+            margin: EdgeInsets.only(top: 40),
+            alignment: Alignment.center,
+            child:Wrap(
+                children:[
+                  DoubleColorButton(
+                      text1: 'Add address later? ',
+                      text2: 'Skip',
+                      txtColor: AppColors.BLACK,
+                      width: 250,
+                      fontfamily: AppFont.FONT,
+                      fontWeight: FontWeight.w600,
+                      fontSize: AppDimen.TEXT_SMALL,
+                      onPressed:(){
+                        App().setNavigation(context, AppRoutes.APP_LOGIN);
+                      })
                 ]
             )
         ),

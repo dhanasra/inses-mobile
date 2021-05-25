@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:inses_app/app/app.dart';
 
 class RegisterViewModel {
@@ -68,4 +70,27 @@ class RegisterViewModel {
     });
   }
 
+  Future<void> getPosition() async {
+    bool locationPermission = await App().locationPermission();
+    if (locationPermission) {
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+
+      }
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+
+        }
+      }
+      Position position = await Geolocator.getCurrentPosition();
+      List<Address> address = await Geocoder.local.findAddressesFromCoordinates(
+          Coordinates(position.latitude, position.longitude));
+      addressController.text = address[0].addressLine.toString();
+    }
+  }
 }
