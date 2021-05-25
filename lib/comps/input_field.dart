@@ -29,6 +29,8 @@ class InputField extends StatefulWidget {
   final String patternErrorText;
   final Color hintColor;
   final bool isShadow;
+  final Widget prefixIcon;
+  final bool autoFocus;
   final int sValidate;
   final int minLength;
   final bool expands;
@@ -39,6 +41,7 @@ class InputField extends StatefulWidget {
   final RegExp regExp;
   final String lengthErrorText;
   final bool isEnabled;
+  final FocusNode focusNode;
   final bool isBothEffect;
   final double height;
 
@@ -46,6 +49,7 @@ class InputField extends StatefulWidget {
       {@required this.text,
       this.inputType,
       this.color,
+        this.prefixIcon,
       this.fontSize,
       this.enabledBorderColor,
       this.focusedBorderColor,
@@ -53,6 +57,7 @@ class InputField extends StatefulWidget {
       this.focusedBorderWidth,
       this.hintColor,
       this.sValidate,
+        this.autoFocus,
       this.fontWeight,
       this.padding,
       this.minLine,
@@ -63,6 +68,7 @@ class InputField extends StatefulWidget {
       this.errorMaxLines,
       this.fontfamily,
       this.regExp,
+        this.focusNode,
       this.validate,
       this.emptyErrorText,
       this.patternErrorText,
@@ -98,6 +104,8 @@ class _InputFieldState extends State<InputField> {
           padding: widget.padding != null ? widget.padding : EdgeInsets.all(0),
           margin: widget.margin != null ? widget.margin : EdgeInsets.all(0),
           child: TextFormField(
+            autofocus: widget.autoFocus,
+            focusNode: widget.focusNode,
             enabled: widget.isEnabled ?? true,
             maxLines: widget.maxLine == 100 ? null : 1,
             minLines: widget.minLine == 100 ? null : 1,
@@ -138,6 +146,7 @@ class _InputFieldState extends State<InputField> {
             decoration: widget.isShadow != null && widget.isShadow
                 ? InputDecoration(
                     isDense: true,
+                prefixIcon: widget.prefixIcon??null,
                     errorMaxLines: widget.errorMaxLines,
                     hintText:
                             widget.text,
@@ -155,6 +164,7 @@ class _InputFieldState extends State<InputField> {
                     border: InputBorder.none)
                 : InputDecoration(
                     isDense: true,
+                    prefixIcon: widget.prefixIcon??null,
                     errorMaxLines: widget.errorMaxLines,
                     errorStyle: TextStyle(
                         fontFamily: widget.fontfamily,

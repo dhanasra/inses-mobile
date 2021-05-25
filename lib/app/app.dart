@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inses_app/comps/border_container.dart';
@@ -18,6 +20,7 @@ import 'app_routes.dart';
 class App extends StatelessWidget {
   static final App _instance = App._internal();
 
+
   App._internal();
   factory App() {
     return _instance;
@@ -35,6 +38,9 @@ class App extends StatelessWidget {
 
   Widget getMaterialApp(
       {@required Widget widget, String title, BuildContext buildContext}) {
+
+
+
       return MaterialApp(
         title: title,
         debugShowCheckedModeBanner: false,

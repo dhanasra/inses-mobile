@@ -28,6 +28,7 @@ class ImageView extends StatelessWidget {
     return Container(
         margin: margin,
         padding: padding,
+        alignment: alignment,
         width: width,
         child: Image(
           image: url != null ? NetworkImage(url) : AssetImage('assets/images/'+asset),
