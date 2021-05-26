@@ -30,6 +30,7 @@ dependencies:
   permission_handler: ^7.1.0
   geolocator: ^7.0.3
   geocoder: ^0.2.1
+  flutter_rating_bar: ^4.0.0
 
 dev_dependencies:
   flutter_test:

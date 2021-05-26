@@ -16,6 +16,7 @@ class Content extends StatelessWidget {
   final double letterSpacing;
   final double textHeight;
   final int maxline;
+  final TextDecoration decoration;
   final TextOverflow overflow;
   final double height;
   final TextAlign textAlign;
@@ -24,6 +25,7 @@ class Content extends StatelessWidget {
       this.color,
       this.fontSize,
       this.fontWeight,
+        this.decoration,
       this.bgColor, this.overflow,
       this.margin,
       this.padding,
@@ -52,11 +54,12 @@ class Content extends StatelessWidget {
             maxLines:maxline ,
             overflow: overflow?? null,
             style: TextStyle(
+
                 height: textHeight ?? 1,
                 letterSpacing: letterSpacing,
                 fontFamily: fontfamily,
                 fontSize: fontSize,
-                decoration: TextDecoration.none,
+                decoration: decoration??TextDecoration.none,
                 fontWeight: fontWeight,
                 color: color),
           ),

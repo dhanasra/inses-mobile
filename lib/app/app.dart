@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
+import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/resources/app_style.dart';
+import 'package:inses_app/views/home_main.dart';
 import 'package:inses_app/views/splash.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:page_transition/page_transition.dart';
@@ -30,7 +32,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return getMaterialApp(
-        widget: Splash(), title: 'Launch', buildContext: context);
+        widget: HomeMain(), title: 'Launch', buildContext: context);
   }
 
   AppRoutes getAppRoutes() {
@@ -172,38 +174,40 @@ class App extends StatelessWidget {
     }
   }
 
-  AppBar appBarBack(BuildContext context,String title,{Widget child}){
-    return AppBar(
-      automaticallyImplyLeading: false,
-      title: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+  PreferredSizeWidget appBarBack(BuildContext context,String title,{Widget child}){
+    return PreferredSize(
+      preferredSize: Size.fromHeight(55),
+      child: Container(
+        color: AppColors.WHITE,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Material(
-              color: AppColors.WHITE,
-              child: IconButton(
-                  icon: Icon(
-                    LineIcons.arrowLeft,
-                    color: AppColors.BLACK_1,
+            Container(
+              padding: EdgeInsets.only(left: 15,right: 15,top: 20,bottom: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    margin: EdgeInsets.only(right: 10),
+                    child: Icon(LineIcons.arrowLeft,color: AppColors.BLACK_3,),
                   ),
-                  splashColor: AppColors.WHITE_3,
-                  splashRadius: 20,
-                  onPressed: () {
-                    setBackNavigation(context);
-                  }),
+                  Expanded(
+                      child: Content(
+                        alignment: Alignment.centerLeft,
+                        text: title,
+                        fontfamily: AppFont.FONT,
+                        color: AppColors.BLACK_2,
+                        fontWeight: FontWeight.w500,
+                        fontSize: AppDimen.TEXT_MEDIUM_1,
+                      )
+                  )
+                ],
+              ),
             ),
-            Content(
-              margin: EdgeInsets.only(top: 5,left: 0),
-              text: title??'',
-              fontSize: AppDimen.TEXT_MEDIUM_1,
-              fontWeight: FontWeight.w600,
-              fontfamily: AppFont.FONT,
-              color: AppColors.BLACK_2,
-            )
-          ]
+            Line(width:double.infinity, height: 3,color: AppColors.WHITE_1,),
+          ],
+        ),
       ),
-      actions: [
-        child??Container()
-      ],
     );
   }
 
