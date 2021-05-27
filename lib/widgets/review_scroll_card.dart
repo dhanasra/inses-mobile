@@ -150,8 +150,7 @@ class _ReviewScrollCardState extends State<ReviewScrollCard> {
             color: AppColors.WHITE_1,
             padding: EdgeInsets.all(10),
             height: 200,
-            child: Expanded(
-                  child: Column(
+            child:Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Container(
@@ -216,8 +215,7 @@ class _ReviewScrollCardState extends State<ReviewScrollCard> {
                       ),
                     ],
                   ),
-                )
-            ),
+                ),
         onTap: (){
 
         });

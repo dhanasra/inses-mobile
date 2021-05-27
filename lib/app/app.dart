@@ -7,11 +7,15 @@ import 'package:flutter/services.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/line.dart';
+import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/resources/app_style.dart';
+import 'package:inses_app/views/address_select.dart';
+import 'package:inses_app/views/date_time_select.dart';
 import 'package:inses_app/views/home_main.dart';
+import 'package:inses_app/views/service_select.dart';
 import 'package:inses_app/views/splash.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:page_transition/page_transition.dart';
@@ -32,7 +36,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return getMaterialApp(
-        widget: HomeMain(), title: 'Launch', buildContext: context);
+        widget: ServiceSelect(), title: 'Launch', buildContext: context);
   }
 
   AppRoutes getAppRoutes() {
@@ -41,8 +45,6 @@ class App extends StatelessWidget {
 
   Widget getMaterialApp(
       {@required Widget widget, String title, BuildContext buildContext}) {
-
-
 
       return MaterialApp(
         title: title,
@@ -198,9 +200,10 @@ class App extends StatelessWidget {
                         fontfamily: AppFont.FONT,
                         color: AppColors.BLACK_2,
                         fontWeight: FontWeight.w500,
-                        fontSize: AppDimen.TEXT_MEDIUM_1,
+                        fontSize: AppDimen.TEXT_MEDIUM_3,
                       )
-                  )
+                  ),
+                  child??Container()
                 ],
               ),
             ),

@@ -98,8 +98,7 @@ class _ScrollCardState extends State<ScrollCard> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4.0),
                 ),
-                child: Expanded(
-                  child: Column(
+                child:  Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Container(
@@ -139,7 +138,7 @@ class _ScrollCardState extends State<ScrollCard> {
                     ],
                   ),
                 )
-            )),
+            ),
         onTap: (){
 
         });
