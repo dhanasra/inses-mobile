@@ -32,6 +32,9 @@ dependencies:
   geocoder: ^0.2.1
   flutter_rating_bar: ^4.0.0
   google_maps_flutter: ^2.0.6
+  razorpay_flutter: ^1.2.6
+  webview_flutter: ^2.0.8
+  url_launcher: ^6.0.4
 
 dev_dependencies:
   flutter_test:

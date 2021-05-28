@@ -13,9 +13,13 @@ import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/resources/app_style.dart';
 import 'package:inses_app/views/address_select.dart';
+import 'package:inses_app/views/booking_desc.dart';
 import 'package:inses_app/views/date_time_select.dart';
 import 'package:inses_app/views/home_main.dart';
+import 'package:inses_app/views/payment_choose.dart';
+import 'package:inses_app/views/service_add_cart.dart';
 import 'package:inses_app/views/service_select.dart';
+import 'package:inses_app/views/service_summary.dart';
 import 'package:inses_app/views/splash.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:page_transition/page_transition.dart';
@@ -27,7 +31,6 @@ import 'app_routes.dart';
 class App extends StatelessWidget {
   static final App _instance = App._internal();
 
-
   App._internal();
   factory App() {
     return _instance;
@@ -36,7 +39,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return getMaterialApp(
-        widget: ServiceSelect(), title: 'Launch', buildContext: context);
+        widget: Splash(), title: 'Launch', buildContext: context);
   }
 
   AppRoutes getAppRoutes() {
@@ -191,7 +194,10 @@ class App extends StatelessWidget {
                 children: [
                   Container(
                     margin: EdgeInsets.only(right: 10),
-                    child: Icon(LineIcons.arrowLeft,color: AppColors.BLACK_3,),
+                    child: OnTapField(
+                      onTap: (){App().setBackNavigation(context);},
+                      child: Icon(LineIcons.arrowLeft,color: AppColors.BLACK_3,),
+                    )
                   ),
                   Expanded(
                       child: Content(

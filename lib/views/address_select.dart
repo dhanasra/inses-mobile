@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/input_field.dart';
@@ -14,7 +15,6 @@ import 'package:inses_app/model/area.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
-import 'package:inses_app/widgets/input_item.dart';
 import 'package:inses_app/widgets/input_item_two.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 
@@ -53,6 +53,32 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
               child: Icon(Icons.location_on,color: AppColors.PRIMARY_COLOR,),
               onTap: (){}
           )
+      ),
+      bottomNavigationBar: Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OnTapField(
+                child: BorderContainer(
+                  margin: EdgeInsets.all(20),
+                  bgColor: AppColors.SECONDARY_COLOR,
+                  padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 10),
+                  radius: 4,
+                  child: Content(
+                    color:AppColors.WHITE,
+                    text: 'Continue',
+                    fontfamily: AppFont.FONT,
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimen.TEXT_SMALL,
+                  ),
+                ),
+                onTap:(){
+                  App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_4);
+                }
+            )
+          ],
+        ),
       ),
       body: Container(
         child: buildView(),
@@ -135,61 +161,12 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
             contentPadding: EdgeInsets.only(
                 top: 15, bottom: 15, left: 10, right: 10),
             width: 400),
-        MiniTitle(
-          text: 'Save as',
+        Line(
+          width: double.infinity,
+          height: 1,
+          color: AppColors.WHITE_1,
+          margin: EdgeInsets.only(bottom: 10),
         ),
-        StreamBuilder(
-            stream: addressController.stream,
-            builder: (context,AsyncSnapshot shot){
-              return Column(
-                children: [
-                  BorderContainer(
-                    margin: EdgeInsets.only(top: 10,left: 15,right: 15,bottom: 30),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        OnTapField(
-                            child: saveItem(Icons.home,'home',shot.hasData?shot.data=='home'?true:false:false,),
-                            onTap: (){
-                              addressController.add('home');
-                            }
-                        ),
-                        OnTapField(
-                            child: saveItem(Icons.work,'work',shot.hasData?shot.data=='work'?true:false:false,),
-                            onTap: (){
-                              addressController.add('work');
-                            }
-                        ),
-                        OnTapField(
-                            child: saveItem(Icons.add_location_alt,'other',shot.hasData?shot.data=='other'?true:false:false,),
-                            onTap: (){
-                              addressController.add('other');
-                            }
-                        )
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible:shot.data=='other'?true:false,
-                      child: InputItemTwo(
-                        // focusNode: _viewmodel.phoneFocus,
-                        // controller: _viewmodel.phoneController,
-                        prefixIcon: Icon(Icons.add_location_rounded),
-                        autoFocus: false,
-                        margin: EdgeInsets.only(top: 10,left: 15,right: 15),
-                        text: 'Save as office, shop etc.',
-                        emptyError: 'Phone number should not be empty',
-                        lengthError: 'Enter a valid phone number',
-                        patternError: 'Enter a valid phone number',
-                        minLength: 10,
-                        inputType: TextInputType.phone,
-                        isObscurred: false,
-                        regExp:(RegExp(r'[0-9]')),
-                      ),
-                  )
-                ],
-              );
-            }),
       ],
     );
   }

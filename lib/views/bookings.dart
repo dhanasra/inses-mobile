@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:inses_app/app/app.dart';
 import 'package:inses_app/resources/app_colors.dart';
+import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/views/current_booking.dart';
 import 'package:inses_app/views/past_booking_item.dart';
 
@@ -18,28 +20,34 @@ class _BookingsState extends State<Bookings> {
           length: 2,
           child: Scaffold(
             appBar: PreferredSize(
-                preferredSize: Size.fromHeight(80),
-                child: Container(
-                  color: AppColors.WHITE,
-                  child: TabBar(
-                    unselectedLabelColor: AppColors.WHITE_1,
-                    labelColor: AppColors.PRIMARY_COLOR,
-                    indicatorColor: AppColors.SECONDARY_COLOR,
-                    tabs: [
-                      Container(
-                        height: 55,
-                        child: Tab(
-                          text: 'In Progress',
-                        ),
+                preferredSize: Size.fromHeight(123),
+                child: Column(
+                  children: [
+                    App().appBarBack(context, 'My Bookings'),
+                    Container(
+                      color: AppColors.WHITE,
+                      child: TabBar(
+                        indicatorWeight: 5,
+                        unselectedLabelColor: AppColors.WHITE_1,
+                        labelColor: AppColors.PRIMARY_COLOR,
+                        indicatorColor: AppColors.SECONDARY_COLOR,
+                        tabs: [
+                          Container(
+                            height: 55,
+                            child: Tab(
+                              text: 'ONGOING',
+                            ),
+                          ),
+                          Container(
+                            height: 55,
+                            child: Tab(
+                              text: 'HISTORY',
+                            ),
+                          ),
+                        ],
                       ),
-                      Container(
-                        height: 55,
-                        child: Tab(
-                          text: 'Completed',
-                        ),
-                      ),
-                    ],
-                  ),
+                    )
+                  ],
                 )
             ),
             body: Container(

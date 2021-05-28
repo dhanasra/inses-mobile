@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:inses_app/widgets/booking_empty.dart';
 import 'package:inses_app/widgets/booking_item.dart';
 
 class PastBooking extends StatefulWidget {
@@ -16,11 +17,12 @@ class _PastBookingState extends State<PastBooking> {
   }
 
   Widget buildView(){
-    return ListView.builder(
-      itemCount: 10,
-      itemBuilder: (context,index){
-        return BookingItem();
-      },
-    );
+    // return ListView.builder(
+    //   itemCount: 10,
+    //   itemBuilder: (context,index){
+    //     return BookingItem();
+    //   },
+    // );
+    return EmptyBooking();
   }
 }

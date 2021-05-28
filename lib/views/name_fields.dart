@@ -154,7 +154,7 @@ class _NameFieldsState extends State<NameFields> {
                       fontWeight: FontWeight.w600,
                       fontSize: AppDimen.TEXT_SMALL,
                       onPressed:(){
-                        App().setNavigation(context, AppRoutes.APP_LOGIN);
+                        App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                       })
                 ]
             )

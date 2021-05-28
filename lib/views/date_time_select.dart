@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/resources/app_colors.dart';
+import 'package:inses_app/resources/app_dimen.dart';
+import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/views/time_item.dart';
 import 'package:inses_app/widgets/date_item.dart';
 import 'package:inses_app/widgets/mini_title.dart';
@@ -34,6 +37,32 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: App().appBarBack(context, 'Schedule Your Service'),
+      bottomNavigationBar: Container(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OnTapField(
+                child: BorderContainer(
+                  margin: EdgeInsets.all(20),
+                  bgColor: AppColors.SECONDARY_COLOR,
+                  padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 10),
+                  radius: 4,
+                  child: Content(
+                    color:AppColors.WHITE,
+                    text: 'Continue',
+                    fontfamily: AppFont.FONT,
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimen.TEXT_SMALL,
+                  ),
+                ),
+                onTap:(){
+                  App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_5);
+                }
+            )
+          ],
+        ),
+      ),
       body: Container(
         child: buildView(),
       ),

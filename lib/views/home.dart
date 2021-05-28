@@ -7,10 +7,12 @@ import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/line.dart';
+import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/widgets/app_drawer.dart';
 import 'package:inses_app/widgets/promise_item.dart';
 import 'package:inses_app/widgets/review_scroll_card.dart';
 import 'package:inses_app/widgets/scroll_card.dart';
@@ -57,10 +59,13 @@ class _HomeState extends State<Home> {
     ];
     super.initState();
   }
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: AppDrawer(),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: Container(
@@ -74,12 +79,16 @@ class _HomeState extends State<Home> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      margin: EdgeInsets.only(right: 20),
-                      child: Icon(
-                        Icons.menu,
-                        color: AppColors.WHITE_1,
-                      ),
+                      OnTapField(
+                        child: Container(
+                            margin: EdgeInsets.only(right: 20),
+                            child: Icon(
+                              Icons.menu,
+                              color: AppColors.WHITE_1,
+                            ),),
+                            onTap: (){
+                              _scaffoldKey.currentState.openDrawer();
+                            }
                     ),
                     Expanded(
                         child: Row(
@@ -121,8 +130,7 @@ class _HomeState extends State<Home> {
     return ListView(
       children: [
         Container(
-          color: AppColors.WHITE,
-          padding: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 20),
+          padding: EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 10),
           child: Row(
             children: [
               Expanded(
@@ -202,7 +210,7 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
-        SearchInputField(),
+        // SearchInputField(),
         ScrollCard(),
         Line(
           width: double.infinity,
