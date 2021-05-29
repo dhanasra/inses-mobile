@@ -1,13 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/line.dart';
+import 'package:inses_app/database/constants.dart';
+import 'package:inses_app/model/service.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
+import 'package:inses_app/widgets/error_item.dart';
+import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/mini_card_item.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 import 'package:inses_app/widgets/promise_item.dart';
@@ -22,6 +34,19 @@ class ServiceSelect extends StatefulWidget {
 }
 
 class _ServiceSelectState extends State<ServiceSelect> {
+
+  NetworkBloc bloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+  OrderViewModel viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    viewModel = OrderViewModel(App());
+    bloc = NetworkBloc(appRepository: appRepository);
+    bloc.add(GetServices());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,12 +55,25 @@ class _ServiceSelectState extends State<ServiceSelect> {
           'Select your need',
       ),
       body: Container(
-        child: buildView(),
+        child: BlocBuilder<NetworkBloc,NetworkState>(
+          bloc: bloc,
+          builder: (context,state){
+            if(state is Initial || state is Loading){
+              return buildView(true,[]);
+            }else if(state is Error){
+              return ErrorItem();
+            }else if(state is GotServices){
+              return buildView(false,state.services);
+            }else{
+              return Container();
+            }
+          },
+        ),
       ),
     );
   }
 
-  Widget buildView(){
+  Widget buildView(bool isLoading,List<ServiceModel> services){
     return ListView(
       children: [
           Stack(
@@ -115,7 +153,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
                                       Content(
                                         padding: EdgeInsets.only(left: 10),
                                         alignment: Alignment.centerRight,
-                                        text: '8056384773',
+                                        text: AppConstants.INSES_NUMBER,
                                         fontfamily: AppFont.FONT,
                                         color: AppColors.WHITE,
                                         fontWeight: FontWeight.w400,
@@ -134,7 +172,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
                       fontfamily: AppFont.FONT,
                       textHeight: 1.5,
                       letterSpacing: 1,
-                      text: 'Best Plumbing Services in Madurai',
+                      text: 'Best ${OrderViewModel.category} Services in Madurai',
                       color: AppColors.WHITE,
                       fontWeight: FontWeight.w600,
                       fontSize: AppDimen.TEXT_H1,
@@ -144,7 +182,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
                       alignment: Alignment.centerLeft,
                       fontfamily: AppFont.FONT,
                       textHeight: 1.5,
-                      text: 'Get lowest prices for plumbing services in Madurai',
+                      text: 'Get lowest prices for ${OrderViewModel.category} services in Madurai',
                       color: AppColors.WHITE_1,
                       fontWeight: FontWeight.w400,
                       fontSize: AppDimen.TEXT_SMALL,
@@ -160,14 +198,19 @@ class _ServiceSelectState extends State<ServiceSelect> {
                   child: Column(
                     children: [
                       MiniTitle(text: 'Select what you need',margin: EdgeInsets.only(bottom: 20),),
-                      ListView.builder(
+                      isLoading?Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Loader()
+                        ],
+                      ):ListView.builder(
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: 6,
+                          itemCount: services.length,
                           itemBuilder: (context,index){
-                            return ServiceSubItem();
+                            return ServiceSubItem(service: services[index],);
                           }
-                      ),
+                      )
                     ],
                   )
                 ),
@@ -177,7 +220,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
         Content(
           margin: EdgeInsets.only(top: 30),
           padding: EdgeInsets.all(15),
-          text: 'Plumbin Service Includes',
+          text: '${OrderViewModel.category} Service Includes',
           alignment: Alignment.centerLeft,
           textAlign: TextAlign.start,
           textHeight: 1.5,

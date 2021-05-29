@@ -12,6 +12,8 @@ import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
+import 'package:inses_app/widgets/sub.dart';
 
 class ServiceAddCart extends StatefulWidget {
 
@@ -37,13 +39,13 @@ class _ServiceAddCartState extends State<ServiceAddCart> {
         'Select your services',
       ),
       bottomNavigationBar: Container(
+        padding: EdgeInsets.all(20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
             OnTapField(
                 child: BorderContainer(
-                  margin: EdgeInsets.all(20),
                   bgColor: AppColors.SECONDARY_COLOR,
                   padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 10),
                   radius: 4,
@@ -56,7 +58,13 @@ class _ServiceAddCartState extends State<ServiceAddCart> {
                   ),
                 ),
                 onTap:(){
-                  App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_3);
+                  if(items==0){
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Select atleast 1 service',style: TextStyle(fontSize: AppDimen.TEXT_SMALL),)));
+                  }else{
+                    OrderViewModel.noOfService = items;
+                    OrderViewModel.totalPrice = items*OrderViewModel.basePrice;
+                    App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_3);
+                  }
                 }
             )
           ],
@@ -81,7 +89,7 @@ class _ServiceAddCartState extends State<ServiceAddCart> {
               radius: 4,
               child: Content(
                 color:AppColors.WHITE,
-                text: 'Repair',
+                text: '${OrderViewModel.category}',
                 fontfamily: AppFont.FONT,
                 fontWeight: FontWeight.w500,
                 fontSize: AppDimen.TEXT_SMALL,
@@ -111,15 +119,15 @@ class _ServiceAddCartState extends State<ServiceAddCart> {
                     children: [
                       Content(
                         padding: EdgeInsets.only(bottom: 12),
-                        text: 'Tap',
+                        text: '${OrderViewModel.service}',
                         color: AppColors.BLACK,
                         alignment: Alignment.centerLeft,
                         fontfamily: AppFont.FONT,
                         fontSize: AppDimen.TEXT_SMALL,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                       Content(
-                        text: '\u20B9 100',
+                        text: '\u20B9 ${OrderViewModel.basePrice}',
                         color: AppColors.BLACK,
                         alignment: Alignment.centerLeft,
                         fontfamily: AppFont.FONT,

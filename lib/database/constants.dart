@@ -24,6 +24,9 @@ class AppConstants {
   static const LOGGED_IN = 'LOGGED_IN';
   static const LOGGED_OUT = 'LOGGED_OUT';
 
+
+  static const INSES_NUMBER ='+91 0452-4267198';
+
   static String THEME = 'DARK';
 
   static const DEFAULT_IMAGE_URL =

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +39,8 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return getMaterialApp(
-        widget: Splash(), title: 'Launch', buildContext: context);
+      return getMaterialApp(widget: Splash(), title: 'Launch', buildContext: context);
+
   }
 
   AppRoutes getAppRoutes() {
@@ -92,6 +93,15 @@ class App extends StatelessWidget {
       }
     }else{
       return true;
+    }
+  }
+
+  Future<bool> isNetworkConnectivityOn()async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile ||connectivityResult == ConnectivityResult.wifi) {
+      return true;
+    } else {
+      return false;
     }
   }
 

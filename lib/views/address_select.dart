@@ -15,6 +15,7 @@ import 'package:inses_app/model/area.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/widgets/input_item_two.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 
@@ -31,6 +32,8 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
   StreamController<Position> mapController;
   StreamController<String> addressController;
   List<AreaModel> areas;
+  OrderViewModel viewModel;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -40,6 +43,7 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
     _controller = Completer();
     mapController = StreamController();
     addressController = StreamController();
+    viewModel = OrderViewModel(App());
     super.initState();
   }
 
@@ -55,13 +59,13 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
           )
       ),
       bottomNavigationBar: Container(
+        padding: EdgeInsets.all(20),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
             OnTapField(
                 child: BorderContainer(
-                  margin: EdgeInsets.all(20),
                   bgColor: AppColors.SECONDARY_COLOR,
                   padding: EdgeInsets.only(left: 10,right: 10,top: 10,bottom: 10),
                   radius: 4,
@@ -74,14 +78,20 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
                   ),
                 ),
                 onTap:(){
-                  App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_4);
-                }
+                    if(_formKey.currentState.validate()) {
+                      OrderViewModel.address = viewModel.addressController.text;
+                      App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_4);
+                    }
+                  }
             )
           ],
         ),
       ),
-      body: Container(
-        child: buildView(),
+      body: Form(
+        key: _formKey,
+        child:Container(
+          child: buildView(),
+        )
       ),
     );
   }
@@ -133,7 +143,7 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
             errorMaxLines: 3,
             autoFocus: false,
             margin: EdgeInsets.only(top: 10,left: 15,right: 15,bottom: 20),
-            // controller: _viewmodel.addressController,
+            controller: viewModel.addressController,
             emptyErrorText: 'Email Id Should not be empty',
             patternErrorText: 'Please Enter a valid Email Id',
             enabledBorderColor: AppColors.WHITE_1,

@@ -10,6 +10,7 @@ import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
 
 class ServiceItem extends StatelessWidget {
   final ServiceModel serviceModel;
@@ -50,6 +51,7 @@ class ServiceItem extends StatelessWidget {
           ),
         ),
         onTap: (){
+          OrderViewModel.category = serviceModel.name;
           App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_1);
         }
     );

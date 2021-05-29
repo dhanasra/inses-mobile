@@ -6,23 +6,28 @@ import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/widgets/review_scroll_card.dart';
 import 'package:inses_app/widgets/sub.dart';
 
 class ServiceSubItem extends StatelessWidget {
-  final String img;
-  final String service;
-  ServiceSubItem({this.img,this.service});
+  final ServiceModel service;
+  ServiceSubItem({this.service});
   @override
   Widget build(BuildContext context) {
-    return OnTapField(
-        child: Container(
+    return Container(
             child: Column(
               children: [
-                Row(
+              OnTapField(
+              child:
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.only(top: 10,bottom: 10),
+                    child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ImageContainer(
@@ -50,14 +55,16 @@ class ServiceSubItem extends StatelessWidget {
                     )
                   ],
                 ),
-                Line(width: double.infinity, height: 2,color: AppColors.WHITE_1,margin: EdgeInsets.only(left: 10,right: 10,top: 15,bottom: 15),),
+                ),
+                  onTap: (){
+                    OrderViewModel.service = 'Pipe fitting / replacing';
+                    App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_2);
+                  }
+              ),
+                Line(width: double.infinity, height: 2,color: AppColors.WHITE_1,margin: EdgeInsets.only(left: 10,right: 10),),
 
               ],
             )
-        ),
-        onTap: (){
-          App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_2);
-        }
     );
   }
 }
