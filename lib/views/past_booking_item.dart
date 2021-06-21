@@ -33,12 +33,6 @@ class _PastBookingState extends State<PastBooking> {
     bloc = NetworkBloc(appRepository: appRepository);
     bloc.add(GetBookingHistory());
 
-    controller.addListener(() {
-      if (controller.position.pixels ==
-          controller.position.maxScrollExtent) {
-
-      }
-    });
     super.initState();
   }
 
@@ -76,30 +70,16 @@ class _PastBookingState extends State<PastBooking> {
         await Future.delayed(Duration(seconds: 5));
       },
       child: ListView.builder(
-        itemCount: 10+1,
+        itemCount: bookings.length,
         itemBuilder: (context,index){
-          if(index == 10){
-            return _buildProgressIndicator(true);
-          }else {
-            return BookingItem();
-          }
+          print("==========================${bookings.length}");
+            return BookingItem(bookings[index]);
         },
         controller: controller,
       ),
     );
   }
 
-  Widget _buildProgressIndicator(bool isLoading) {
-    return new Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: new Center(
-        child: new Opacity(
-          opacity: isLoading ? 1.0 : 00,
-          child: new CircularProgressIndicator(),
-        ),
-      ),
-    );
-  }
 
   @override
   void dispose() {

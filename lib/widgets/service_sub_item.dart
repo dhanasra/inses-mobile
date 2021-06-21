@@ -16,7 +16,8 @@ import 'package:inses_app/widgets/sub.dart';
 
 class ServiceSubItem extends StatelessWidget {
   final ServiceModel service;
-  ServiceSubItem({this.service});
+  final VoidCallback onpressed;
+  ServiceSubItem({this.service,this.onpressed});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -32,14 +33,15 @@ class ServiceSubItem extends StatelessWidget {
                   children: [
                     ImageContainer(
                       width: 40,
+                      bgColor: AppColors.WHITE,
                       height: 40,
                       radius: 100,
-                      url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mjl8fHBsdW1iaW5nfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                      url: service.icon,
                     ),
                     Expanded(
                         child: Content(
                           margin: EdgeInsets.only(top: 10,bottom: 10,left: 15,right: 15),
-                          text: 'Pipe fitting / replacing',
+                          text: service.name,
                           alignment: Alignment.centerLeft,
                           textAlign: TextAlign.start,
                           textHeight: 1.5,
@@ -56,8 +58,12 @@ class ServiceSubItem extends StatelessWidget {
                   ],
                 ),
                 ),
-                  onTap: (){
-                    OrderViewModel.service = 'Pipe fitting / replacing';
+                  onTap: onpressed??(){
+                    OrderViewModel.service = service.name;
+                    OrderViewModel.serviceId = service.id;
+                    OrderViewModel.serviceIcon = service.icon;
+                    OrderViewModel.serviceImage = service.image;
+                    OrderViewModel.basePrice = service.price;
                     App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_2);
                   }
               ),

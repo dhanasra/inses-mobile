@@ -20,13 +20,13 @@ import 'package:inses_app/widgets/input_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 
-class Settings extends StatefulWidget {
+class PasswordSettings extends StatefulWidget {
 
   @override
-  _SettingsState createState() => _SettingsState();
+  _PasswordSettingsState createState() => _PasswordSettingsState();
 }
 
-class _SettingsState extends State<Settings> {
+class _PasswordSettingsState extends State<PasswordSettings> {
   NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -42,48 +42,48 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: App().appBarBack(
-        context,
-        'Settings',
-      ),
-      body: Form(
-          key: _formKey,
-          child:BlocBuilder<NetworkBloc,NetworkState>(
-            bloc: bloc,
-            builder: (context,state){
-              if(state is Empty || state is Loading){
-                return buildView(true);
-              }else if(state is Error){
-                return ErrorItem();
-              }else if(state is Initial || state is Success){
-                if(state is Success){
+        appBar: App().appBarBack(
+          context,
+          'Settings',
+        ),
+        body: Form(
+            key: _formKey,
+            child:BlocBuilder<NetworkBloc,NetworkState>(
+              bloc: bloc,
+              builder: (context,state){
+                if(state is Empty || state is Loading){
+                  return buildView(true);
+                }else if(state is Error){
+                  return ErrorItem();
+                }else if(state is Initial || state is Success){
+                  if(state is Success){
 
-                  Future.delayed(Duration.zero, () async {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Wrap(
-                              children: [
-                                Content(
-                                  padding: EdgeInsets.only(top: 5,bottom: 5),
-                                  text: 'Profile is updated successfully',
-                                  fontSize: AppDimen.TEXT_SMALL,
-                                  fontWeight: FontWeight.w400,
-                                  fontfamily: AppFont.FONT,
-                                ),
-                              ],
-                            )
-                        )
-                    );
-                  });
+                    Future.delayed(Duration.zero, () async {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Wrap(
+                                children: [
+                                  Content(
+                                    padding: EdgeInsets.only(top: 5,bottom: 5),
+                                    text: 'Password is updated successfully',
+                                    fontSize: AppDimen.TEXT_SMALL,
+                                    fontWeight: FontWeight.w400,
+                                    fontfamily: AppFont.FONT,
+                                  ),
+                                ],
+                              )
+                          )
+                      );
+                    });
+                  }
+                  viewModel.phoneController.text = '';
+                  return buildView(false);
+                }else{
+                  return Container();
                 }
-                viewModel.phoneController.text = '';
-                return buildView(false);
-              }else{
-                return Container();
-              }
-            },
-          )
-      )
+              },
+            )
+        )
     );
   }
 
@@ -91,33 +91,19 @@ class _SettingsState extends State<Settings> {
     return ListView(
       children: [
         MiniTitle(
-          text: 'Update Profile',
+          text: 'Update Account Password',
         ),
         InputItem(
-          focusNode: viewModel.nameFocus,
-          controller: viewModel.nameController,
-          autoFocus: true,
-          prefixIcon: Icon(Icons.person),
-          margin: EdgeInsets.only(top: 30,left: 15,right: 15),
-          text: ProfileViewModel.name,
-          emptyError: 'Name should not be empty',
-          isObscurred: false,
-        ),
-        InputItem(
-          focusNode: viewModel.phoneFocus,
-          controller: viewModel.phoneController,
-          maxLength: 10,
-          prefixIcon: Icon(Icons.phone),
+          focusNode: viewModel.passwordFocus,
           autoFocus: false,
+          controller: viewModel.passwordController,
+          prefixIcon: Icon(Icons.lock),
           margin: EdgeInsets.only(top: 20,left: 15,right: 15),
-          text: ProfileViewModel.phone,
-          emptyError: 'Phone number should not be empty',
-          lengthError: 'Enter a valid phone number',
-          patternError: 'Enter a valid phone number',
-          minLength: 10,
-          inputType: TextInputType.phone,
-          isObscurred: false,
-          regExp:(RegExp(r'[0-9]')),
+          text: 'Password',
+          emptyError: 'Password should not be empty',
+          lengthError: 'Password length should greater than 5',
+          minLength: 6,
+          isObscurred: true,
         ),
         BorderContainer(
             radius: 4,
@@ -143,7 +129,7 @@ class _SettingsState extends State<Settings> {
               ),
               onTap: (){
                 if(_formKey.currentState.validate()) {
-                  bloc.add(UpdateProfile(name: viewModel.nameController.text,phone: viewModel.phoneController.text));
+                  bloc.add(UpdatePassword(password: viewModel.passwordController.text));
                 }
               },
             )

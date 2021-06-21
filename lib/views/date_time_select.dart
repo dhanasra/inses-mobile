@@ -60,7 +60,7 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
                   ),
                 ),
                 onTap:(){
-                  if(OrderViewModel.date==null || OrderViewModel.time.isEmpty){
+                  if(OrderViewModel.date==null || OrderViewModel.startTime.isEmpty){
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Schedule your date and time',style: TextStyle(fontSize: AppDimen.TEXT_SMALL),)));
                   }else{
                     App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_5);
@@ -91,7 +91,7 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
                   OnTapField(
                       child: DateItem(date: '${viewModel.dateformatter.format(DateTime.now())}',day: '${viewModel.dayformatter.format(DateTime.now())}',isSelected: shot.hasData?shot.data=='today'?true:false:false,),
                       onTap: (){
-                        final DateFormat formatter = DateFormat('dd MMM');
+                        final DateFormat formatter = DateFormat('yyyy-MM-dd');
                         final String formatted = formatter.format(DateTime.now());
                         OrderViewModel.date = formatted;
                         dateController.add('today');
@@ -100,9 +100,9 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
                   OnTapField(
                       child: DateItem(date: '${viewModel.dateformatter.format(DateTime.now().add(Duration(days: 1)))}',day: '${viewModel.dayformatter.format(DateTime.now().add(Duration(days: 1)))}',isSelected: shot.hasData?shot.data=='tomorrow'?true:false:false,),
                       onTap: (){
-                        final DateFormat formatter = DateFormat('dd MMM');
-                        final String formatted = formatter.format(DateTime.now().add(Duration(days: 1)));
-                        OrderViewModel.date = formatted;
+                        final DateFormat formatter1 = DateFormat('yyyy-MM-dd');
+                        final String formatted1 = formatter1.format(DateTime.now().add(Duration(days: 1)));
+                        OrderViewModel.date = formatted1;
                         dateController.add('tomorrow');
                       }
                   ),
@@ -144,84 +144,96 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
                     OnTapField(
                         child: TimeItem(time: '10AM - 11AM', isSelected: shot.hasData?shot.data=='10-11'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '10AM - 11AM';
+                          OrderViewModel.startTime = '10:00:00';
+                          OrderViewModel.endTime = '11:00:00';
                           timeController.add('10-11');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '11AM - 12PM', isSelected: shot.hasData?shot.data=='11-12'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '11AM - 12PM';
+                          OrderViewModel.startTime = '11:00:00';
+                          OrderViewModel.endTime = '12:00:00';
                           timeController.add('11-12');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '12PM -  1PM', isSelected: shot.hasData?shot.data=='12-1'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '12PM - 1PM';
+                          OrderViewModel.startTime = '12:00:00';
+                          OrderViewModel.endTime = '13:00:00';
                           timeController.add('12-1');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '1PM - 2PM', isSelected: shot.hasData?shot.data=='1-2'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '1PM - 2PM';
+                          OrderViewModel.startTime = '13:00:00';
+                          OrderViewModel.endTime = '14:00:00';
                           timeController.add('1-2');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '2PM - 3PM', isSelected: shot.hasData?shot.data=='2-3'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '2PM - 3PM';
+                          OrderViewModel.startTime = '14:00:00';
+                          OrderViewModel.endTime = '15:00:00';
                           timeController.add('2-3');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '3PM -  4PM', isSelected: shot.hasData?shot.data=='3-4'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '3PM - 4PM';
+                          OrderViewModel.startTime = '15:00:00';
+                          OrderViewModel.endTime = '16:00:00';
                           timeController.add('3-4');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '4PM -  5PM', isSelected: shot.hasData?shot.data=='4-5'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '4PM - 5PM';
+                          OrderViewModel.startTime = '16:00:00';
+                          OrderViewModel.endTime = '17:00:00';
                           timeController.add('4-5');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '5PM - 6PM', isSelected: shot.hasData?shot.data=='5-6'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '5PM - 6PM';
+                          OrderViewModel.startTime = '17:00:00';
+                          OrderViewModel.endTime = '18:00:00';
                           timeController.add('5-6');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '6PM - 7PM', isSelected: shot.hasData?shot.data=='6-7'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '6PM - 7PM';
+                          OrderViewModel.startTime = '18:00:00';
+                          OrderViewModel.endTime = '19:00:00';
                           timeController.add('6-7');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '7PM -  8PM', isSelected: shot.hasData?shot.data=='7-8'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '7PM - 8PM';
+                          OrderViewModel.startTime = '19:00:00';
+                          OrderViewModel.endTime = '20:00:00';
                           timeController.add('7-8');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '8PM -  9PM', isSelected: shot.hasData?shot.data=='8-9'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '8PM - 9PM';
+                          OrderViewModel.startTime = '20:00:00';
+                          OrderViewModel.endTime = '21:00:00';
                           timeController.add('8-9');
                         }
                     ),
                     OnTapField(
                         child: TimeItem(time: '9PM - 10PM', isSelected: shot.hasData?shot.data=='9-10'?true:false:false,),
                         onTap: (){
-                          OrderViewModel.time = '9PM - 10PM';
+                          OrderViewModel.startTime = '21:00:00';
+                          OrderViewModel.endTime = '22:00:00';
                           timeController.add('9-10');
                         }
                     ),
@@ -260,7 +272,7 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
     );
 
     if (picked != null ){
-      final DateFormat formatter = DateFormat('dd MMM');
+      final DateFormat formatter = DateFormat('yyyy-MM-dd');
       final String formatted = formatter.format(picked);
       OrderViewModel.date = formatted;
 

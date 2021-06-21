@@ -47,7 +47,7 @@ class _SplashState extends State<Splash> {
               } else if (state is Authenticate) {
                 return Launch();
               } else if (state is Welcome) {
-                App().setNavigation(context, AppRoutes.APP_SPLASH_LOAD);
+                App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                 return SplashWidget();
               } else {
                 return SplashWidget();

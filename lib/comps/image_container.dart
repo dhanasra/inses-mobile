@@ -39,7 +39,7 @@ class ImageContainer extends StatelessWidget {
           borderRadius: BorderRadius.circular(radius),
           image: DecorationImage(
             colorFilter: new ColorFilter.mode(
-                Colors.black.withOpacity(1), BlendMode.dstATop),
+                bgColor, BlendMode.dstATop),
             image: url != null ? NetworkImage(url) : AssetImage('assets/images/'+asset),
             fit: BoxFit.cover,
           ),

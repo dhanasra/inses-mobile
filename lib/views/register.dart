@@ -1,10 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
+import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/primary_button.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -25,23 +33,58 @@ class _RegisterState extends State<Register> {
 
   RegisterViewModel _viewmodel;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  NetworkBloc bloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
   void initState() {
     _viewmodel = RegisterViewModel(App());
+    bloc = NetworkBloc(appRepository: appRepository);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: AppColors.WHITE,
-        child:  Form(
-          key: _formKey,
-          child: buildView(),
-        )
-      ),
+      body: BlocBuilder<NetworkBloc,NetworkState>(
+        bloc: bloc,
+        builder: (context,state){
+          if(state is RegisterSuccess){
+            print("success");
+            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+          }else if(state is RegisterError){
+            print("error");
+            if(state.error==""){
+
+            }else{
+              Future.delayed(Duration.zero, () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Wrap(
+                          children: [
+                            Content(
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              text: state.error,
+                              fontSize: AppDimen.TEXT_SMALL,
+                              fontWeight: FontWeight.w400,
+                              fontfamily: AppFont.FONT,
+                            ),
+                          ],
+                        )
+                    )
+                );
+              });
+            }
+          }
+          return Container(
+              color: AppColors.WHITE,
+              child:  Form(
+                key: _formKey,
+                child: buildView(),
+              )
+          );
+        },
+      )
     );
   }
 
@@ -83,6 +126,7 @@ class _RegisterState extends State<Register> {
           lengthError: 'Enter a valid phone number',
           patternError: 'Enter a valid phone number',
           minLength: 10,
+          maxLength: 10,
           inputType: TextInputType.phone,
           isObscurred: false,
           regExp:(RegExp(r'[0-9]')),
@@ -95,8 +139,8 @@ class _RegisterState extends State<Register> {
           margin: EdgeInsets.only(top: 20,left: 20,right: 20),
           text: 'Password',
           emptyError: 'Password should not be empty',
-          lengthError: 'Password length should greater than 8',
-          minLength: 8,
+          lengthError: 'Password length should greater than 5',
+          minLength: 6,
           isObscurred: true,
         ),
         Container(
@@ -114,7 +158,13 @@ class _RegisterState extends State<Register> {
                       radius: 5,
                       onPressed:(){
                           if(_formKey.currentState.validate()) {
-                            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+                            bloc.add(
+                                AddUser(
+                                  name: _viewmodel.nameController.text,
+                                  phone: _viewmodel.phoneController.text,
+                                  password: _viewmodel.passwordController.text
+                                )
+                            );
                           }
                       }),
                 ]

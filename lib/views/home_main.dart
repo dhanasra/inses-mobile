@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/content.dart';
+import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/home_view_model.dart';
+import 'package:inses_app/views/admin_home.dart';
 import 'package:inses_app/views/home.dart';
 import 'package:inses_app/views/profile.dart';
 import 'package:inses_app/views/bookings.dart';
@@ -32,11 +35,19 @@ class _HomeMainState extends State<HomeMain> {
   }
 
   Widget _buildView(){
-    final List<Widget> _children = [
+
+    final List<Widget> _children = HomeViewModel.loginStatus==AppConstants.LOGGED_IN_ADMIN
+        ?[
+        AdminHome(),
+        Bookings(),
+        Profile()
+    ]
+        :[
       Home(),
       Bookings(),
       Profile()
     ];
+
     return Scaffold(
       body: _children[_currentIndex], //
       bottomNavigationBar: BottomNavigationBar(

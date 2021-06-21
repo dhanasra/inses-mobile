@@ -107,7 +107,7 @@ class _ServiceAddCartState extends State<ServiceAddCart> {
           margin: EdgeInsets.only(left: 15,right: 15,top: 10),
           radius: 5,
           height: 150,
-          url: 'https://waterforfuture.org/wp-content/uploads/2019/11/ways-conserve-water-1068x713-1024x684.jpg',
+          url: OrderViewModel.serviceImage,
         ),
         Container(
           margin: EdgeInsets.only(left: 15,right: 15,top: 20),

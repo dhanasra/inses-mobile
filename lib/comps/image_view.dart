@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +8,7 @@ class ImageView extends StatelessWidget {
   final String asset;
   final double width;
   final double height;
+  final String path;
   final bool isShadow;
   final EdgeInsetsGeometry margin;
   final EdgeInsetsGeometry padding;
@@ -18,6 +21,7 @@ class ImageView extends StatelessWidget {
       @required this.width,
       this.height,
       this.isShadow,
+        this.path,
       this.margin,
       this.padding,
       this.alignment,
@@ -31,7 +35,7 @@ class ImageView extends StatelessWidget {
         alignment: alignment,
         width: width,
         child: Image(
-          image: url != null ? NetworkImage(url) : AssetImage('assets/images/'+asset),
+          image: url != null ? NetworkImage(url) :path!=null?Image.file(File(path)): AssetImage('assets/images/'+asset),
           height: height,
         ),
         decoration: BoxDecoration(

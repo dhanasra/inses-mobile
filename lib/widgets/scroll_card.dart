@@ -17,6 +17,8 @@ import 'package:inses_app/resources/app_font.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ScrollCard extends StatefulWidget {
+  final List<OfferModel> offers;
+  ScrollCard({this.offers});
 
   @override
   _ScrollCardState createState() => _ScrollCardState();
@@ -31,11 +33,7 @@ class _ScrollCardState extends State<ScrollCard> {
   @override
   void initState() {
     super.initState();
-    scrolls = [
-      OfferModel(old: '\u20B9 699',txt: 'AC Services starts onwards \u20B9 499',img: 'https://inses.in/wp-content/uploads/2021/04/ac.jpg'),
-      OfferModel(old: '\u20B9 299',txt: 'System Services starts onwards \u20B9 199',img: 'https://inses.in/wp-content/uploads/2021/04/RO-1400x600.png'),
-      OfferModel(old: '\u20B9 299',txt: 'RO Services starts onwards \u20B9 199',img: 'https://inses.in/wp-content/uploads/2021/04/System-1400x600.png'),
-    ];
+    scrolls = widget.offers;
     _pageController = PageController(
       initialPage: 0,
     );
@@ -109,17 +107,26 @@ class _ScrollCardState extends State<ScrollCard> {
                           children: [
                             Content(
                               alignment: Alignment.centerLeft,
-                              text:offer.old,
+                              text:"\u20B9 "+offer.old,
                               decoration: TextDecoration.lineThrough,
                               fontfamily: AppFont.FONT,
                               color: AppColors.WARNING_COLOR,
                               fontWeight: FontWeight.w500,
                               fontSize: AppDimen.TEXT_MEDIUM_3,
                             ),
-                            Content(
+                            Flexible(child: Content(
                               padding: EdgeInsets.only(left: 20),
                               alignment: Alignment.centerLeft,
                               text:offer.txt,
+                              overflow: TextOverflow.ellipsis,
+                              fontfamily: AppFont.FONT,
+                              color: AppColors.BLACK,
+                              fontWeight: FontWeight.w500,
+                              fontSize: AppDimen.TEXT_MEDIUM_3,
+                            ),),
+                            Content(
+                              alignment: Alignment.centerLeft,
+                              text:"\u20B9 "+offer.offer,
                               fontfamily: AppFont.FONT,
                               color: AppColors.BLACK,
                               fontWeight: FontWeight.w500,

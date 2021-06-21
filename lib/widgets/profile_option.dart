@@ -11,9 +11,10 @@ class ProfileOption extends StatelessWidget {
   final String option;
   final String sub;
   final IconData icon;
+  final Icon trailingIcon;
   final VoidCallback onPressed;
 
-  ProfileOption({this.onPressed,this.icon,this.option,this.sub});
+  ProfileOption({this.onPressed,this.icon,this.option,this.sub,this.trailingIcon});
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +60,7 @@ class ProfileOption extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.only(left: 10),
-            child: Icon(LineIcons.arrowRight),
+            child: trailingIcon??Icon(LineIcons.arrowRight),
           )
         ],
       ),

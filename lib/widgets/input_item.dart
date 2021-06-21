@@ -16,7 +16,9 @@ class InputItem extends StatelessWidget {
   final TextInputType inputType;
   final FocusNode focusNode;
   final bool isShadow;
+  final int maxLength;
   final bool autoFocus;
+  final double width;
   final Icon prefixIcon;
   final int minLength;
   final EdgeInsetsGeometry margin;
@@ -25,10 +27,12 @@ class InputItem extends StatelessWidget {
     this.margin,
     this.minLength,
     this.lengthError,
+    this.maxLength,
     this.patternError,
     this.emptyError,
     this.autoFocus,
     this.prefixIcon,
+    this.width,
     this.isShadow,
     this.controller,
     this.regExp,
@@ -50,6 +54,7 @@ class InputItem extends StatelessWidget {
         regExp: regExp,
         minLength: minLength,
         errorMaxLines: 3,
+        maxLength: maxLength,
         inputType: inputType,
         isObscured: isObscurred,
         emptyErrorText: emptyError,
@@ -72,6 +77,6 @@ class InputItem extends StatelessWidget {
         fontSize: AppDimen.TEXT_SMALLER,
         contentPadding: EdgeInsets.only(
             top: 15, bottom: 15, left: 10, right: 10),
-        width: 400);
+        width: width??400);
   }
 }

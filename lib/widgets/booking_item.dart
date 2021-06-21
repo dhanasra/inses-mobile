@@ -7,11 +7,18 @@ import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/database/constants.dart';
+import 'package:inses_app/model/bookings.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/home_view_model.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
 
 class BookingItem extends StatefulWidget {
+  final BookingModel bookingModel;
+
+  BookingItem(this.bookingModel);
 
   @override
   _BookingItemState createState() => _BookingItemState();
@@ -25,7 +32,12 @@ class _BookingItemState extends State<BookingItem> {
       elevation: 4,
       child: OnTapField(
         onTap: (){
-          App().setNavigation(context, AppRoutes.APP_BOOKING_INFO);
+          print(HomeViewModel.loginStatus+AppConstants.LOGGED_IN);
+          OrderViewModel.booking = widget.bookingModel;
+          OrderViewModel.orderId = widget.bookingModel.id;
+          HomeViewModel.loginStatus==AppConstants.LOGGED_IN?
+          App().setNavigation(context, AppRoutes.APP_BOOKING_INFO):
+          App().setNavigation(context, AppRoutes.APP_UPDATE_BOOKING_STATUS);
         },
         child: Container(
           margin: EdgeInsets.all(10),
@@ -42,7 +54,7 @@ class _BookingItemState extends State<BookingItem> {
                           bgColor: AppColors.SUCCESS_COLOR,
                           child: Content(
                             width: 80,
-                            text: 'Completed',
+                            text: widget.bookingModel.status,
                             color: AppColors.WHITE,
                             fontfamily: AppFont.FONT,
                             fontSize: AppDimen.TEXT_MINI,
@@ -54,7 +66,7 @@ class _BookingItemState extends State<BookingItem> {
                   Content(
                     padding: EdgeInsets.only(top: 8,bottom: 8),
                     alignment: Alignment.centerRight,
-                    text: '\u20B9 2000',
+                    text: '\u20B9 ${widget.bookingModel.totalPrice}',
                     color: AppColors.BLACK_3,
                     fontfamily: AppFont.FONT,
                     fontSize: AppDimen.TEXT_SMALLEST,
@@ -73,7 +85,7 @@ class _BookingItemState extends State<BookingItem> {
                       height: 60,
                       width: 60,
                       bgColor: AppColors.WHITE_1,
-                      asset: 'plumber.jpeg',
+                      url: widget.bookingModel.icon,
                     ),
                     Expanded(
                         child: Container(
@@ -82,7 +94,7 @@ class _BookingItemState extends State<BookingItem> {
                             children: [
                               Content(
                                 padding: EdgeInsets.only(top: 8,bottom: 8),
-                                text: 'Plumbing Service',
+                                text: widget.bookingModel.categoryName,
                                 color: AppColors.BLACK,
                                 alignment: Alignment.centerLeft,
                                 fontfamily: AppFont.FONT,
@@ -91,7 +103,7 @@ class _BookingItemState extends State<BookingItem> {
                               ),
                               Content(
                                 padding: EdgeInsets.only(top: 8,bottom: 8),
-                                text: 'pipe fitting or replacing',
+                                text: widget.bookingModel.name,
                                 color: AppColors.BLACK_3,
                                 alignment: Alignment.centerLeft,
                                 fontfamily: AppFont.FONT,
@@ -118,7 +130,7 @@ class _BookingItemState extends State<BookingItem> {
                           Icon(Icons.access_time,size: 15,color: AppColors.GRAY,),
                           Content(
                             margin: EdgeInsets.only(left: 5),
-                            text: '12 May, 11.30 pm',
+                            text: widget.bookingModel.date,
                             color: AppColors.GRAY,
                             fontfamily: AppFont.FONT,
                             fontSize: AppDimen.TEXT_SMALLEST,
@@ -135,7 +147,7 @@ class _BookingItemState extends State<BookingItem> {
                             Icon(Icons.monetization_on,size: 15,color: AppColors.GRAY,),
                             Content(
                               padding: EdgeInsets.only(left: 5),
-                              text: 'Cash',
+                              text: widget.bookingModel.payMethod,
                               color: AppColors.GRAY,
                               fontfamily: AppFont.FONT,
                               fontSize: AppDimen.TEXT_SMALLEST,

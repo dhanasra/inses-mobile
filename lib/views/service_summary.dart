@@ -13,6 +13,7 @@ import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/model/order.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/app_repository.dart';
 import 'package:inses_app/network/bloc/network_bloc.dart';
@@ -22,6 +23,7 @@ import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
+import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -80,7 +82,14 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                       ),
                     ),
                     onTap:(){
-                      bloc.add(BookService());
+                      bloc.add(BookService(order: Order(
+                        date: OrderViewModel.date,
+                        start_time:OrderViewModel.startTime,
+                        end_time: OrderViewModel.endTime,
+                        address: OrderViewModel.address,
+                        service_id: OrderViewModel.serviceId,
+                        quantity: OrderViewModel.noOfService
+                      )));
                     }
                 )
             )
@@ -226,7 +235,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
         Content(
           margin: EdgeInsets.only(top: 0, bottom: 10,left: 15,right: 15),
           color:AppColors.BLACK,
-          text: '\u20B9 49',
+          text: '\u20B9 ${OrderViewModel.totalPrice}',
           alignment: Alignment.centerLeft,
           fontfamily: AppFont.FONT,
           fontWeight: FontWeight.w500,
@@ -249,7 +258,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                 radius: 5,
                 height: 50,
                 width: 50,
-                url: 'https://waterforfuture.org/wp-content/uploads/2019/11/ways-conserve-water-1068x713-1024x684.jpg',
+                url: OrderViewModel.serviceIcon,
               ),
               Expanded(
                   child: Column(
@@ -327,16 +336,16 @@ class _ServiceSummaryState extends State<ServiceSummary> {
   void openCheckout() async {
     var options = {
       "key": "rzp_test_1DP5mmOlF5G5ag",
-      "amount": "${OrderViewModel.totalPrice}",
+      "amount": "${OrderViewModel.totalPrice*100}",
       "currency": "INR",
-      "name": "Acme Cor",
+      "name": "INSES",
       "description": "${OrderViewModel.service}",
       "image": "https://inses.in/wp-content/uploads/2021/03/inses-logo.png",
       // "handler": (response) {},
       "prefill": {
-        "name": "Gaurav Kumar",
-        "email": "gaurav.kumar@example.com",
-        "contact": "${887939839}"
+        "name": "${ProfileViewModel.name}",
+        // "email": "gaurav.kumar@example.com",
+        "contact": "${ProfileViewModel.phone}"
       },
       'external': {
         'wallets': ['paytm']
@@ -361,7 +370,8 @@ class _ServiceSummaryState extends State<ServiceSummary> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    bloc.add(UpdatePaymentStatus());
+    print(response.paymentId);
+    bloc.add(UpdatePaymentStatus(orderId:OrderViewModel.orderId,paymentId: response.paymentId,method: 'CARD'));
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -443,7 +453,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                     radius: 4,
                     child: Content(
                       color:AppColors.BLACK,
-                      text: 'LATER',
+                      text: 'ON TIME CASH',
                       fontfamily: AppFont.FONT,
                       fontWeight: FontWeight.w500,
                       fontSize: AppDimen.TEXT_SMALL,
@@ -546,7 +556,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                 margin: EdgeInsets.only(left: 10),
                 text: 'Payment Failed!',
                 color: AppColors.BLACK,
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.center,
                 fontfamily: AppFont.FONT,
                 fontSize: AppDimen.TEXT_H7,
                 fontWeight: FontWeight.w500,
@@ -559,10 +569,10 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                 height: 20,
               ),
               Content(
-                margin: EdgeInsets.only(left: 10),
+                margin: EdgeInsets.only(left: 10,top: 10,bottom: 10),
                 text: 'Try again later!',
                 color: AppColors.BLACK,
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.center,
                 fontfamily: AppFont.FONT,
                 fontSize: AppDimen.TEXT_SMALL,
                 fontWeight: FontWeight.w500,

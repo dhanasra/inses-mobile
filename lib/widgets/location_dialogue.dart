@@ -12,10 +12,12 @@ class LocationDialogue extends StatelessWidget {
   final String description;
   final String text;
   final VoidCallback onPressed;
+  final Icon icon;
 
   LocationDialogue({
     this.text,
     this.title,
+    this.icon,
     this.description,
     this.onPressed
 });
@@ -134,7 +136,7 @@ class LocationDialogue extends StatelessWidget {
               radius: 40,
               bgColor: AppColors.WHITE,
               padding: EdgeInsets.all(5),
-              child: Icon(Icons.location_on,color: AppColors.PRIMARY_COLOR,),
+              child: icon??Icon(Icons.location_on,color: AppColors.PRIMARY_COLOR,),
             )
           )
         )

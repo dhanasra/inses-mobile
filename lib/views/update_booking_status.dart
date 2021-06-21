@@ -1,46 +1,110 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/line.dart';
+import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/database/constants.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
-import 'package:inses_app/widgets/mini_title.dart';
-import 'package:inses_app/widgets/service_sub_item.dart';
+import 'package:inses_app/widgets/error_item.dart';
+import 'package:inses_app/widgets/loader.dart';
 
-class BookingDesc extends StatefulWidget {
+class UpdateBookingStatus extends StatefulWidget {
 
   @override
-  _BookingDescState createState() => _BookingDescState();
+  _UpdateBookingStatusState createState() => _UpdateBookingStatusState();
 }
 
-class _BookingDescState extends State<BookingDesc> {
+class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
+  NetworkBloc bloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
   void initState() {
+    bloc = NetworkBloc(appRepository: appRepository);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       appBar: App().appBarBack(
         context,
         OrderViewModel.booking.categoryName,
       ),
       body: Container(
-        child: buildView(),
+        padding: EdgeInsets.only(bottom: 50),
+        child: BlocBuilder<NetworkBloc,NetworkState>(
+          bloc: bloc,
+          builder: (context,state){
+            if(state is Empty || state is Loading){
+              return buildView(OrderViewModel.load1,OrderViewModel.load2);
+            }else if(state is Error){
+              return ErrorItem();
+            }else if(state is Initial || state is Approved || state is Completed){
+              if(state is Approved){
+                Future.delayed(Duration.zero, () async {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Wrap(
+                            children: [
+                              Content(
+                                padding: EdgeInsets.only(top: 5,bottom: 5),
+                                text: 'Order is approved successfully',
+                                fontSize: AppDimen.TEXT_SMALL,
+                                fontWeight: FontWeight.w400,
+                                fontfamily: AppFont.FONT,
+                              ),
+                            ],
+                          )
+                      )
+                  );
+                });
+              }
+              if(state is Completed){
+                Future.delayed(Duration.zero, () async {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Wrap(
+                            children: [
+                              Content(
+                                padding: EdgeInsets.only(top: 5,bottom: 5),
+                                text: 'Order is completed successfully',
+                                fontSize: AppDimen.TEXT_SMALL,
+                                fontWeight: FontWeight.w400,
+                                fontfamily: AppFont.FONT,
+                              ),
+                            ],
+                          )
+                      )
+                  );
+                });
+              }
+              OrderViewModel.load1 = false;
+              OrderViewModel.load2 = false;
+              return buildView(false,false);
+            }else{
+              return Container();
+            }
+          },
+        )
       ),
     );
   }
 
-  Widget buildView(){
-    print("here");
+  Widget buildView(bool isLoading1,bool isLoading2){
     return ListView(
       children: [
         Stack(
@@ -281,22 +345,99 @@ class _BookingDescState extends State<BookingDesc> {
                         textHeight: 1.5,
                       ),
                       Visibility(
-                        visible: false,
-                          child: BorderContainer(
-                              radius: 4,
-                              margin: EdgeInsets.only(top: 30),
-                              padding: EdgeInsets.only(left: 5,right: 5,top: 15,bottom: 15),
-                              bgColor: AppColors.SECONDARY_COLOR,
-                              child: Content(
-                                text: 'REVIEW',
+                        visible: OrderViewModel.booking.status=='PENDING',
+                        child: BorderContainer(
+                            radius: 4,
+                            margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                            padding: EdgeInsets.only(top: 5,bottom: 5),
+                            bgColor: AppColors.SECONDARY_COLOR,
+                            child: OnTapField(
+                              child: isLoading1
+                                  ?Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Loader(margin: EdgeInsets.all(0),)
+                                ],
+                              )
+                                  :Content(
+                                padding: EdgeInsets.only(top: 10,bottom: 10),
+                                text: 'APPROVE ORDER',
                                 color: AppColors.WHITE,
                                 fontfamily: AppFont.FONT,
                                 fontSize: AppDimen.TEXT_SMALL,
                                 fontWeight: FontWeight.w400,
+                              ),
+                              onTap: (){
+                                OrderViewModel.load1 = true;
+                                  bloc.add(ApproveOrder(categoryId: OrderViewModel.booking.id));
+                              },
+                            )
+                        )
+                      ),
+                      Visibility(
+                        visible: OrderViewModel.booking.status=='APPROVED',
+                        child: BorderContainer(
+                            radius: 4,
+                            margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                            padding: EdgeInsets.only(top: 5,bottom: 5),
+                            bgColor: AppColors.SECONDARY_COLOR,
+                            child: OnTapField(
+                              child: isLoading1
+                                  ?Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Loader(margin: EdgeInsets.all(0),)
+                                ],
+                              )
+                                  :Content(
+                                padding: EdgeInsets.only(top: 10,bottom: 10),
+                                text: 'ORDER COMPLETED',
+                                color: AppColors.WHITE,
+                                fontfamily: AppFont.FONT,
+                                fontSize: AppDimen.TEXT_SMALL,
+                                fontWeight: FontWeight.w400,
+                              ),
+                              onTap: (){
+                                OrderViewModel.load1 = true;
+                                 bloc.add(CompleteOrder(categoryId: OrderViewModel.booking.id));
+                              },
+                            )
+                        )
+                      ),
+                      Visibility(
+                          visible: OrderViewModel.booking.payStatus=='PENDING',
+                          child:
+                          BorderContainer(
+                              radius: 4,
+                              margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              bgColor: AppColors.SECONDARY_COLOR,
+                              child: OnTapField(
+                                child: isLoading2
+                                    ?Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Loader(margin: EdgeInsets.all(0),)
+                                  ],
+                                )
+                                    :Content(
+                                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                                  text: 'UPDATE',
+                                  color: AppColors.WHITE,
+                                  fontfamily: AppFont.FONT,
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                onTap: (){
+                                  OrderViewModel.load2 = true;
+                                  bloc.add(UpdatePaymentStatus(orderId:OrderViewModel.orderId,paymentId: '',method: 'CASH'));
+                                },
                               )
                           )
                       )
-
                     ],
                   )
               ),

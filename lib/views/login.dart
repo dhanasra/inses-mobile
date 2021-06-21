@@ -1,11 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
+import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/primary_button.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -28,24 +36,59 @@ class _LoginState extends State<Login> {
 
   RegisterViewModel _viewmodel;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  NetworkBloc bloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
 
   @override
   void initState() {
     _viewmodel = RegisterViewModel(App());
+    bloc = NetworkBloc(appRepository: appRepository);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-          color: AppColors.WHITE,
-          child:  Form(
-            key: _formKey,
-            child: buildView(),
-          )
-      ),
+      body:BlocBuilder<NetworkBloc,NetworkState>(
+        bloc: bloc,
+        builder: (context,state){
+          if(state is LoginSuccess){
+            print("success");
+            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+          }else if(state is LoginError){
+            print("error");
+            if(state.error==""){
+
+            }else{
+              Future.delayed(Duration.zero, () async {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Wrap(
+                          children: [
+                            Content(
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              text: state.error,
+                              fontSize: AppDimen.TEXT_SMALL,
+                              fontWeight: FontWeight.w400,
+                              fontfamily: AppFont.FONT,
+                            ),
+                          ],
+                        )
+                    )
+                );
+              });
+            }
+          }
+          return Container(
+              color: AppColors.WHITE,
+              child:  Form(
+                key: _formKey,
+                child: buildView(),
+              )
+          );
+        },
+      )
     );
   }
 
@@ -69,14 +112,15 @@ class _LoginState extends State<Login> {
         InputItem(
           focusNode: _viewmodel.phoneFocus,
           controller: _viewmodel.phoneController,
-          autoFocus: true,
           prefixIcon: Icon(Icons.phone),
-          margin: EdgeInsets.only(top: 30,left: 20,right: 20),
+          autoFocus: true,
+          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
           text: 'Phone number',
           emptyError: 'Phone number should not be empty',
           lengthError: 'Enter a valid phone number',
-          patternError: 'Enter a valid email id',
+          patternError: 'Enter a valid phone number',
           minLength: 10,
+          maxLength: 10,
           inputType: TextInputType.phone,
           isObscurred: false,
           regExp:(RegExp(r'[0-9]')),
@@ -89,10 +133,9 @@ class _LoginState extends State<Login> {
           margin: EdgeInsets.only(top: 20,left: 20,right: 20),
           text: 'Password',
           emptyError: 'Password should not be empty',
-          lengthError: 'Password length should greater than 8',
-          minLength: 8,
+          lengthError: 'Password length should greater than 5',
+          minLength: 6,
           isObscurred: true,
-          regExp:(RegExp(r'[0-9]')),
         ),
         Container(
             margin: EdgeInsets.only(top: 70,left: 20,right: 20),
@@ -109,7 +152,12 @@ class _LoginState extends State<Login> {
                       radius: 5,
                       onPressed:(){
                         if(_formKey.currentState.validate()) {
-                          App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+                          bloc.add(
+                              LoginUser(
+                                  phone: _viewmodel.phoneController.text,
+                                  password: _viewmodel.passwordController.text
+                              )
+                          );
                         }
                       }),
                 ]

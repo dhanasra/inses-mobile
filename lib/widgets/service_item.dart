@@ -6,6 +6,7 @@ import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
@@ -13,9 +14,10 @@ import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 
 class ServiceItem extends StatelessWidget {
-  final ServiceModel serviceModel;
+  final CategoryModel serviceModel;
+  final VoidCallback onPressed;
 
-  ServiceItem({this.serviceModel});
+  ServiceItem({this.serviceModel,this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,7 @@ class ServiceItem extends StatelessWidget {
                   height: 50,
                   child: ImageView(
                     width: 50,
-                    url: serviceModel.img,
+                    url: serviceModel.image,
                   ),
                 ),
                 Content(
@@ -50,7 +52,8 @@ class ServiceItem extends StatelessWidget {
             ),
           ),
         ),
-        onTap: (){
+        onTap: onPressed??(){
+          OrderViewModel.categoryId = serviceModel.id;
           OrderViewModel.category = serviceModel.name;
           App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_1);
         }

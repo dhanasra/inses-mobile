@@ -1,13 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:inses_app/views/about.dart';
+import 'package:inses_app/views/add_category.dart';
+import 'package:inses_app/views/add_offer.dart';
+import 'package:inses_app/views/add_service.dart';
 import 'package:inses_app/views/address_select.dart';
 import 'package:inses_app/views/booking_desc.dart';
 import 'package:inses_app/views/bookings.dart';
 import 'package:inses_app/views/contact.dart';
 import 'package:inses_app/views/date_time_select.dart';
+import 'package:inses_app/views/ed_category.dart';
+import 'package:inses_app/views/ed_offer.dart';
+import 'package:inses_app/views/ed_service.dart';
 import 'package:inses_app/views/home_main.dart';
+import 'package:inses_app/views/items.dart';
+import 'package:inses_app/views/launch.dart';
 import 'package:inses_app/views/login.dart';
 import 'package:inses_app/views/name_fields.dart';
+import 'package:inses_app/views/password_settings.dart';
 import 'package:inses_app/views/payment_history.dart';
 import 'package:inses_app/views/profile.dart';
 import 'package:inses_app/views/register.dart';
@@ -15,6 +24,7 @@ import 'package:inses_app/views/service_add_cart.dart';
 import 'package:inses_app/views/service_select.dart';
 import 'package:inses_app/views/service_summary.dart';
 import 'package:inses_app/views/settings.dart';
+import 'package:inses_app/views/update_booking_status.dart';
 
 class AppRoutes {
   //Authentication pages
@@ -25,6 +35,7 @@ class AppRoutes {
   static const String APP_LOGIN = '/login';
   static const String APP_AUTH_LOAD = '/auth_load';
   static const String APP_SPLASH_LOAD = '/splash_load';
+  static const String APP_LAUNCH = '/launch';
 
 
   static const String APP_HOME_MAIN = '/home_main';
@@ -35,6 +46,7 @@ class AppRoutes {
 
   static const String APP_PROFILE = '/profile';
   static const String APP_SETTINGS = '/settings';
+  static const String APP_PASSWORD_SETTINGS = '/password_settings';
   static const String APP_CONTACT = '/contact';
   static const String APP_ABOUT = '/about';
   static const String APP_PAYMENT_HISTORY = '/payment_history';
@@ -45,8 +57,94 @@ class AppRoutes {
   static const String APP_ORDER_FLOW_4 = '/order_flow_4';
   static const String APP_ORDER_FLOW_5 = '/order_flow_5';
 
+  // admin
+
+  static const String APP_SERVICE_LIST = '/service_list';
+
+  static const String APP_ADD_SERVICE = '/add_service';
+  static const String APP_ADD_CATEGORY = '/add_category';
+  static const String APP_ADD_OFFER = '/add_offer';
+
+  static const String APP_ED_SERVICE = '/ed_service';
+  static const String APP_ED_CATEGORY = '/ed_category';
+  static const String APP_ED_OFFER = '/ed_offer';
+
+  static const String APP_UPDATE_BOOKING_STATUS = '/update_booking_status';
+
   Route getRoutes(RouteSettings routeSettings) {
     switch (routeSettings.name) {
+      case APP_LAUNCH:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => Launch(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_UPDATE_BOOKING_STATUS:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => UpdateBookingStatus(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_SERVICE_LIST:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => Items(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ADD_CATEGORY:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => AddCategory(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ADD_OFFER:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => AddOffer(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ADD_SERVICE:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => AddService(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ED_CATEGORY:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => EdCategory(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ED_OFFER:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => EdOffer(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ED_SERVICE:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => EdService(),
+            fullscreenDialog: true,
+          );
+        }
       case APP_PAYMENT_HISTORY:
         {
           return CupertinoPageRoute<void>(
@@ -68,6 +166,14 @@ class AppRoutes {
           return CupertinoPageRoute<void>(
             settings: routeSettings,
             builder: (BuildContext context) => About(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_PASSWORD_SETTINGS:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => PasswordSettings(),
             fullscreenDialog: true,
           );
         }
@@ -196,6 +302,42 @@ class AppRoutes {
 
   getWidget(BuildContext context, String appRouteName) {
     switch (appRouteName) {
+      case APP_LAUNCH:
+        {
+          return Launch();
+        }
+      case APP_UPDATE_BOOKING_STATUS:
+        {
+          return UpdateBookingStatus();
+        }
+      case APP_SERVICE_LIST:
+        {
+          return Items();
+        }
+      case APP_ADD_CATEGORY:
+        {
+          return AddCategory();
+        }
+      case APP_ADD_OFFER:
+        {
+          return AddOffer();
+        }
+      case APP_ADD_SERVICE:
+        {
+          return AddService();
+        }
+      case APP_ED_CATEGORY:
+        {
+          return EdCategory();
+        }
+      case APP_ED_OFFER:
+        {
+          return EdOffer();
+        }
+      case APP_ED_SERVICE:
+        {
+          return EdService();
+        }
       case APP_PAYMENT_HISTORY:
         {
           return PaymentHistory();
@@ -211,6 +353,10 @@ class AppRoutes {
       case APP_SETTINGS:
         {
           return Settings();
+        }
+      case APP_PASSWORD_SETTINGS:
+        {
+          return PasswordSettings();
         }
       case APP_PROFILE:
         {

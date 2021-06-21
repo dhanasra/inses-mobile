@@ -44,7 +44,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
     super.initState();
     viewModel = OrderViewModel(App());
     bloc = NetworkBloc(appRepository: appRepository);
-    bloc.add(GetServices());
+    bloc.add(GetCategoryServices(id: OrderViewModel.categoryId));
   }
 
   @override

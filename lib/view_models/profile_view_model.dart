@@ -7,6 +7,10 @@ class ProfileViewModel {
   static ProfileViewModel _instance;
   var messageController;
   FocusNode messageFocus;
+  var nameController;
+  FocusNode nameFocus;
+  var passwordController;
+  FocusNode passwordFocus;
   var phoneController;
   FocusNode phoneFocus;
 
@@ -23,10 +27,26 @@ class ProfileViewModel {
   }
 
   void _init() {
+    nameFocus = FocusNode();
+    nameController = TextEditingController(text: "");
+    passwordFocus = FocusNode();
+    passwordController = TextEditingController(text: "");
     messageFocus = FocusNode();
     messageController = TextEditingController(text: "");
     phoneFocus = FocusNode();
     phoneController = TextEditingController(text: "");
+
+    passwordController.addListener(() {
+      String password = passwordController.text.toString();
+      if (password.isNotEmpty && (password[0] == " " || password[0] == "."))
+        passwordController.text = "";
+    });
+
+    nameController.addListener(() {
+      String password = nameController.text.toString();
+      if (password.isNotEmpty && (password[0] == " " || password[0] == "."))
+        nameController.text = "";
+    });
 
     messageController.addListener(() {
       String password = messageController.text.toString();

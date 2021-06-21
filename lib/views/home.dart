@@ -1,18 +1,34 @@
-import 'dart:developer';
 
+
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/database/app_preferences.dart';
 import 'package:inses_app/model/service.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/utils/url.dart';
+import 'package:inses_app/view_models/home_view_model.dart';
 import 'package:inses_app/widgets/app_drawer.dart';
+import 'package:inses_app/widgets/loader.dart';
+import 'package:inses_app/widgets/location_dialogue.dart';
 import 'package:inses_app/widgets/promise_item.dart';
 import 'package:inses_app/widgets/review_scroll_card.dart';
 import 'package:inses_app/widgets/scroll_card.dart';
@@ -28,44 +44,27 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List<ServiceModel> services;
+  NetworkBloc bloc;
+  NetworkBloc bloc1;
+  NetworkBloc categoryBloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   void initState() {
-    services = [
-      ServiceModel(
-          name: 'Electrical',
-          img: 'https://inses.in/wp-content/uploads/2021/03/electrical.png'),
-      ServiceModel(
-          name: 'Installation',
-          img:
-              'https://inses.in/wp-content/uploads/2021/03/solar-installation.png'),
-      ServiceModel(
-          name: 'New Connection',
-          img:
-              'https://inses.in/wp-content/uploads/2021/03/new-connection.png'),
-      ServiceModel(
-          name: 'Painting',
-          img: 'https://inses.in/wp-content/uploads/2021/03/new-painting.png'),
-      ServiceModel(
-          name: 'Plumbing',
-          img: 'https://inses.in/wp-content/uploads/2021/03/tap.png'),
-      ServiceModel(
-          name: 'LED Tv',
-          img: 'https://inses.in/wp-content/uploads/2021/03/led-tv.png'),
-      ServiceModel(
-          name: 'Maintenance',
-          img: 'https://inses.in/wp-content/uploads/2021/03/maintenance.png'),
-    ];
     super.initState();
+    bloc = NetworkBloc(appRepository: appRepository);
+    bloc1 = NetworkBloc(appRepository: appRepository);
+    bloc1.add(GetOffers());
+    categoryBloc = NetworkBloc(appRepository: appRepository);
+    categoryBloc.add(GetCategories());
   }
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: AppDrawer(),
+      drawer: AppDrawer(logout),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: Container(
@@ -120,9 +119,21 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: Container(
-        child: buildView(),
-      ),
+      body: BlocBuilder<NetworkBloc,NetworkState>(
+        bloc: bloc,
+        builder: (context,state){
+          if(state is LogoutSuccess){
+            print("success");
+            App().setNavigation(context, AppRoutes.APP_LAUNCH);
+          }
+          return Container(
+              color: AppColors.WHITE,
+              child: Container(
+                child: buildView(),
+              ),
+          );
+        },
+      )
     );
   }
 
@@ -211,7 +222,26 @@ class _HomeState extends State<Home> {
           ),
         ),
         // SearchInputField(),
-        ScrollCard(),
+        BlocBuilder<NetworkBloc,NetworkState>(
+          bloc: bloc1,
+          builder: (context,state){
+            if(state is GotOffers){
+              return ScrollCard(offers: state.offers);
+            }else if(state is Loading){
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Loader(),
+                    margin: EdgeInsets.all(20),
+                  )
+                ],
+              );
+            }else{
+              return Container();
+            }
+          },
+        ),
         Line(
           width: double.infinity,
           height: 10,
@@ -230,21 +260,41 @@ class _HomeState extends State<Home> {
                 AppColors.WHITE,
               ], radius: 0.85, focal: Alignment.center),
             ),
-            child: GridView.builder(
-              shrinkWrap: true,
-              itemCount: services.length,
-              physics: NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 0.0,
-                mainAxisSpacing: 0.0,
-              ),
-              itemBuilder: (context, index) {
-                return ServiceItem(
-                  serviceModel: services[index],
-                );
+            child: BlocBuilder<NetworkBloc,NetworkState>(
+              bloc: categoryBloc,
+              builder: (context,state){
+                if(state is Loading){
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        child: Loader(),
+                        margin: EdgeInsets.all(20),
+                      )
+                    ],
+                  );
+                }else if(state is GotCategories){
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    itemCount: state.categories.length,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 0.0,
+                      mainAxisSpacing: 0.0,
+                    ),
+                    itemBuilder: (context, index) {
+                      return ServiceItem( 
+                        serviceModel: state.categories[index],
+                      );
+                    },
+                  );
+                }else{
+                  return Container();
+                }
               },
-            )),
+            )
+        ),
         Line(
           width: double.infinity,
           height: 10,
@@ -295,4 +345,29 @@ class _HomeState extends State<Home> {
       ],
     );
   }
+
+  void logout(){
+    Future.delayed(Duration.zero, () {
+      this.showDialogue();
+    });
+  }
+
+  showDialogue(){
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context){
+          return LocationDialogue(
+              title: "Logout",
+              description: "Are you want to logout ?",
+              text: "Yes",
+              onPressed:(){
+                bloc.add(Logout());
+                Navigator.of(context).pop();
+              }
+          );
+        }
+    );
+  }
+
 }
