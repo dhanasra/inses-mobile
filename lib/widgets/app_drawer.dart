@@ -1,4 +1,5 @@
 
+import 'package:inses_app/utils/url.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ class _AppDrawerState extends State<AppDrawer> {
             leading: Icon(Icons.share),
             title: Text('Invite Friends'),
             onTap: () {
-              Share.share('Hello, friend! ${ProfileViewModel.name} invites you to INSES Home service - instance booking app \n https://play.google.com/store/apps/details?id=com.dog',subject: '');
+              Share.share('Hello, friend! ${ProfileViewModel.name} invites you to INSES Home service - instance booking app \n ${AppUrl.APP_URL}',subject: '');
             },
           ),
           ListTile(

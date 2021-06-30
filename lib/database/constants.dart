@@ -15,6 +15,7 @@ class AppConstants {
   static const LOGGED_IN_ADMIN = 'LOGGED_IN_ADMIN';
   static const LOGGED_OUT = 'LOGGED_OUT';
 
+  static String INTERNET = 'OK';
 
   static const INSES_NUMBER ='+91 0452-4267198';
 }

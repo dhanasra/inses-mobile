@@ -9,6 +9,7 @@ import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -67,17 +68,31 @@ class App extends StatelessWidget {
 
   Future<dynamic> setNavigation(
       BuildContext context, String appRouteName) async {
-    Future.delayed(const Duration(milliseconds: 100), () async {
-      final info = await Navigator.push(
-          context,
-          PageTransition(
-              child: getAppRoutes().getWidget(context, appRouteName),
-              type: PageTransitionType.fade,
-              settings: RouteSettings(name: appRouteName),
-              duration: Duration(milliseconds: 0)));
+    if(AppConstants.INTERNET=='OK'){
+      Future.delayed(const Duration(milliseconds: 100), () async {
+        final info = await Navigator.push(
+            context,
+            PageTransition(
+                child: getAppRoutes().getWidget(context, appRouteName),
+                type: PageTransitionType.fade,
+                settings: RouteSettings(name: appRouteName),
+                duration: Duration(milliseconds: 0)));
 
-      return info;
-    });
+        return info;
+      });
+    }else{
+      Future.delayed(const Duration(milliseconds: 100), () async {
+        final info = await Navigator.push(
+            context,
+            PageTransition(
+                child: getAppRoutes().getWidget(context, AppRoutes.APP_NO_INTERNET),
+                type: PageTransitionType.fade,
+                settings: RouteSettings(name: AppRoutes.APP_NO_INTERNET),
+                duration: Duration(milliseconds: 0)));
+
+        return info;
+      });
+    }
   }
 
   Future<bool> locationPermission() async{

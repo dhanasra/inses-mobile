@@ -19,6 +19,7 @@ import 'package:inses_app/views/items.dart';
 import 'package:inses_app/views/launch.dart';
 import 'package:inses_app/views/login.dart';
 import 'package:inses_app/views/name_fields.dart';
+import 'package:inses_app/views/no_internet.dart';
 import 'package:inses_app/views/password_settings.dart';
 import 'package:inses_app/views/payment_history.dart';
 import 'package:inses_app/views/profile.dart';
@@ -63,6 +64,8 @@ class AppRoutes {
 
   static const String APP_ADD_REVIEW = '/add_review';
 
+  static const String APP_NO_INTERNET = '/no_internet';
+
   // admin
 
   static const String APP_SERVICE_LIST = '/service_list';
@@ -82,6 +85,14 @@ class AppRoutes {
 
   Route getRoutes(RouteSettings routeSettings) {
     switch (routeSettings.name) {
+      case APP_NO_INTERNET:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => NoInternet(),
+            fullscreenDialog: true,
+          );
+        }
       case APP_SELECT_CATEGORY:
         {
           return CupertinoPageRoute<void>(
@@ -335,6 +346,10 @@ class AppRoutes {
 
   getWidget(BuildContext context, String appRouteName) {
     switch (appRouteName) {
+      case APP_NO_INTERNET:
+        {
+          return NoInternet();
+        }
       case APP_SELECT_CATEGORY:
         {
           return SelectCategory();

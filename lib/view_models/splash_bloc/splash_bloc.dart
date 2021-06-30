@@ -1,7 +1,9 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
+import 'package:inses_app/app/app.dart';
 import 'package:inses_app/database/app_preferences.dart';
 import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/network/app_api_client.dart';
@@ -21,6 +23,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     RemoteConfig remoteConfig = RemoteConfig.instance;
     remoteConfig.setDefaults(<String, dynamic>{
       'endpoint': AppUrl.BASE_URL,
+      'appurl':AppUrl.APP_URL
     });
 
     await remoteConfig.setConfigSettings(RemoteConfigSettings(
@@ -31,6 +34,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     bool updated = await remoteConfig.fetchAndActivate();
     if (updated) {
       AppUrl.BASE_URL = remoteConfig.getString('endpoint');
+      AppUrl.APP_URL = remoteConfig.getString('appurl');
     }
 
     print(AppUrl.BASE_URL);
