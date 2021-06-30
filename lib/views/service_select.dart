@@ -7,6 +7,7 @@ import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/line.dart';
+import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/app_api_client.dart';
@@ -26,6 +27,7 @@ import 'package:inses_app/widgets/promise_item.dart';
 import 'package:inses_app/widgets/review_scroll_card.dart';
 import 'package:inses_app/widgets/service_sub_item.dart';
 import 'package:inses_app/widgets/sub.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ServiceSelect extends StatefulWidget {
 
@@ -38,6 +40,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
   NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   OrderViewModel viewModel;
+  NetworkBloc reviewBloc;
 
   @override
   void initState() {
@@ -45,6 +48,8 @@ class _ServiceSelectState extends State<ServiceSelect> {
     viewModel = OrderViewModel(App());
     bloc = NetworkBloc(appRepository: appRepository);
     bloc.add(GetCategoryServices(id: OrderViewModel.categoryId));
+    reviewBloc = NetworkBloc(appRepository: appRepository);
+    reviewBloc.add(GetReview());
   }
 
   @override
@@ -136,32 +141,37 @@ class _ServiceSelectState extends State<ServiceSelect> {
                           Expanded(
                               child: Container(
                                 alignment: Alignment.centerRight,
-                                child: BorderContainer(
-                                  radius: 20,
-                                  padding:
-                                  EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                                  borderColor: AppColors.WHITE,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.phone,
-                                        size: 18,
-                                        color: AppColors.WHITE,
-                                      ),
-                                      Content(
-                                        padding: EdgeInsets.only(left: 10),
-                                        alignment: Alignment.centerRight,
-                                        text: AppConstants.INSES_NUMBER,
-                                        fontfamily: AppFont.FONT,
-                                        color: AppColors.WHITE,
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: AppDimen.TEXT_SMALLEST,
-                                      )
-                                    ],
+                                child: OnTapField(
+                                  child: BorderContainer(
+                                    radius: 20,
+                                    padding:
+                                    EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                                    borderColor: AppColors.WHITE,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.phone,
+                                          size: 18,
+                                          color: AppColors.WHITE,
+                                        ),
+                                        Content(
+                                          padding: EdgeInsets.only(left: 10),
+                                          alignment: Alignment.centerRight,
+                                          text: AppConstants.INSES_NUMBER,
+                                          fontfamily: AppFont.FONT,
+                                          color: AppColors.WHITE,
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: AppDimen.TEXT_SMALLEST,
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
+                                  onTap: (){
+                                    launch("tel://${AppConstants.INSES_NUMBER}");
+                                  },
+                                )
                               ))
                         ],
                       ),
@@ -319,7 +329,26 @@ class _ServiceSelectState extends State<ServiceSelect> {
         Sub(
           text: 'Customer stories',
         ),
-        ReviewScrollCard()
+        BlocBuilder<NetworkBloc,NetworkState>(
+          bloc: reviewBloc,
+          builder: (context,state){
+            if(state is GotReviews){
+              return ReviewScrollCard(reviews: state.reviews,);
+            }else if(state is Loading){
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Loader(),
+                    margin: EdgeInsets.all(20),
+                  )
+                ],
+              );
+            }else{
+              return Container();
+            }
+          },
+        ),
       ],
     );
   }

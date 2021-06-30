@@ -1,3 +1,6 @@
+
+import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,49 +44,56 @@ class _SettingsState extends State<Settings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: App().appBarBack(
-        context,
-        'Settings',
-      ),
-      body: Form(
-          key: _formKey,
-          child:BlocBuilder<NetworkBloc,NetworkState>(
-            bloc: bloc,
-            builder: (context,state){
-              if(state is Empty || state is Loading){
-                return buildView(true);
-              }else if(state is Error){
-                return ErrorItem();
-              }else if(state is Initial || state is Success){
-                if(state is Success){
-
-                  Future.delayed(Duration.zero, () async {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                            content: Wrap(
-                              children: [
-                                Content(
-                                  padding: EdgeInsets.only(top: 5,bottom: 5),
-                                  text: 'Profile is updated successfully',
-                                  fontSize: AppDimen.TEXT_SMALL,
-                                  fontWeight: FontWeight.w400,
-                                  fontfamily: AppFont.FONT,
-                                ),
-                              ],
-                            )
-                        )
-                    );
-                  });
-                }
-                viewModel.phoneController.text = '';
-                return buildView(false);
-              }else{
-                return Container();
-              }
-            },
-          )
-      )
+    return WillPopScope(
+        child: Scaffold(
+            appBar: App().appBarBack(
+              context,
+              'Settings',
+            ),
+            body: Form(
+                key: _formKey,
+                child:BlocBuilder<NetworkBloc,NetworkState>(
+                  bloc: bloc,
+                  builder: (context,state){
+                    if(state is Empty || state is Loading){
+                      return buildView(true);
+                    }else if(state is Error){
+                      return ErrorItem();
+                    }else if(state is Initial || state is Success){
+                      if(state is Success){
+                        ProfileViewModel.name = viewModel.nameController.text;
+                        ProfileViewModel.phone = viewModel.phoneController.text;
+                        Future.delayed(Duration.zero, () async {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Wrap(
+                                    children: [
+                                      Content(
+                                        padding: EdgeInsets.only(top: 5,bottom: 5),
+                                        text: 'Profile is updated successfully',
+                                        fontSize: AppDimen.TEXT_SMALL,
+                                        fontWeight: FontWeight.w400,
+                                        fontfamily: AppFont.FONT,
+                                      ),
+                                    ],
+                                  )
+                              )
+                          );
+                        });
+                      }
+                      viewModel.phoneController.text = '';
+                      return buildView(false);
+                    }else{
+                      return Container();
+                    }
+                  },
+                )
+            )
+        ),
+        onWillPop: () async{
+          App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+          return true;
+        }
     );
   }
 

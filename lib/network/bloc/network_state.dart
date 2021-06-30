@@ -4,6 +4,7 @@ import 'package:inses_app/model/bookings.dart';
 import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/payment_history.dart';
+import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 
 abstract class NetworkState extends Equatable {
@@ -17,6 +18,7 @@ class Initial extends NetworkState {}
 
 class Loading extends NetworkState {}
 
+
 class Empty extends NetworkState {}
 
 class Error extends NetworkState {
@@ -26,6 +28,8 @@ class Error extends NetworkState {
 }
 
 class RegisterSuccess extends NetworkState {}
+
+class AdditionalRemoved extends NetworkState {}
 
 class RegisterError extends NetworkState {
   final String error;
@@ -42,6 +46,19 @@ class GotUserDetails extends NetworkState {
 
 }
 
+class GotReviews extends NetworkState {
+  final List<ReviewModel> reviews;
+
+  const GotReviews({this.reviews});
+
+}
+
+class GotBooking extends NetworkState {
+  final BookingModel booking;
+  const GotBooking({this.booking});
+
+}
+
 class Success extends NetworkState {}
 
 class LoginSuccess extends NetworkState {}
@@ -52,6 +69,8 @@ class LogoutSuccess extends NetworkState {}
 class Approved extends NetworkState {}
 
 class Completed extends NetworkState {}
+
+class Added extends NetworkState {}
 
 class LoginError extends NetworkState {
   final String error;

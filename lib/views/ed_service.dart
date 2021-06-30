@@ -60,12 +60,15 @@ class _EdServiceState extends State<EdService> {
       appBar: App().appBarBack(
         context,
         'Edit  Service',
-        child: IconButton(
+        child:SizedBox(
+          width: 45,
+          height: 45,
+          child: IconButton(
           icon: Icon(Icons.delete),
           onPressed: (){
             editBloc.add(DeleteService(serviceId: EditViewModel.service.id));
           },
-        ),
+        ),),
       ),
       body:Form(
           key: _formKey,
@@ -94,6 +97,7 @@ class _EdServiceState extends State<EdService> {
                             )
                         )
                     );
+                    App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                   });
                 }
                 return buildView(false);

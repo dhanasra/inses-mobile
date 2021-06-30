@@ -1,7 +1,10 @@
+
 import 'package:flutter/cupertino.dart';
 import 'package:inses_app/views/about.dart';
+import 'package:inses_app/views/add_additional_charge.dart';
 import 'package:inses_app/views/add_category.dart';
 import 'package:inses_app/views/add_offer.dart';
+import 'package:inses_app/views/add_review.dart';
 import 'package:inses_app/views/add_service.dart';
 import 'package:inses_app/views/address_select.dart';
 import 'package:inses_app/views/booking_desc.dart';
@@ -20,6 +23,7 @@ import 'package:inses_app/views/password_settings.dart';
 import 'package:inses_app/views/payment_history.dart';
 import 'package:inses_app/views/profile.dart';
 import 'package:inses_app/views/register.dart';
+import 'package:inses_app/views/select_category.dart';
 import 'package:inses_app/views/service_add_cart.dart';
 import 'package:inses_app/views/service_select.dart';
 import 'package:inses_app/views/service_summary.dart';
@@ -57,9 +61,12 @@ class AppRoutes {
   static const String APP_ORDER_FLOW_4 = '/order_flow_4';
   static const String APP_ORDER_FLOW_5 = '/order_flow_5';
 
+  static const String APP_ADD_REVIEW = '/add_review';
+
   // admin
 
   static const String APP_SERVICE_LIST = '/service_list';
+  static const String APP_SELECT_CATEGORY = '/select_category';
 
   static const String APP_ADD_SERVICE = '/add_service';
   static const String APP_ADD_CATEGORY = '/add_category';
@@ -69,10 +76,36 @@ class AppRoutes {
   static const String APP_ED_CATEGORY = '/ed_category';
   static const String APP_ED_OFFER = '/ed_offer';
 
+  static const String APP_ADDITIONAL_CHARGE = '/additional_charge';
+
   static const String APP_UPDATE_BOOKING_STATUS = '/update_booking_status';
 
   Route getRoutes(RouteSettings routeSettings) {
     switch (routeSettings.name) {
+      case APP_SELECT_CATEGORY:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => SelectCategory(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ADD_REVIEW:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => AddReview(),
+            fullscreenDialog: true,
+          );
+        }
+      case APP_ADDITIONAL_CHARGE:
+        {
+          return CupertinoPageRoute<void>(
+            settings: routeSettings,
+            builder: (BuildContext context) => AddAdditionalCharge(),
+            fullscreenDialog: true,
+          );
+        }
       case APP_LAUNCH:
         {
           return CupertinoPageRoute<void>(
@@ -302,6 +335,18 @@ class AppRoutes {
 
   getWidget(BuildContext context, String appRouteName) {
     switch (appRouteName) {
+      case APP_SELECT_CATEGORY:
+        {
+          return SelectCategory();
+        }
+      case APP_ADD_REVIEW:
+        {
+          return AddReview();
+        }
+      case APP_ADDITIONAL_CHARGE:
+        {
+          return AddAdditionalCharge();
+        }
       case APP_LAUNCH:
         {
           return Launch();

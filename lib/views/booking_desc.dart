@@ -1,15 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
 import 'package:inses_app/comps/line.dart';
+import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/database/constants.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
+import 'package:inses_app/widgets/error_item.dart';
+import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 import 'package:inses_app/widgets/service_sub_item.dart';
 
@@ -20,28 +31,70 @@ class BookingDesc extends StatefulWidget {
 }
 
 class _BookingDescState extends State<BookingDesc> {
+  NetworkBloc bloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+
+  String type;
+  String payType;
+  String additional;
 
   @override
   void initState() {
+    type = OrderViewModel.booking.status;
+    payType = OrderViewModel.booking.payStatus;
+    bloc = NetworkBloc(appRepository: appRepository);
+    OrderViewModel.load4 = true;
+    bloc.add(GetBookingDetails(id: OrderViewModel.booking.id));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      appBar: App().appBarBack(
-        context,
-        OrderViewModel.booking.categoryName,
-      ),
-      body: Container(
-        child: buildView(),
-      ),
+    return  WillPopScope(
+        child: Scaffold(
+          appBar: App().appBarBack(
+            context,
+            OrderViewModel.booking.categoryName,
+          ),
+          body: Container(
+              padding: EdgeInsets.only(bottom: 0),
+              child: BlocBuilder<NetworkBloc,NetworkState>(
+                bloc: bloc,
+                builder: (context,state){
+                  if(state is Empty || state is Loading){
+                    return buildView(true);
+                  }else if(state is Error){
+                    return ErrorItem();
+                  }else if(state is GotBooking ){
+                    if(state is GotBooking){
+                      OrderViewModel.booking = state.booking;
+                      type = OrderViewModel.booking.status;
+                      additional = OrderViewModel.booking.additionalPrice!=0?"ADDED":"ADD";
+                      print(additional);
+                    }
+                    return buildView(false);
+                  }else{
+                    return Container();
+                  }
+                },
+              )
+          ),
+        ),
+        onWillPop: ()async{
+          App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+          return true;
+        }
     );
   }
 
-  Widget buildView(){
+  Widget buildView(bool isLoading){
     print("here");
-    return ListView(
+    return isLoading?Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Loader()
+      ],
+    ):ListView(
       children: [
         Stack(
           children: [
@@ -271,7 +324,7 @@ class _BookingDescState extends State<BookingDesc> {
                       ),
                       Content(
                         color:AppColors.BLACK,
-                        margin: EdgeInsets.only(top: 5),
+                        margin: EdgeInsets.only(top: 5,bottom: 15),
                         text: OrderViewModel.booking.payMethod,
                         overflow: TextOverflow.ellipsis,
                         fontfamily: AppFont.FONT,
@@ -281,18 +334,90 @@ class _BookingDescState extends State<BookingDesc> {
                         textHeight: 1.5,
                       ),
                       Visibility(
-                        visible: false,
+                          visible: additional=='ADDED',
+                          child: Row(
+                            children: [
+                              Expanded(child: Content(
+                                color:AppColors.GRAY,
+                                margin: EdgeInsets.only(top: 5),
+                                text: 'Additional Price',
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLEST,
+                                alignment: Alignment.centerLeft,
+                                textHeight: 1.5,
+                              ),),
+                              Expanded(child: Content(
+                                color:AppColors.BLACK,
+                                margin: EdgeInsets.only(top: 5),
+                                text: '\u20B9 ${OrderViewModel.booking.additionalPrice}',
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLER,
+                                alignment: Alignment.centerRight,
+                                textHeight: 1.5,
+                              ),),
+                            ],
+                          )
+                      ),
+                      Visibility(
+                          visible: additional=='ADDED',
+                          child: Row(
+                            children: [
+                              Expanded(child: Content(
+                                color:AppColors.GRAY,
+                                margin: EdgeInsets.only(top: 5),
+                                text: 'Description',
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLEST,
+                                alignment: Alignment.centerLeft,
+                                textHeight: 1.5,
+                              ),),
+                              Expanded(child: Content(
+                                color:AppColors.BLACK,
+                                margin: EdgeInsets.only(top: 5),
+                                text: OrderViewModel.booking.additionalDesc,
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLER,
+                                alignment: Alignment.centerRight,
+                                textHeight: 1.5,
+                              ),),
+                            ],
+                          )
+                      ),
+                      Visibility(
+                        visible: !OrderViewModel.booking.reviewed,
                           child: BorderContainer(
                               radius: 4,
-                              margin: EdgeInsets.only(top: 30),
-                              padding: EdgeInsets.only(left: 5,right: 5,top: 15,bottom: 15),
+                              margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
                               bgColor: AppColors.SECONDARY_COLOR,
-                              child: Content(
-                                text: 'REVIEW',
-                                color: AppColors.WHITE,
-                                fontfamily: AppFont.FONT,
-                                fontSize: AppDimen.TEXT_SMALL,
-                                fontWeight: FontWeight.w400,
+                              child: OnTapField(
+                                child: isLoading
+                                    ?Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Loader(margin: EdgeInsets.all(0),)
+                                  ],
+                                )
+                                    :Content(
+                                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                                  text: 'ADD REVIEW',
+                                  color: AppColors.WHITE,
+                                  fontfamily: AppFont.FONT,
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                onTap: (){
+                                  App().setNavigation(context, AppRoutes.APP_ADD_REVIEW);
+                                },
                               )
                           )
                       )

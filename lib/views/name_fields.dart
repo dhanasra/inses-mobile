@@ -19,6 +19,7 @@ import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:inses_app/view_models/register_view_model.dart';
 import 'package:inses_app/widgets/double_color_button.dart';
 import 'package:inses_app/widgets/grey_micro.dart';
@@ -87,6 +88,7 @@ class _NameFieldsState extends State<NameFields> {
           );
         }else if(state is Initial || state is Success){
           if(state is Success){
+            ProfileViewModel.address = _viewmodel.addressController.text;
             Future.delayed(Duration.zero, () async {
               ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

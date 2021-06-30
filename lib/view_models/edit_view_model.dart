@@ -12,6 +12,7 @@ class EditViewModel{
   static int type;
 
   static String serviceImage;
+  static int rating;
   static File icon;
   static File image;
   var priceController;

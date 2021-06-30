@@ -1,7 +1,7 @@
-
-
 import 'dart:convert';
-
+import 'package:inses_app/database/constants.dart';
+import 'package:inses_app/main.dart';
+import 'package:inses_app/views/splash.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +37,7 @@ import 'package:inses_app/widgets/service_item.dart';
 import 'package:inses_app/widgets/sub.dart';
 import 'package:inses_app/widgets/sub_title.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -47,6 +48,7 @@ class _HomeState extends State<Home> {
   NetworkBloc bloc;
   NetworkBloc bloc1;
   NetworkBloc categoryBloc;
+  NetworkBloc reviewBloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
@@ -57,7 +59,9 @@ class _HomeState extends State<Home> {
     bloc1 = NetworkBloc(appRepository: appRepository);
     bloc1.add(GetOffers());
     categoryBloc = NetworkBloc(appRepository: appRepository);
+    reviewBloc = NetworkBloc(appRepository: appRepository);
     categoryBloc.add(GetCategories());
+    reviewBloc.add(GetReview());
   }
 
   @override
@@ -124,7 +128,9 @@ class _HomeState extends State<Home> {
         builder: (context,state){
           if(state is LogoutSuccess){
             print("success");
-            App().setNavigation(context, AppRoutes.APP_LAUNCH);
+            Future.delayed(Duration.zero,()async{
+              RestartWidget.restartApp(context);
+            });
           }
           return Container(
               color: AppColors.WHITE,
@@ -191,32 +197,37 @@ class _HomeState extends State<Home> {
               Expanded(
                   child: Container(
                 alignment: Alignment.centerRight,
-                child: BorderContainer(
-                  radius: 20,
-                  padding:
-                      EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                  borderColor: AppColors.GRAY,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.phone,
-                        size: 18,
-                        color: AppColors.BLACK,
-                      ),
-                      Content(
-                        padding: EdgeInsets.only(left: 10),
-                        alignment: Alignment.centerRight,
-                        text: '8056384773',
-                        fontfamily: AppFont.FONT,
-                        color: AppColors.BLACK,
-                        fontWeight: FontWeight.w400,
-                        fontSize: AppDimen.TEXT_SMALLEST,
-                      )
-                    ],
+                child: OnTapField(
+                  child:  BorderContainer(
+                    radius: 20,
+                    padding:
+                    EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+                    borderColor: AppColors.GRAY,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.phone,
+                          size: 18,
+                          color: AppColors.BLACK,
+                        ),
+                        Content(
+                          padding: EdgeInsets.only(left: 10),
+                          alignment: Alignment.centerRight,
+                          text: AppConstants.INSES_NUMBER,
+                          fontfamily: AppFont.FONT,
+                          color: AppColors.BLACK,
+                          fontWeight: FontWeight.w400,
+                          fontSize: AppDimen.TEXT_SMALLEST,
+                        )
+                      ],
+                    ),
                   ),
-                ),
+                  onTap: (){
+                    launch("tel://${AppConstants.INSES_NUMBER}");
+                  },
+                )
               ))
             ],
           ),
@@ -341,7 +352,26 @@ class _HomeState extends State<Home> {
         Sub(
           text: 'Customer stories',
         ),
-        ReviewScrollCard()
+        BlocBuilder<NetworkBloc,NetworkState>(
+          bloc: reviewBloc,
+          builder: (context,state){
+            if(state is GotReviews){
+              return ReviewScrollCard(reviews: state.reviews,);
+            }else if(state is Loading){
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: Loader(),
+                    margin: EdgeInsets.all(20),
+                  )
+                ],
+              );
+            }else{
+              return Container();
+            }
+          },
+        ),
       ],
     );
   }

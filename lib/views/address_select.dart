@@ -16,7 +16,9 @@ import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
+import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:inses_app/widgets/input_item_two.dart';
+import 'package:inses_app/widgets/location_dialogue.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 
 class AddressSelect extends StatefulWidget {
@@ -44,6 +46,7 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
     mapController = StreamController();
     addressController = StreamController();
     viewModel = OrderViewModel(App());
+    viewModel.addressController.text = ProfileViewModel.address.toString();
     super.initState();
   }
 
@@ -170,6 +173,28 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
             contentPadding: EdgeInsets.only(
                 top: 15, bottom: 15, left: 10, right: 10),
             width: 400),
+        OnTapField(child: BorderContainer(
+          bgColor: AppColors.WHITE_2,
+          margin: EdgeInsets.only(top: 20, bottom: 10,left: 15,right: 15),
+          padding: EdgeInsets.only(top: 10, bottom: 10,left: 15,right: 15),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.location_on,color: AppColors.SUCCESS_COLOR,size: 20,),
+              Flexible(
+                child: Content(
+                  margin: EdgeInsets.only(left: 10),
+                  text: 'Add Current Location',
+                  color: AppColors.BLACK_3,
+                  alignment: Alignment.centerLeft,
+                  fontfamily: AppFont.FONT,
+                  fontSize: AppDimen.TEXT_SMALLEST,
+                  fontWeight: FontWeight.w500,
+                ),
+              )
+            ],
+          ),
+        ), onTap: showDialogue),
         Line(
           width: double.infinity,
           height: 1,
@@ -204,6 +229,24 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
           ],
         ),
       )
+    );
+  }
+
+  showDialogue(){
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context){
+          return LocationDialogue(
+              title: "current location",
+              description: "Add your current location address",
+              text: "Yes",
+              onPressed:(){
+                viewModel.getPosition();
+                Navigator.of(context).pop();
+              }
+          );
+        }
     );
   }
 

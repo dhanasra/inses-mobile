@@ -30,6 +30,7 @@ class _AboutState extends State<About> {
 
   Widget buildView(){
     return WebView(
+      javascriptMode: JavascriptMode.unrestricted,
       initialUrl: 'https://inses.in/aboutus/',
       onWebViewCreated: (WebViewController webViewController) {
         _controller = webViewController;

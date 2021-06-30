@@ -48,6 +48,8 @@ class _AddServiceState extends State<AddService> {
   @override
   void initState() {
     _viewmodel = EditViewModel(App());
+    picked1 = false;
+    picked2 = false;
     editBloc = NetworkBloc(appRepository: appRepository);
     super.initState();
   }
@@ -67,7 +69,24 @@ class _AddServiceState extends State<AddService> {
                 if(state is Empty || state is Loading){
                   return buildView(true);
                 }else if(state is Error){
-                  return ErrorItem();
+                  Future.delayed(Duration.zero, () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Wrap(
+                              children: [
+                                Content(
+                                  padding: EdgeInsets.only(top: 5,bottom: 5),
+                                  text: state.error??(state.error.isNotEmpty?state.error:"Error Occured"),
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                  fontfamily: AppFont.FONT,
+                                ),
+                              ],
+                            )
+                        )
+                    );
+                  });
+                  return buildView(false);
                 }else if(state is Initial || state is Success){
                   if(state is Success){
                     Future.delayed(Duration.zero, () async {
@@ -86,6 +105,7 @@ class _AddServiceState extends State<AddService> {
                               )
                           )
                       );
+                      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                     });
                   }
                   return buildView(false);
@@ -150,10 +170,10 @@ class _AddServiceState extends State<AddService> {
                   BorderContainer(
                     margin: EdgeInsets.only(top: 20,left: 20,right: 20),
                     borderColor: AppColors.WHITE_1,
-                    child: ImageView(
+                    child: Container(
                       margin: EdgeInsets.all(20),
-                      width: 80,
-                      url: EditViewModel.service.icon,
+                      width: 120,
+                      height: 120,
                     ),
                   ),
                   OnTapField(
@@ -208,10 +228,10 @@ class _AddServiceState extends State<AddService> {
                   BorderContainer(
                     margin: EdgeInsets.only(top: 20,left: 20,right: 20),
                     borderColor: AppColors.WHITE_1,
-                    child: ImageView(
+                    child: Container(
                       margin: EdgeInsets.all(20),
-                      width: 180,
-                      url: EditViewModel.service.image,
+                      width: 220,
+                      height: 120,
                     ),
                   ),
                   OnTapField(
@@ -262,7 +282,7 @@ class _AddServiceState extends State<AddService> {
                 )
                     :Content(
                   padding: EdgeInsets.only(top: 10,bottom: 10),
-                  text: 'UPDATE',
+                  text: 'ADD',
                   color: AppColors.WHITE,
                   fontfamily: AppFont.FONT,
                   fontSize: AppDimen.TEXT_SMALL,
@@ -272,11 +292,11 @@ class _AddServiceState extends State<AddService> {
                   if(_formKey.currentState.validate()) {
                     editBloc.add(
                         AddServiceEvent(
-                            categoryId: EditViewModel.service.categoryId,
+                            categoryId: EditViewModel.category.id,
                             name: _viewmodel.nameController.text,
                             price: int.parse( _viewmodel.priceController.text),
-                            icon: EditViewModel.icon,
-                            image: EditViewModel.image
+                            icon: picked1?EditViewModel.icon:null,
+                            image: picked2?EditViewModel.image:null
                         )
                     );
                   }

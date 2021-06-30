@@ -89,19 +89,19 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   OnTapField(
-                      child: DateItem(date: '${viewModel.dateformatter.format(DateTime.now())}',day: '${viewModel.dayformatter.format(DateTime.now())}',isSelected: shot.hasData?shot.data=='today'?true:false:false,),
+                      child: DateItem(date: '${viewModel.dateformatter.format(DateTime.now().add(Duration(days: 1)))}',day: '${viewModel.dayformatter.format(DateTime.now())}',isSelected: shot.hasData?shot.data=='today'?true:false:false,),
                       onTap: (){
                         final DateFormat formatter = DateFormat('yyyy-MM-dd');
-                        final String formatted = formatter.format(DateTime.now());
+                        final String formatted = formatter.format(DateTime.now().add(Duration(days: 1)));
                         OrderViewModel.date = formatted;
                         dateController.add('today');
                       }
                   ),
                   OnTapField(
-                      child: DateItem(date: '${viewModel.dateformatter.format(DateTime.now().add(Duration(days: 1)))}',day: '${viewModel.dayformatter.format(DateTime.now().add(Duration(days: 1)))}',isSelected: shot.hasData?shot.data=='tomorrow'?true:false:false,),
+                      child: DateItem(date: '${viewModel.dateformatter.format(DateTime.now().add(Duration(days: 2)))}',day: '${viewModel.dayformatter.format(DateTime.now().add(Duration(days: 1)))}',isSelected: shot.hasData?shot.data=='tomorrow'?true:false:false,),
                       onTap: (){
                         final DateFormat formatter1 = DateFormat('yyyy-MM-dd');
-                        final String formatted1 = formatter1.format(DateTime.now().add(Duration(days: 1)));
+                        final String formatted1 = formatter1.format(DateTime.now().add(Duration(days: 2)));
                         OrderViewModel.date = formatted1;
                         dateController.add('tomorrow');
                       }

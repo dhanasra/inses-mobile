@@ -223,30 +223,30 @@ class _ServiceSummaryState extends State<ServiceSummary> {
           fontWeight: FontWeight.w500,
           fontSize: AppDimen.TEXT_SMALL,
         ),
-        Content(
-          margin: EdgeInsets.only(top: 20, bottom: 10,left: 15,right: 15),
-          color:AppColors.BLACK,
-          text: 'Convenience Charges',
-          fontfamily: AppFont.FONT,
-          alignment: Alignment.centerLeft,
-          fontWeight: FontWeight.w500,
-          fontSize: AppDimen.TEXT_SMALLEST,
-        ),
-        Content(
-          margin: EdgeInsets.only(top: 0, bottom: 10,left: 15,right: 15),
-          color:AppColors.BLACK,
-          text: '\u20B9 ${OrderViewModel.totalPrice}',
-          alignment: Alignment.centerLeft,
-          fontfamily: AppFont.FONT,
-          fontWeight: FontWeight.w500,
-          fontSize: AppDimen.TEXT_SMALL,
-        ),
-        Line(
-          width: double.infinity,
-          height: 2,
-          color: AppColors.WHITE_1,
-          margin: EdgeInsets.only(top: 20, bottom: 10),
-        ),
+        // Content(
+        //   margin: EdgeInsets.only(top: 20, bottom: 10,left: 15,right: 15),
+        //   color:AppColors.BLACK,
+        //   text: 'Convenience Charges',
+        //   fontfamily: AppFont.FONT,
+        //   alignment: Alignment.centerLeft,
+        //   fontWeight: FontWeight.w500,
+        //   fontSize: AppDimen.TEXT_SMALLEST,
+        // ),
+        // Content(
+        //   margin: EdgeInsets.only(top: 0, bottom: 10,left: 15,right: 15),
+        //   color:AppColors.BLACK,
+        //   text: '\u20B9 ${OrderViewModel.totalPrice}',
+        //   alignment: Alignment.centerLeft,
+        //   fontfamily: AppFont.FONT,
+        //   fontWeight: FontWeight.w500,
+        //   fontSize: AppDimen.TEXT_SMALL,
+        // ),
+        // Line(
+        //   width: double.infinity,
+        //   height: 2,
+        //   color: AppColors.WHITE_1,
+        //   margin: EdgeInsets.only(top: 20, bottom: 10),
+        // ),
         Container(
           margin: EdgeInsets.only(left: 15,right: 15,top: 20),
           child: Row(
@@ -335,7 +335,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
 
   void openCheckout() async {
     var options = {
-      "key": "rzp_test_1DP5mmOlF5G5ag",
+      "key": "rzp_live_PIb7s06FK67MLz",
       "amount": "${OrderViewModel.totalPrice*100}",
       "currency": "INR",
       "name": "INSES",
@@ -396,7 +396,9 @@ class _ServiceSummaryState extends State<ServiceSummary> {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return WillPopScope(
+            onWillPop: (){},
+        child:alert);
       },
     );
   }
@@ -472,7 +474,9 @@ class _ServiceSummaryState extends State<ServiceSummary> {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return WillPopScope(
+            onWillPop: (){},
+        child:alert);
       },
     );
   }
@@ -539,7 +543,9 @@ class _ServiceSummaryState extends State<ServiceSummary> {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return WillPopScope(
+            onWillPop: (){},
+        child:alert);
       },
     );
   }
@@ -564,13 +570,13 @@ class _ServiceSummaryState extends State<ServiceSummary> {
               SizedBox(
                 height: 20,
               ),
-              Icon(Icons.check_circle_outline,color: AppColors.SUCCESS_COLOR,size: 100,),
+              Icon(Icons.close,color: AppColors.WARNING_COLOR,size: 100,),
               SizedBox(
                 height: 20,
               ),
               Content(
                 margin: EdgeInsets.only(left: 10,top: 10,bottom: 10),
-                text: 'Try again later!',
+                text: 'Use On Time Case!',
                 color: AppColors.BLACK,
                 alignment: Alignment.center,
                 fontfamily: AppFont.FONT,
@@ -603,7 +609,9 @@ class _ServiceSummaryState extends State<ServiceSummary> {
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return alert;
+        return WillPopScope(
+            onWillPop: (){},
+        child:alert);
       },
     );
   }

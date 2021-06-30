@@ -4,6 +4,7 @@ import 'package:inses_app/model/bookings.dart';
 import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/payment_history.dart';
+import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/app_repository.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
@@ -142,7 +143,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is GetUserAddress) {
       yield Loading();
       try {
-        final String response = await appRepository.logout();
+        final String response = await appRepository.getUserAddress();
         if(response == "success"){
           yield LogoutSuccess();
         }else if(response == "Error"){
@@ -230,6 +231,10 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
           yield Success();
         }else if(response == "Error"){
           yield Error(error: "");
+        }else if(response == "icon error"){
+          yield Error(error: "Icon Size is Too Large");
+        }else if(response == "image error"){
+          yield Error(error: "Image Size is Too Large");
         }else{
           yield Error(error: response);
         }
@@ -387,6 +392,53 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       }
     }
 
+    if (event is AddReview) {
+      yield Loading();
+      try {
+        final String response = await appRepository.addReview(
+          event.id,event.rating,event.comment
+        );
+        if(response == "success"){
+          yield Success();
+        }else if(response == "Error"){
+          yield Error(error: "");
+        }else{
+          yield Error(error: response);
+        }
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
+    if (event is GetReview) {
+      yield Loading();
+      try {
+        final List<ReviewModel> reviews = await appRepository.getReviews();
+        yield GotReviews(reviews: reviews);
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
+    if (event is RemoveAdditionalCharge) {
+      yield Loading();
+      try {
+        final String response = await appRepository.deleteAdditional(event.id);
+        if(response == "success"){
+          yield AdditionalRemoved();
+        }else if(response == "Error"){
+          yield Error(error: "");
+        }else{
+          yield Error(error: response);
+        }
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
     if (event is GetBookings) {
       yield Loading();
       try {
@@ -445,6 +497,17 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       }
     }
 
+    if (event is GetBookingDetails) {
+      yield Loading();
+      try {
+        final BookingModel bookingModel = await appRepository.getBookingDetails(event.id);
+        yield GotBooking(booking: bookingModel);
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
     if (event is CompleteOrder) {
       yield Loading();
       try {
@@ -477,6 +540,19 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
         final String response = await appRepository.paymentStatus(event.orderId,event.paymentId,event.method);
         if(response=='success') {
           yield PaymentStatusUpdated();
+        }
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
+    if (event is AddAdditionalCharge) {
+      yield Loading();
+      try {
+        final String response = await appRepository.addAdditionalCharges(event.orderId,event.price,event.desc);
+        if(response=='success') {
+          yield Added();
         }
       } catch (e) {
         print(e);

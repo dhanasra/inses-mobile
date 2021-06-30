@@ -11,6 +11,8 @@ import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/order.dart';
 import 'package:inses_app/model/payment_history.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/utils/url.dart';
@@ -57,6 +59,8 @@ class AppApiClient {
         await AppPreferences().setPhoneNumber(phone: phone);
         await AppPreferences().setLoginStatus(status: roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN);
 
+        await updateFCMToken();
+
         return "success";
       }else if(status==422){
         String error = json['data']['errors'][0]['rule'];
@@ -74,6 +78,21 @@ class AppApiClient {
 
   }
 
+  Future<void> updateFCMToken()async{
+    String token = await FirebaseMessaging.instance.getToken(vapidKey: AppUrl.VAPID_KEY);
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('${_baseUrl}fcm-token'));
+    request.body = jsonEncode({
+      "token": token
+    });
+    print(token);
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    String responseStr = await response.stream.bytesToString();
+  }
+
   Future<String> userLogin(String phone,String password) async {
     var headers = {
       'Content-Type': 'application/json'
@@ -85,12 +104,13 @@ class AppApiClient {
       "password": password
     });
     request.headers.addAll(headers);
-
+    print(1);
     http.StreamedResponse response = await request.send();
     String responseStr = await response.stream.bytesToString();
-
+    print(1);
+    print(responseStr);
     Map<String, dynamic> json = jsonDecode(responseStr);
-
+    print(1);
     if (response.statusCode == 200) {
       int status = json['status'];
       print(status);
@@ -100,11 +120,21 @@ class AppApiClient {
 
         int roleId = json['data']['user']['role_id'];
         String name = json['data']['user']['name'];
+        String phone = json['data']['user']['phone'];
+
+        ProfileViewModel.name = name;
+        ProfileViewModel.phone = phone;
 
         await AppPreferences().setToken(token: token);
         await AppPreferences().setRefreshToken(refreshToken: rToken);
         await AppPreferences().setName(firstName: name);
         await AppPreferences().setPhoneNumber(phone: phone);
+
+        await updateFCMToken();
+
+        String address = await getUserAddress();
+        ProfileViewModel.address = address;
+
         await AppPreferences().setLoginStatus(status: roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN);
         HomeViewModel.loginStatus = roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN;
         print(roleId);
@@ -286,8 +316,15 @@ class AppApiClient {
     if (response.statusCode == 200) {
       int status =  json['status'];
       if(status==200){
-        String address = json['data']['userAddresses']['address'];
-        return address;
+        try{
+          print(1);
+          String address = json['data']['userAddresses'][0]['address'];
+          print(1);
+          return address;
+        }catch(e){
+          print(e);
+          return "";
+        }
       }
     }
     else {
@@ -465,40 +502,60 @@ class AppApiClient {
     try {
       print('${_baseUrl}service');
 
-      var request = http.MultipartRequest('POST', Uri.parse('${_baseUrl}service'))
-        ..fields['name'] = name
-        ..fields['category_id'] = categoryId.toString()
-        ..fields['price'] = price.toString()
-        ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
-          contentType:MediaType('icon','png/jpeg/jpg'),
-        ))
-        ..files.add(await http.MultipartFile.fromPath('image', image.path,
-          contentType:MediaType('image','png/jpeg/jpg'),
-        ));
+      final bytes = icon.readAsBytesSync().lengthInBytes;
+      final kb = bytes / 1024;
+      final mb = kb / 1024;
 
-      request.headers.addAll(headers);
+      final bytes1 = image.readAsBytesSync().lengthInBytes;
+      final kb1 = bytes1 / 1024;
+      final mb1 = kb1 / 1024;
 
-      http.StreamedResponse response = await request.send();
+      print(mb.toString()+" "+mb1.toString());
 
-      String responseStr = await response.stream.bytesToString();
+      if(mb>1){
+        return "icon error";
+      }else if(mb1>1){
+        return "image error";
+      }else {
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('${_baseUrl}service'))
+          ..fields['name'] = name
+          ..fields['category_id'] = categoryId.toString()
+          ..fields['price'] = price.toString()
+          ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
+            contentType: MediaType('icon', 'png/jpeg/jpg'),
+          ))
+          ..files.add(await http.MultipartFile.fromPath('image', image.path,
+            contentType: MediaType('image', 'png/jpeg/jpg'),
+          ));
 
-      print(responseStr);
+        request.headers.addAll(headers);
 
-      Map<String, dynamic> json = jsonDecode(responseStr);
+        http.StreamedResponse response = await request.send();
 
-      if (response.statusCode == 200) {
-        int status = json['status'];
-        if (status == 200) {
-          return 'success';
+        String responseStr = await response.stream.bytesToString();
+
+        print(responseStr);
+
+        Map<String, dynamic> json = jsonDecode(responseStr);
+
+        if (response.statusCode == 200) {
+          int status = json['status'];
+          if (status == 200) {
+            return 'success';
+          }
         }
-      }
-      else {
-        print(response.reasonPhrase);
-        return 'Error';
+        else {
+          print(response.statusCode);
+          print(response.hashCode);
+          print(response.reasonPhrase);
+          return 'Error';
+        }
       }
 
     }catch(e){
-      print(e);
+      print(e.toString());
+      print(e.toString().contains("<center><h1>413 Request Entity Too Large</h1></center>"));
     }
 
   }
@@ -593,6 +650,46 @@ class AppApiClient {
 
   }
 
+  Future<String> deleteAdditional(int id) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json',
+    };
+    try {
+      print('${_baseUrl}additional-charge/$id');
+
+
+      var request = http.Request('DELETE', Uri.parse('${_baseUrl}additional-charge/$id'));
+
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      String responseStr = await response.stream.bytesToString();
+
+      print(responseStr);
+
+      Map<String, dynamic> json = jsonDecode(responseStr);
+
+      if (response.statusCode == 200) {
+        int status = json['status'];
+        if (status == 200) {
+          return 'success';
+        }
+      }
+      else {
+        print(response.reasonPhrase);
+        return 'Error';
+      }
+
+    }catch(e){
+      print(e);
+    }
+
+  }
+
   Future<String> addCategory({String name,File image}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
@@ -622,6 +719,43 @@ class AppApiClient {
       if (response.statusCode == 200) {
         int status = json['status'];
         if (status == 200) {
+          return 'success';
+        }
+      }
+      else {
+        print(response.reasonPhrase);
+        return 'Error';
+      }
+
+    }catch(e){
+      print(e);
+    }
+
+  }
+
+  Future<String> addReview({int id,int rating,String comment}) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json',
+    };
+    try {
+      var body = jsonEncode({
+        "order_id": id,
+        "rating":rating,
+        "comment":comment
+      });
+      var response = await http.post(Uri.parse('${_baseUrl}review'),body: body,headers: headers);
+
+      String responseStr = response.body.toString();
+      print(responseStr);
+
+      Map<String, dynamic> json = jsonDecode(responseStr);
+
+      if (response.statusCode == 200) {
+        int status =  json['status'];
+        if(status==200){
           return 'success';
         }
       }
@@ -736,6 +870,9 @@ class AppApiClient {
     try {
       print('${_baseUrl}category/$categoryId');
 
+
+
+
       var request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}category/$categoryId'))
         ..fields['name'] = name
         ..files.add(await http.MultipartFile.fromPath('image', image.path,
@@ -759,12 +896,13 @@ class AppApiClient {
         }
       }
       else {
-        print(response.reasonPhrase);
+        print(response.statusCode+response.hashCode );
+     //   print(response.reasonPhrase);
         return 'Error';
       }
 
     }catch(e){
-      print(e);
+      print(e.hashCode);
     }
 
   }
@@ -877,31 +1015,172 @@ class AppApiClient {
       int status =  json['status'];
       if(status==200){
         List orders = json['data']['orders'];
-        orders.forEach((element) {
-          bookings.add(
-              BookingModel(
-                id: element['id'],
-                name: element['service']['name'],
-                categoryName: element['service']['category_name'],
-                address: element['address'],
-                totalPrice: element['total'],
-                startTime: element['start_time'],
-                endTime: element['end_time'],
-                status: element['status'],
-                payStatus: element['payment_status'],
-                payMethod: element['payment_method'],
-                icon: element['service']['icon'],
-                date: element['date'],
-                quantity:element['quantity']
-              )
-          );
-        });
+          orders.forEach((element) {
+            try {
+              bookings.add(
+                  BookingModel(
+                      id: element['id'],
+                      name: element['service']['name'],
+                      categoryName: element['service']['category_name'],
+                      address: element['address'],
+                      totalPrice: element['total'],
+                      startTime: element['start_time'],
+                      endTime: element['end_time'],
+                      status: element['status'],
+                      payStatus: element['payment_status'],
+                      payMethod: element['payment_method'],
+                      icon: element['service']['icon'],
+                      date: element['date'],
+                      quantity: element['quantity']
+                  )
+              );
+            }catch(e){
+
+            }
+          });
         return bookings;
       }
     }
     else {
       print(response.reasonPhrase);
       return [];
+    }
+  }
+
+  Future<List<String>> getUserDetail(int id) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token
+    };
+    var request = http.Request('GET', Uri.parse('${_baseUrl}user/$id'));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    String responseStr = await response.stream.bytesToString();
+
+    Map<String, dynamic> json = jsonDecode(responseStr);
+
+    List<String> userDetails = [];
+
+    if (response.statusCode == 200) {
+      int status =  json['status'];
+      if(status==200){
+        String name = json['data']['user']['name'];
+        String phone = json['data']['user']['phone'];
+        userDetails.add(name);
+        userDetails.add(phone);
+        return userDetails;
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+      return ["",""];
+    }
+  }
+
+  Future<List<ReviewModel>> getReviews() async {
+    final List<ReviewModel> reviews = [];
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('GET', Uri.parse('${_baseUrl}review'));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    String responseStr = await response.stream.bytesToString();
+    print(responseStr);
+
+    Map<String, dynamic> json = jsonDecode(responseStr);
+
+    if (response.statusCode == 200) {
+      int status =  json['status'];
+      if(status==200){
+        List orders = json['data']['reviews'];
+
+        orders.forEach((element) {
+          String date = element['created_at'].toString();
+          int idx = date.indexOf("T");
+
+          reviews.add(
+              ReviewModel(
+                  name: element['user']['name'],
+                  date: date.substring(0,idx).trim(),
+                  stars: element['rating'],
+                  review: element['comment'],
+                  img: element['user']['name'].toString().substring(0,1)
+              )
+          );
+        });
+        return reviews;
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+      return [];
+    }
+  }
+
+  Future<BookingModel> getBooking(int id) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('GET', Uri.parse('${_baseUrl}order/$id'));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    String responseStr = await response.stream.bytesToString();
+    print(responseStr);
+
+    Map<String, dynamic> json = jsonDecode(responseStr);
+
+    if (response.statusCode == 200) {
+      int status =  json['status'];
+      if(status==200){
+        int additionalPrice ;
+        int additionalId ;
+        String desc;
+        try{
+          additionalPrice = json['data']['order']['additional_charges'][0]['price'];
+          desc = json['data']['order']['additional_charges'][0]['description'];
+          additionalId = json['data']['order']['additional_charges'][0]['id'];
+        }catch(e){
+          additionalPrice = 0;
+          additionalId = 0;
+          desc = "";
+        }
+
+        List<String> userDetails = await getUserDetail(json['data']['order']['user_id']);
+
+        return BookingModel(
+            id: json['data']['order']['id'],
+            name: json['data']['order']['service']['name'],
+            categoryName: json['data']['order']['service']['category_name'],
+            address: json['data']['order']['address'],
+            totalPrice: json['data']['order']['total'],
+            startTime: json['data']['order']['start_time'],
+            endTime: json['data']['order']['end_time'],
+            status: json['data']['order']['status'],
+            payStatus: json['data']['order']['payment_status'],
+            additionalPrice: additionalPrice,
+            userName: userDetails[0],
+            userPhone: userDetails[1],
+            additionalDesc: desc,
+            reviewed: json['data']['order']['reviewed'],
+            additionalId: additionalId,
+            payMethod: json['data']['order']['payment_method'],
+            icon: json['data']['order']['service']['icon'],
+            date: json['data']['order']['date'],
+            quantity:json['data']['order']['quantity']
+        );
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+      return BookingModel();
     }
   }
 
@@ -975,10 +1254,56 @@ class AppApiClient {
 
       request.headers.addAll(headers);
 
+      request.body = jsonEncode(
+          {
+            "status":"success",
+            "transaction_id":paymentId,
+            "method":method
+          }
+      );
+
+      http.StreamedResponse response = await request.send();
+
+      String responseStr = await response.stream.bytesToString();
+
+      print(responseStr);
+
+      Map<String, dynamic> json = jsonDecode(responseStr);
+
+      if (response.statusCode == 200) {
+        int status =  json['status'];
+        if(status==200){
+          return 'success';
+        }
+      }
+      else {
+        print(response.reasonPhrase);
+        return 'Error';
+      }
+    }catch(e){
+      print(e);
+    }
+  }
+
+  Future<String> addAdditionalCharge(int orderId,int price,String desc) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    print(1);
+    try{
+      print(1);
+      var headers = {
+        'x-refresh-token': token,
+        'Content-Type': 'application/json'
+      };
+
+      var request = http.Request('POST', Uri.parse('${_baseUrl}additional-charge'));
+
+      request.headers.addAll(headers);
+
       request.body = jsonEncode({
-        "status":"success",
-        "transaction_id":paymentId,
-        "method":method
+        "order_id": orderId,
+        "price": price,
+        "description": desc
       });
 
       http.StreamedResponse response = await request.send();

@@ -46,13 +46,16 @@ class _AddCategoryState extends State<AddCategory> {
   @override
   void initState() {
     _viewmodel = EditViewModel(App());
+    path1 = "";
+    EditViewModel.image = null;
+    picked1 = false;
     editBloc = NetworkBloc(appRepository: appRepository);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
         appBar: App().appBarBack(
           context,
           'Add category',
@@ -84,6 +87,7 @@ class _AddCategoryState extends State<AddCategory> {
                               )
                           )
                       );
+                      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                     });
                   }
                   return buildView(false);
@@ -93,7 +97,10 @@ class _AddCategoryState extends State<AddCategory> {
               },
             )
         )
-    );
+    ), onWillPop: ()async{
+      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+      return true;
+    });
   }
 
   Widget buildView(bool isLoading){
@@ -138,7 +145,8 @@ class _AddCategoryState extends State<AddCategory> {
                     borderColor: AppColors.WHITE_1,
                     child: Container(
                       margin: EdgeInsets.all(20),
-                      width: 80,
+                      width: 120,
+                      height: 120,
                     ),
                   ),
                   OnTapField(
@@ -198,9 +206,12 @@ class _AddCategoryState extends State<AddCategory> {
                 onTap: (){
                   if(_formKey.currentState.validate()) {
                     editBloc.add(
-                        AddCategoryEvent(
+                        picked1?AddCategoryEvent(
                             name: _viewmodel.nameController.text,
                             image: EditViewModel.image
+                        ):AddCategoryEvent(
+                            name: _viewmodel.nameController.text,
+                            image: null
                         )
                     );
                   }

@@ -26,6 +26,8 @@ class Logout extends NetworkEvent {}
 
 class GetUserDetails extends NetworkEvent {}
 
+class AuthExpired extends NetworkEvent {}
+
 class UpdateProfile extends NetworkEvent {
   final String name;
   final String phone;
@@ -133,6 +135,8 @@ class GetBookings extends NetworkEvent {}
 
 class GetBookingHistory extends NetworkEvent {}
 
+class GetReview extends NetworkEvent {}
+
 class AddMessage extends NetworkEvent{
   final String message;
   AddMessage({this.message});
@@ -157,6 +161,22 @@ class UpdatePaymentStatus extends NetworkEvent {
   UpdatePaymentStatus({this.orderId,this.paymentId,this.method});
 }
 
+class AddAdditionalCharge extends NetworkEvent {
+  final int orderId;
+  final int price;
+  final String desc;
+
+  AddAdditionalCharge({this.orderId,this.price,this.desc});
+}
+
+class AddReview extends NetworkEvent {
+  final int id;
+  final int rating;
+  final String comment;
+
+  AddReview({this.id,this.rating,this.comment});
+}
+
 
 class ApproveOrder extends NetworkEvent {
   final int categoryId;
@@ -166,4 +186,14 @@ class ApproveOrder extends NetworkEvent {
 class CompleteOrder extends NetworkEvent {
   final int categoryId;
   CompleteOrder({this.categoryId});
+}
+
+class GetBookingDetails extends NetworkEvent {
+  final int id;
+  GetBookingDetails({this.id});
+}
+
+class RemoveAdditionalCharge extends NetworkEvent {
+  final int id;
+  RemoveAdditionalCharge({this.id});
 }

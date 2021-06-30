@@ -19,7 +19,8 @@ import 'package:inses_app/resources/app_font.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ReviewScrollCard extends StatefulWidget {
-
+  final List<ReviewModel> reviews;
+  ReviewScrollCard({this.reviews});
   @override
   _ReviewScrollCardState createState() => _ReviewScrollCardState();
 }
@@ -33,43 +34,7 @@ class _ReviewScrollCardState extends State<ReviewScrollCard> {
   @override
   void initState() {
     super.initState();
-    scrolls = [
-      ReviewModel(
-          name:'Harishkumar',
-          img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80',
-          date: 'May 23, 2021',
-        review: 'Timely service. Both service and service charge are satisfied.',
-        stars: 5
-      ),
-      ReviewModel(
-          name:'Faumitha',
-          img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80',
-          date: 'May 19, 2021',
-          review: 'Service was too gud.. I loved it.. definitely I will refer my frnds',
-          stars: 5
-      ),
-      ReviewModel(
-          name:'Sandhya Jaganath',
-          img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80',
-          date: 'May 16, 2021',
-          review: 'Service was excellent and pricing for the service is genuine. On time delivery of the product. Team is very supportive',
-          stars: 5
-      ),
-      ReviewModel(
-          name:'Nandita Vaishali',
-          img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80',
-          date: 'May 12, 2021',
-          review: 'Excellent on-time service and promising!',
-          stars: 5
-      ),
-      ReviewModel(
-          name:'Balaji kr',
-          img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NHx8bWVufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&w=1000&q=80',
-          date: 'May 8, 2021',
-          review: 'Very innovative way of service and unique approach in the market. Punctual and cost effective services.',
-          stars: 5
-      )
-    ];
+    scrolls = widget.reviews;
     _pageController = PageController(
       initialPage: 0,
     );
@@ -158,11 +123,20 @@ class _ReviewScrollCardState extends State<ReviewScrollCard> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            ImageContainer(
-                              height: 50,
-                              width: 50,
-                              url: review.img,
+                            BorderContainer(
                               radius: 100,
+                              bgColor: AppColors.WHITE,
+                              margin: EdgeInsets.all(10),
+                              child: Content(
+                                margin: EdgeInsets.all(10),
+                                text:review.img.toUpperCase(),
+                                textHeight: 1.5,
+                                color: AppColors.PRIMARY_COLOR,
+                                fontfamily: AppFont.FONT,
+                                letterSpacing: 1.2,
+                                fontSize: AppDimen.TEXT_H1_LARGE,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
                             Expanded(
                                 child: Column(
@@ -190,7 +164,7 @@ class _ReviewScrollCardState extends State<ReviewScrollCard> {
                             ),
                             Container(
                               child: RatingBarIndicator(
-                                rating: 5,
+                                rating: review.stars.toDouble(),
                                 itemBuilder: (context, index) => Icon(
                                   Icons.star,
                                   color: AppColors.PRIMARY_COLOR,

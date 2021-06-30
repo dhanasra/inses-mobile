@@ -16,6 +16,7 @@ import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:inses_app/view_models/register_view_model.dart';
 import 'package:inses_app/widgets/double_color_button.dart';
 import 'package:inses_app/widgets/grey_micro.dart';
@@ -51,6 +52,8 @@ class _RegisterState extends State<Register> {
         builder: (context,state){
           if(state is RegisterSuccess){
             print("success");
+            ProfileViewModel.name = _viewmodel.nameController.text;
+            ProfileViewModel.phone =  _viewmodel.phoneController.text;
             App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
           }else if(state is RegisterError){
             print("error");

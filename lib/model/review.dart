@@ -4,7 +4,7 @@ class ReviewModel extends Equatable {
   final String name;
   final String img;
   final String date;
-  final double stars;
+  final int stars;
   final String review;
   
 

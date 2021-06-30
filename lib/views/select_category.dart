@@ -20,44 +20,33 @@ import 'package:inses_app/widgets/mini_title.dart';
 import 'package:inses_app/widgets/service_item.dart';
 import 'package:inses_app/widgets/service_sub_item.dart';
 
-class Items extends StatefulWidget {
+
+class SelectCategory extends StatefulWidget {
 
   @override
-  _ItemsState createState() => _ItemsState();
+  _SelectCategoryState createState() => _SelectCategoryState();
 }
 
-class _ItemsState extends State<Items> {
+class _SelectCategoryState extends State<SelectCategory> {
 
   NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+
 
   @override
   void initState() {
     super.initState();
     bloc = NetworkBloc(appRepository: appRepository);
-    bloc.add(EditViewModel.type==0?GetCategories():EditViewModel.type==1?GetServices():GetOffers());
+    bloc.add(GetCategories());
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: App().appBarBack(
-        context,
-        'Select your need',
-        child: SizedBox(
-          width: 40,
-          height: 40,
-          child: IconButton(
-              icon: Icon(Icons.add),
-              onPressed: (){
-                EditViewModel.type==0?
-                App().setNavigation(context, AppRoutes.APP_ADD_CATEGORY):
-                EditViewModel.type==1?
-                App().setNavigation(context, AppRoutes.APP_SELECT_CATEGORY):
-                App().setNavigation(context, AppRoutes.APP_ADD_OFFER);
-              }
-          ),
-        )
+          context,
+          'Select category',
       ),
       body: Container(
         child: BlocBuilder<NetworkBloc,NetworkState>(
@@ -67,12 +56,8 @@ class _ItemsState extends State<Items> {
               return buildView(true,[],[],[]);
             }else if(state is Error){
               return ErrorItem();
-            }else if(state is GotServices){
-              return buildView(false,state.services,[],[]);
             }else if(state is GotCategories){
               return buildView(false,[],state.categories,[]);
-            }else if(state is GotOffers){
-              return buildView(false,[],[],state.offers);
             }else{
               return Container();
             }
@@ -81,7 +66,6 @@ class _ItemsState extends State<Items> {
       ),
     );
   }
-
   Widget buildView(bool isLoading,List<ServiceModel> services,List<CategoryModel> categories,List<OfferModel> offers){
     return ListView(
       children: [
@@ -89,13 +73,13 @@ class _ItemsState extends State<Items> {
             padding: EdgeInsets.all(20),
             child: Column(
               children: [
-                MiniTitle(text: 'Select what you need',margin: EdgeInsets.only(bottom: 20),),
+                MiniTitle(text: 'Select Category',margin: EdgeInsets.only(bottom: 20),),
                 isLoading?Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Loader()
                   ],
-                ):EditViewModel.type==0?
+                ):
                 GridView.builder(
                   shrinkWrap: true,
                   itemCount: categories.length,
@@ -110,40 +94,10 @@ class _ItemsState extends State<Items> {
                       serviceModel: categories[index],
                       onPressed: (){
                         EditViewModel.category = categories[index];
-                        App().setNavigation(context, AppRoutes.APP_ED_CATEGORY);
+                        App().setNavigation(context, AppRoutes.APP_ADD_SERVICE);
                       },
                     );
                   },
-                ):EditViewModel.type==1?
-                ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: services.length,
-                    itemBuilder: (context,index){
-                      return
-                        ServiceSubItem(
-                          service: services[index],
-                          onpressed: (){
-                            EditViewModel.service = services[index];
-                            App().setNavigation(context, AppRoutes.APP_ED_SERVICE);
-                          },
-                        );
-                    }
-                ): ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: offers.length,
-                    itemBuilder: (context,index){
-                      ServiceModel service = ServiceModel(name: offers[index].old+offers[index].txt+offers[index].offer,icon: offers[index].img);
-                      return
-                        ServiceSubItem(
-                          service: service,
-                          onpressed: (){
-                            EditViewModel.offer = offers[index];
-                            App().setNavigation(context, AppRoutes.APP_ED_OFFER);
-                          },
-                        );
-                    }
                 )
               ],
             )

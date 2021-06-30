@@ -16,6 +16,7 @@ class ProfileViewModel {
 
   static String name = '';
   static String phone = '';
+  static String address = '';
 
   factory ProfileViewModel(App app) {
     _instance ??= ProfileViewModel._internal();

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/views/current_booking.dart';
@@ -15,7 +16,7 @@ class Bookings extends StatefulWidget {
 class _BookingsState extends State<Bookings> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return WillPopScope(child: SafeArea(
       child: DefaultTabController(
           length: 2,
           child: Scaffold(
@@ -23,7 +24,7 @@ class _BookingsState extends State<Bookings> {
                 preferredSize: Size.fromHeight(123),
                 child: Column(
                   children: [
-                    App().appBarBack(context, 'My Bookings'),
+                    App().appBarBack(context, 'My Bookings',onPressed: (){App().setNavigation(context, AppRoutes.APP_HOME_MAIN);}),
                     Container(
                       color: AppColors.WHITE,
                       child: TabBar(
@@ -55,7 +56,10 @@ class _BookingsState extends State<Bookings> {
             ),
           )
       ),
-    );
+    ), onWillPop: ()async{
+      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+      return true;
+    });
   }
 
   Widget buildView(){

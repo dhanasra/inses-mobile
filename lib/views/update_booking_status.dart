@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
@@ -31,81 +32,106 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
   NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
+  String type;
+  String payType;
+  String additional;
+
   @override
   void initState() {
+    type = OrderViewModel.booking.status;
+    payType = OrderViewModel.booking.payStatus;
     bloc = NetworkBloc(appRepository: appRepository);
+    OrderViewModel.load4 = true;
+    bloc.add(GetBookingDetails(id: OrderViewModel.booking.id));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: App().appBarBack(
-        context,
-        OrderViewModel.booking.categoryName,
-      ),
-      body: Container(
-        padding: EdgeInsets.only(bottom: 50),
-        child: BlocBuilder<NetworkBloc,NetworkState>(
-          bloc: bloc,
-          builder: (context,state){
-            if(state is Empty || state is Loading){
-              return buildView(OrderViewModel.load1,OrderViewModel.load2);
-            }else if(state is Error){
-              return ErrorItem();
-            }else if(state is Initial || state is Approved || state is Completed){
-              if(state is Approved){
-                Future.delayed(Duration.zero, () async {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Wrap(
-                            children: [
-                              Content(
-                                padding: EdgeInsets.only(top: 5,bottom: 5),
-                                text: 'Order is approved successfully',
-                                fontSize: AppDimen.TEXT_SMALL,
-                                fontWeight: FontWeight.w400,
-                                fontfamily: AppFont.FONT,
-                              ),
-                            ],
-                          )
-                      )
-                  );
-                });
-              }
-              if(state is Completed){
-                Future.delayed(Duration.zero, () async {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Wrap(
-                            children: [
-                              Content(
-                                padding: EdgeInsets.only(top: 5,bottom: 5),
-                                text: 'Order is completed successfully',
-                                fontSize: AppDimen.TEXT_SMALL,
-                                fontWeight: FontWeight.w400,
-                                fontfamily: AppFont.FONT,
-                              ),
-                            ],
-                          )
-                      )
-                  );
-                });
-              }
-              OrderViewModel.load1 = false;
-              OrderViewModel.load2 = false;
-              return buildView(false,false);
-            }else{
-              return Container();
-            }
-          },
-        )
-      ),
+    return WillPopScope(
+        child: Scaffold(
+          appBar: App().appBarBack(
+            context,
+            OrderViewModel.booking.categoryName,
+          ),
+          body: Container(
+              padding: EdgeInsets.only(bottom: 0),
+              child: BlocBuilder<NetworkBloc,NetworkState>(
+                bloc: bloc,
+                builder: (context,state){
+                  if(state is Empty || state is Loading){
+                    return buildView(OrderViewModel.load4,OrderViewModel.load3,OrderViewModel.load1,OrderViewModel.load2);
+                  }else if(state is Error){
+                    return ErrorItem();
+                  }else if( state is Approved || state is Completed || state is PaymentStatusUpdated || state is Added || state is GotBooking || state is AdditionalRemoved){
+                    if(state is GotBooking){
+                      OrderViewModel.booking = state.booking;
+                      type = OrderViewModel.booking.status;
+                      additional = OrderViewModel.booking.additionalPrice!=0?"ADDED":"ADD";
+                      print(additional);
+                    }
+                    if(state is AdditionalRemoved){
+                      Future.delayed(Duration.zero, () async {
+                        setState(() {
+                          type = "ADD";
+                        });
+                      });
+                      bloc.add(GetBookingDetails(id: OrderViewModel.booking.id));
+                    }
+                    if(state is Approved){
+                      Future.delayed(Duration.zero, () async {
+                        setState(() {
+                          type = "APPROVED";
+                        });
+                      });
+                    }
+                    if(state is Completed){
+                      Future.delayed(Duration.zero, () async {
+                        setState(() {
+                          type = "COMPLETED";
+                        });
+                      });
+                    }
+                    if(state is PaymentStatusUpdated){
+                      Future.delayed(Duration.zero, () async {
+                        setState(() {
+                          payType = "UPDATED";
+                        });
+                      });
+                    }
+                    if(state is Added){
+                      Future.delayed(Duration.zero, () async {
+                        setState(() {
+                          additional = "ADDED";
+                        });
+                      });
+                    }
+                    OrderViewModel.load1 = false;
+                    OrderViewModel.load2 = false;
+                    OrderViewModel.load4 = false;
+                    OrderViewModel.load3 = false;
+                    return buildView(false,false,false,false);
+                  }else{
+                    return Container();
+                  }
+                },
+              )
+          ),
+        ),
+        onWillPop: ()async{
+          App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+          return true;
+        }
     );
   }
 
-  Widget buildView(bool isLoading1,bool isLoading2){
-    return ListView(
+  Widget buildView(bool isLoading,bool isLoading3,bool isLoading1,bool isLoading2){
+    return isLoading?Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Loader()
+      ],
+    ):ListView(
       children: [
         Stack(
           children: [
@@ -244,7 +270,48 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                       ),
                       Content(
                         color:AppColors.GRAY,
+                        text: 'Name',
+                        alignment: Alignment.centerLeft,
+                        textHeight: 2,
+                        fontfamily: AppFont.FONT,
+                        margin: EdgeInsets.only(top: 15),
+                        fontWeight: FontWeight.w400,
+                        fontSize: AppDimen.TEXT_SMALLEST,
+                      ),
+                      Content(
+                        alignment: Alignment.centerLeft,
+                        textHeight: 1.5,
+                        margin: EdgeInsets.only(top: 5),
+                        color:AppColors.BLACK,
+                        text: OrderViewModel.booking.userName,
+                        fontfamily: AppFont.FONT,
+                        fontWeight: FontWeight.w500,
+                        fontSize: AppDimen.TEXT_SMALLER,
+                      ),
+                      Content(
+                        color:AppColors.GRAY,
+                        text: 'Phone Number',
+                        margin: EdgeInsets.only(top: 15),
+                        alignment: Alignment.centerLeft,
+                        textHeight: 2,
+                        fontfamily: AppFont.FONT,
+                        fontWeight: FontWeight.w400,
+                        fontSize: AppDimen.TEXT_SMALLEST,
+                      ),
+                      Content(
+                        alignment: Alignment.centerLeft,
+                        textHeight: 1.5,
+                        margin: EdgeInsets.only(top: 5),
+                        color:AppColors.BLACK,
+                        text: OrderViewModel.booking.userPhone,
+                        fontfamily: AppFont.FONT,
+                        fontWeight: FontWeight.w500,
+                        fontSize: AppDimen.TEXT_SMALLER,
+                      ),
+                      Content(
+                        color:AppColors.GRAY,
                         text: 'Service',
+                        margin: EdgeInsets.only(top: 15),
                         alignment: Alignment.centerLeft,
                         textHeight: 2,
                         fontfamily: AppFont.FONT,
@@ -295,7 +362,6 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                         color:AppColors.BLACK,
                         margin: EdgeInsets.only(top: 5),
                         text: OrderViewModel.booking.address,
-                        overflow: TextOverflow.ellipsis,
                         fontfamily: AppFont.FONT,
                         fontWeight: FontWeight.w500,
                         fontSize: AppDimen.TEXT_SMALLER,
@@ -345,7 +411,65 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                         textHeight: 1.5,
                       ),
                       Visibility(
-                        visible: OrderViewModel.booking.status=='PENDING',
+                          visible: additional=='ADDED',
+                          child: Row(
+                            children: [
+                              Expanded(child: Content(
+                                color:AppColors.BLACK,
+                                margin: EdgeInsets.only(top: 5),
+                                text: 'Additional Price',
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLER,
+                                alignment: Alignment.centerLeft,
+                                textHeight: 1.5,
+                              ),),
+                              Expanded(child: Content(
+                                color:AppColors.BLACK,
+                                margin: EdgeInsets.only(top: 5),
+                                text: '\u20B9 ${OrderViewModel.booking.additionalPrice}',
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLER,
+                                alignment: Alignment.centerLeft,
+                                textHeight: 1.5,
+                              ),),
+                            ],
+                          )
+                      ),
+                      Visibility(
+                          visible: additional=='ADDED',
+                          child: Row(
+                            children: [
+                              Expanded(child: Content(
+                                color:AppColors.BLACK,
+                                margin: EdgeInsets.only(top: 5),
+                                text: 'Description',
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLER,
+                                alignment: Alignment.centerLeft,
+                                textHeight: 1.5,
+                              ),),
+                              Expanded(child: Content(
+                                color:AppColors.BLACK,
+                                margin: EdgeInsets.only(top: 5),
+                                text: OrderViewModel.booking.additionalDesc,
+                                overflow: TextOverflow.ellipsis,
+                                fontfamily: AppFont.FONT,
+                                fontWeight: FontWeight.w500,
+                                fontSize: AppDimen.TEXT_SMALLER,
+                                alignment: Alignment.centerLeft,
+                                textHeight: 1.5,
+                              ),),
+                            ],
+                          )
+                      ),
+                      Visibility(
+                        visible: type=='PENDING',
                         child: BorderContainer(
                             radius: 4,
                             margin: EdgeInsets.only(left: 15,right: 15,top: 30),
@@ -376,7 +500,68 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                         )
                       ),
                       Visibility(
-                        visible: OrderViewModel.booking.status=='APPROVED',
+                          visible: type!='COMPLETED' && additional=='ADD',
+                          child: BorderContainer(
+                              radius: 4,
+                              margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              bgColor: AppColors.SECONDARY_COLOR,
+                              child: OnTapField(
+                                child: isLoading1
+                                    ?Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Loader(margin: EdgeInsets.all(0),)
+                                  ],
+                                )
+                                    :Content(
+                                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                                  text: 'ADD ADDITIONAL CHARGE',
+                                  color: AppColors.WHITE,
+                                  fontfamily: AppFont.FONT,
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                onTap: (){
+                                  App().setNavigation(context, AppRoutes.APP_ADDITIONAL_CHARGE);
+                                },
+                              )
+                          )
+                      ),
+                      Visibility(
+                          visible: type!='COMPLETED' && additional=='ADDED',
+                          child: BorderContainer(
+                              radius: 4,
+                              margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              bgColor: AppColors.SECONDARY_COLOR,
+                              child: OnTapField(
+                                child: isLoading1
+                                    ?Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Loader(margin: EdgeInsets.all(0),)
+                                  ],
+                                )
+                                    :Content(
+                                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                                  text: 'REMOVE ADDITIONAL CHARGE',
+                                  color: AppColors.WHITE,
+                                  fontfamily: AppFont.FONT,
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                onTap: (){
+                                  OrderViewModel.load3 = true;
+                                  bloc.add(RemoveAdditionalCharge(id: OrderViewModel.booking.additionalId));
+                                },
+                              )
+                          )
+                      ),
+                      Visibility(
+                        visible: type=='APPROVED',
                         child: BorderContainer(
                             radius: 4,
                             margin: EdgeInsets.only(left: 15,right: 15,top: 30),
@@ -407,7 +592,7 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                         )
                       ),
                       Visibility(
-                          visible: OrderViewModel.booking.payStatus=='PENDING',
+                          visible: payType=='PENDING',
                           child:
                           BorderContainer(
                               radius: 4,
@@ -425,7 +610,7 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                                 )
                                     :Content(
                                   padding: EdgeInsets.only(top: 10,bottom: 10),
-                                  text: 'UPDATE',
+                                  text: 'PAYMENT RECEIVED',
                                   color: AppColors.WHITE,
                                   fontfamily: AppFont.FONT,
                                   fontSize: AppDimen.TEXT_SMALL,

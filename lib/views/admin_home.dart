@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
@@ -7,6 +9,13 @@ import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/network/app_api_client.dart';
+import 'package:inses_app/network/app_repository.dart';
+import 'package:inses_app/network/bloc/network_bloc.dart';
+import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_state.dart';
+import 'package:inses_app/widgets/loader.dart';
+import 'package:inses_app/widgets/location_dialogue.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -19,6 +28,8 @@ import 'package:inses_app/widgets/profile_option.dart';
 import 'package:inses_app/widgets/service_item.dart';
 import 'package:inses_app/widgets/sub.dart';
 
+import '../main.dart';
+
 class AdminHome extends StatefulWidget {
 
   @override
@@ -28,11 +39,13 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   HomeViewModel viewModel;
-
+  NetworkBloc bloc;
+  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
   void initState() {
     viewModel = HomeViewModel(App());
+    bloc = NetworkBloc(appRepository: appRepository);
     super.initState();
   }
 
@@ -96,9 +109,23 @@ class _AdminHomeState extends State<AdminHome> {
           ),
         ),
       ),
-      body: Container(
-        child: buildView(),
-      ),
+      body: BlocBuilder<NetworkBloc,NetworkState>(
+        bloc: bloc,
+        builder: (context,state){
+          if(state is LogoutSuccess){
+            print("success");
+            Future.delayed(Duration.zero,()async{
+              RestartWidget.restartApp(context);
+            });
+          }
+          return Container(
+            color: AppColors.WHITE,
+            child: Container(
+              child: buildView(),
+            ),
+          );
+        },
+      )
     );
   }
 
@@ -138,6 +165,26 @@ class _AdminHomeState extends State<AdminHome> {
   }
 
   void logout(){
+    Future.delayed(Duration.zero, () {
+      this.showDialogue();
+    });
+  }
 
+  showDialogue(){
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (BuildContext context){
+          return LocationDialogue(
+              title: "Logout",
+              description: "Are you want to logout ?",
+              text: "Yes",
+              onPressed:(){
+                bloc.add(Logout());
+                Navigator.of(context).pop();
+              }
+          );
+        }
+    );
   }
 }

@@ -7,6 +7,7 @@ import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
+import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -25,11 +26,15 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: App().appBarBack(context, 'Profile'),
+    return WillPopScope(child: Scaffold(
+      appBar: App().appBarBack(context, 'Profile',onPressed: (){App().setNavigation(context, AppRoutes.APP_HOME_MAIN);}),
       body: Container(
         child: buildView(),
       ),
+    ), onWillPop:() async{
+      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+      return true;
+    }
     );
   }
 
@@ -164,7 +169,7 @@ class _ProfileState extends State<Profile> {
             sub: 'Call us for your query',
             icon: Icons.phone,
             onPressed: (){
-              launch("tel://8056384773");
+              launch("tel://${AppConstants.INSES_NUMBER}");
             },
           ),
         ],

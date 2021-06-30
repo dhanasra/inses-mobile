@@ -1,11 +1,5 @@
-
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
@@ -16,32 +10,31 @@ import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/app_repository.dart';
 import 'package:inses_app/network/bloc/network_bloc.dart';
-import 'package:inses_app/network/bloc/network_event.dart';
+import 'package:inses_app/network/bloc/network_event.dart' as ev;
 import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inses_app/view_models/edit_view_model.dart';
-import 'package:inses_app/view_models/home_view_model.dart';
+import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/grey_micro.dart';
 import 'package:inses_app/widgets/input_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/sub_title.dart';
 
-class EdOffer extends StatefulWidget {
+class AddAdditionalCharge extends StatefulWidget {
 
   @override
-  _EdOfferState createState() => _EdOfferState();
+  _AddAdditionalChargeState createState() => _AddAdditionalChargeState();
 }
 
-class _EdOfferState extends State<EdOffer> {
-  EditViewModel _viewmodel;
+class _AddAdditionalChargeState extends State<AddAdditionalCharge> {
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  bool picked1 = false;
-  bool picked2 = false;
-  String path1;
-  String path2;
+  EditViewModel _viewmodel;
   NetworkBloc editBloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
@@ -49,24 +42,14 @@ class _EdOfferState extends State<EdOffer> {
   void initState() {
     _viewmodel = EditViewModel(App());
     editBloc = NetworkBloc(appRepository: appRepository);
-    _viewmodel.nameController.text = EditViewModel.offer.txt;
-    _viewmodel.priceController.text = EditViewModel.offer.old.toString();
-    _viewmodel.offerPriceController.text = EditViewModel.offer.offer.toString();
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
         appBar: App().appBarBack(
           context,
-          'Edit Offer',
-          child: IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: (){
-              editBloc.add(DeleteService(serviceId: EditViewModel.service.id));
-            },
-          ),
+          'Add Additional Charge',
         ),
         body:Form(
             key: _formKey,
@@ -77,8 +60,8 @@ class _EdOfferState extends State<EdOffer> {
                   return buildView(true);
                 }else if(state is Error){
                   return ErrorItem();
-                }else if(state is Initial || state is Success){
-                  if(state is Success){
+                }else if(state is Initial || state is Added){
+                  if(state is Added){
                     Future.delayed(Duration.zero, () async {
                       ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -86,7 +69,7 @@ class _EdOfferState extends State<EdOffer> {
                                 children: [
                                   Content(
                                     padding: EdgeInsets.only(top: 5,bottom: 5),
-                                    text: 'Offer is updated successfully',
+                                    text: 'Additional Charge is Added',
                                     fontSize: AppDimen.TEXT_SMALL,
                                     fontWeight: FontWeight.w400,
                                     fontfamily: AppFont.FONT,
@@ -95,8 +78,9 @@ class _EdOfferState extends State<EdOffer> {
                               )
                           )
                       );
-                      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
-                    });
+                    }
+                    );
+                    App().setNavigation(context, AppRoutes.APP_UPDATE_BOOKING_STATUS);
                   }
                   return buildView(false);
                 }else{
@@ -105,7 +89,10 @@ class _EdOfferState extends State<EdOffer> {
               },
             )
         )
-    );
+    ), onWillPop: ()async{
+      App().setNavigation(context, AppRoutes.APP_UPDATE_BOOKING_STATUS);
+      return true;
+    });
   }
 
   Widget buildView(bool isLoading){
@@ -124,8 +111,8 @@ class _EdOfferState extends State<EdOffer> {
             autoFocus: true,
             prefixIcon: Icon(Icons.cleaning_services_outlined),
             margin: EdgeInsets.only(top: 30,left: 20,right: 20),
-            text: _viewmodel.nameController.text,
-            emptyError: 'Name should not be empty',
+            text: 'Description',
+            emptyError: 'Desc should not be empty',
             isObscurred: false,
           ),
           InputItem(
@@ -133,82 +120,12 @@ class _EdOfferState extends State<EdOffer> {
             autoFocus: false,
             prefixIcon: Icon(Icons.monetization_on_outlined),
             margin: EdgeInsets.only(top: 30,left: 20,right: 20),
-            text: _viewmodel.priceController.text,
-            emptyError: 'price should not be empty',
+            text: 'Amount',
+            emptyError: 'amount should not be empty',
             inputType: TextInputType.number,
             patternError: 'Invalid price',
             regExp:(RegExp(r'[0-9]')),
             isObscurred: false,
-          ),
-          InputItem(
-            controller: _viewmodel.offerPriceController,
-            autoFocus: false,
-            prefixIcon: Icon(Icons.monetization_on_outlined),
-            margin: EdgeInsets.only(top: 30,left: 20,right: 20),
-            text: _viewmodel.offerPriceController.text,
-            emptyError: 'price should not be empty',
-            inputType: TextInputType.number,
-            patternError: 'Invalid price',
-            regExp:(RegExp(r'[0-9]')),
-            isObscurred: false,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Stack(
-                children: [
-                  picked1 ?
-                  BorderContainer(
-                      margin: EdgeInsets.only(top: 20,left: 20,right: 20),
-                      borderColor: AppColors.WHITE_1,
-                      child: SizedBox(
-                        width: 120,
-                        height: 120,
-                        child: Image.file(
-                            File(path1)
-                        ),
-                      )
-                  ):
-                  BorderContainer(
-                    margin: EdgeInsets.only(top: 20,left: 20,right: 20),
-                    borderColor: AppColors.WHITE_1,
-                    child: ImageView(
-                      margin: EdgeInsets.all(20),
-                      width: 80,
-                      url: EditViewModel.offer.img,
-                    ),
-                  ),
-                  OnTapField(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 107,left: 20,right: 20),
-                        child: OnTapField(
-                            child: Content(
-                              width: 122,
-                              padding: EdgeInsets.only(top: 10,bottom: 10),
-                              bgColor: AppColors.TRANSPARANT_3,
-                              text: 'Edit',
-                              color: AppColors.WHITE,
-                              alignment: Alignment.center,
-                              textAlign: TextAlign.center,
-                            ),
-                            onTap: ()async{
-                              PickedFile file = await ImagePicker().getImage(
-                                  source: ImageSource.gallery);
-                              EditViewModel.image = File(file.path);
-                              setState(() {
-                                path1 = file.path;
-                                picked1 = true;
-                              });
-                            }
-                        ),
-                      ),
-                      onTap: (){
-
-                      }
-                  )
-                ],
-              )
-            ],
           ),
           BorderContainer(
               radius: 4,
@@ -226,7 +143,7 @@ class _EdOfferState extends State<EdOffer> {
                 )
                     :Content(
                   padding: EdgeInsets.only(top: 10,bottom: 10),
-                  text: 'UPDATE',
+                  text: 'ADD',
                   color: AppColors.WHITE,
                   fontfamily: AppFont.FONT,
                   fontSize: AppDimen.TEXT_SMALL,
@@ -235,12 +152,10 @@ class _EdOfferState extends State<EdOffer> {
                 onTap: (){
                   if(_formKey.currentState.validate()) {
                     editBloc.add(
-                        EditOfferEvent(
-                            id: EditViewModel.offer.id,
-                            txt: _viewmodel.nameController.text,
-                            price: int.parse( _viewmodel.priceController.text),
-                            old: int.parse( _viewmodel.offerPriceController.text),
-                            image: EditViewModel.image
+                        ev.AddAdditionalCharge(
+                          price: int.parse(_viewmodel.priceController.text),
+                          desc: _viewmodel.nameController.text,
+                          orderId: OrderViewModel.booking.id
                         )
                     );
                   }

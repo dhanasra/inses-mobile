@@ -86,6 +86,7 @@ class _AddOfferState extends State<AddOffer> {
                               )
                           )
                       );
+                      App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
                     });
                   }
                   return buildView(false);

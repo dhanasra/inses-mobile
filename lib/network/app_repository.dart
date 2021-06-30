@@ -7,6 +7,7 @@ import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/order.dart';
 import 'package:inses_app/model/payment_history.dart';
+import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/bloc/network_event.dart';
@@ -151,6 +152,10 @@ class AppRepository {
     return await appApiClient.addMessage(message);
   }
 
+  Future<String> deleteAdditional(int id) async {
+    return await appApiClient.deleteAdditional(id);
+  }
+
 
   Future<String> bookService(Order order) async {
     return await appApiClient.bookService(order);
@@ -158,5 +163,21 @@ class AppRepository {
 
   Future<String> paymentStatus(int orderId,String paymentId,String method) async {
     return await appApiClient.paymentStatus(orderId,paymentId,method);
+  }
+
+  Future<String> addAdditionalCharges(int orderId,int price,String desc) async {
+    return await appApiClient.addAdditionalCharge(orderId, price, desc);
+  }
+
+  Future<String> addReview(int orderId,int rating,String comment) async {
+    return await appApiClient.addReview(id:orderId,rating: rating,comment:comment);
+  }
+
+  Future<List<ReviewModel>> getReviews() async {
+    return await appApiClient.getReviews();
+  }
+
+  Future<BookingModel> getBookingDetails(int orderId) async {
+    return await appApiClient.getBooking(orderId);
   }
 }

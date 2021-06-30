@@ -189,7 +189,7 @@ class App extends StatelessWidget {
     }
   }
 
-  PreferredSizeWidget appBarBack(BuildContext context,String title,{Widget child}){
+  PreferredSizeWidget appBarBack(BuildContext context,String title,{Widget child,VoidCallback onPressed}){
     return PreferredSize(
       preferredSize: Size.fromHeight(55),
       child: Container(
@@ -205,7 +205,7 @@ class App extends StatelessWidget {
                   Container(
                     margin: EdgeInsets.only(right: 10),
                     child: OnTapField(
-                      onTap: (){App().setBackNavigation(context);},
+                      onTap: onPressed??(){App().setBackNavigation(context);},
                       child: Icon(LineIcons.arrowLeft,color: AppColors.BLACK_3,),
                     )
                   ),

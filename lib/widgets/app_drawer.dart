@@ -1,3 +1,5 @@
+
+import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
@@ -7,6 +9,7 @@ import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:share/share.dart';
 
 class AppDrawer extends StatefulWidget {
   final VoidCallback logout;
@@ -32,7 +35,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   ImageView(width: 100,asset: 'logo-h2.png',),
                   Content(
                     margin: EdgeInsets.only(top: 20,bottom: 10),
-                    text: 'Dhana sekaran',
+                    text: ProfileViewModel.name,
                     alignment: Alignment.centerLeft,
                     textAlign: TextAlign.start,
                     textHeight: 1.5,
@@ -44,7 +47,7 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                   Content(
                     margin: EdgeInsets.only(top: 0,bottom: 10),
-                    text: '8056384773',
+                    text: ProfileViewModel.phone,
                     alignment: Alignment.centerLeft,
                     textAlign: TextAlign.start,
                     textHeight: 1.5,
@@ -69,6 +72,7 @@ class _AppDrawerState extends State<AppDrawer> {
             leading: Icon(Icons.share),
             title: Text('Invite Friends'),
             onTap: () {
+              Share.share('Hello, friend! ${ProfileViewModel.name} invites you to INSES Home service - instance booking app \n https://play.google.com/store/apps/details?id=com.dog',subject: '');
             },
           ),
           ListTile(
