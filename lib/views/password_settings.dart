@@ -36,6 +36,8 @@ class _PasswordSettingsState extends State<PasswordSettings> {
   void initState() {
     super.initState();
     viewModel = ProfileViewModel(App());
+    viewModel.passwordController.text = "";
+    viewModel.oldpasswordController.text = "";
     bloc = NetworkBloc(appRepository: appRepository);
   }
 
@@ -54,7 +56,26 @@ class _PasswordSettingsState extends State<PasswordSettings> {
                 if(state is Empty || state is Loading){
                   return buildView(true);
                 }else if(state is Error){
-                  return ErrorItem();
+                  Future.delayed(Duration.zero, () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Wrap(
+                              children: [
+                                Content(
+                                  padding: EdgeInsets.only(top: 5,bottom: 5),
+                                  text: 'Old Password is not correct',
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                  fontfamily: AppFont.FONT,
+                                ),
+                              ],
+                            )
+                        )
+                    );
+                  });
+                  viewModel.oldpasswordController.text='';
+                  viewModel.phoneController.text = '';
+                  return buildView(false);
                 }else if(state is Initial || state is Success){
                   if(state is Success){
 
@@ -94,12 +115,24 @@ class _PasswordSettingsState extends State<PasswordSettings> {
           text: 'Update Account Password',
         ),
         InputItem(
+          focusNode: viewModel.oldpasswordFocus,
+          autoFocus: false,
+          controller: viewModel.oldpasswordController,
+          prefixIcon: Icon(Icons.lock),
+          margin: EdgeInsets.only(top: 20,left: 15,right: 15),
+          text: 'Old Password',
+          emptyError: 'Password should not be empty',
+          lengthError: 'Password length should greater than 5',
+          minLength: 6,
+          isObscurred: true,
+        ),
+        InputItem(
           focusNode: viewModel.passwordFocus,
           autoFocus: false,
           controller: viewModel.passwordController,
           prefixIcon: Icon(Icons.lock),
           margin: EdgeInsets.only(top: 20,left: 15,right: 15),
-          text: 'Password',
+          text: 'New Password',
           emptyError: 'Password should not be empty',
           lengthError: 'Password length should greater than 5',
           minLength: 6,
@@ -129,7 +162,7 @@ class _PasswordSettingsState extends State<PasswordSettings> {
               ),
               onTap: (){
                 if(_formKey.currentState.validate()) {
-                  bloc.add(UpdatePassword(password: viewModel.passwordController.text));
+                  bloc.add(UpdatePassword(old:viewModel.oldpasswordController.text,password: viewModel.passwordController.text));
                 }
               },
             )

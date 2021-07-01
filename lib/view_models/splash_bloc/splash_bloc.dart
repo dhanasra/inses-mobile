@@ -20,22 +20,22 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   @override
   Stream<SplashState> mapEventToState(SplashEvent event) async* {
 
-    RemoteConfig remoteConfig = RemoteConfig.instance;
-    remoteConfig.setDefaults(<String, dynamic>{
-      'endpoint': AppUrl.BASE_URL,
-      'appurl':AppUrl.APP_URL
-    });
-
-    await remoteConfig.setConfigSettings(RemoteConfigSettings(
-      fetchTimeout: Duration(seconds: 30),
-      minimumFetchInterval: Duration(hours: 1),
-    ));
-
-    bool updated = await remoteConfig.fetchAndActivate();
-    if (updated) {
-      AppUrl.BASE_URL = remoteConfig.getString('endpoint');
-      AppUrl.APP_URL = remoteConfig.getString('appurl');
-    }
+    // RemoteConfig remoteConfig = RemoteConfig.instance;
+    // remoteConfig.setDefaults(<String, dynamic>{
+    //   'endpoint': AppUrl.BASE_URL,
+    //   'appurl':AppUrl.APP_URL
+    // });
+    //
+    // await remoteConfig.setConfigSettings(RemoteConfigSettings(
+    //   fetchTimeout: Duration(seconds: 30),
+    //   minimumFetchInterval: Duration(hours: 1),
+    // ));
+    //
+    // bool updated = await remoteConfig.fetchAndActivate();
+    // if (updated) {
+    //   AppUrl.BASE_URL = remoteConfig.getString('endpoint');
+    //   AppUrl.APP_URL = remoteConfig.getString('appurl');
+    // }
 
     print(AppUrl.BASE_URL);
 

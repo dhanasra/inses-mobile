@@ -290,13 +290,31 @@ class _AddServiceState extends State<AddService> {
                 ),
                 onTap: (){
                   if(_formKey.currentState.validate()) {
-                    editBloc.add(
-                        AddServiceEvent(
-                            categoryId: EditViewModel.category.id,
-                            name: _viewmodel.nameController.text,
-                            price: int.parse( _viewmodel.priceController.text),
-                            icon: picked1?EditViewModel.icon:null,
-                            image: picked2?EditViewModel.image:null
+                    if (picked1 && picked2) {
+                      editBloc.add(
+                          AddServiceEvent(
+                              categoryId: EditViewModel.category.id,
+                              name: _viewmodel.nameController.text,
+                              price: int.parse(_viewmodel.priceController.text),
+                              icon: picked1 ? EditViewModel.icon : null,
+                              image: picked2 ? EditViewModel.image : null
+                          )
+                      );
+                    }
+                  }else{
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Wrap(
+                              children: [
+                                Content(
+                                  padding: EdgeInsets.only(top: 5,bottom: 5),
+                                  text: ("Select Image"),
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                  fontfamily: AppFont.FONT,
+                                ),
+                              ],
+                            )
                         )
                     );
                   }

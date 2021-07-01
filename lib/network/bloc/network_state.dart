@@ -61,7 +61,10 @@ class GotBooking extends NetworkState {
 
 class Success extends NetworkState {}
 
-class LoginSuccess extends NetworkState {}
+class LoginSuccess extends NetworkState {
+  final String id;
+  const LoginSuccess({this.id});
+}
 
 class LogoutSuccess extends NetworkState {}
 

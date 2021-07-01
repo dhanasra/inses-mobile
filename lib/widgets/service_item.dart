@@ -42,6 +42,8 @@ class ServiceItem extends StatelessWidget {
                 Content(
                   padding: EdgeInsets.only(top: 20),
                   alignment: Alignment.center,
+                  textAlign: TextAlign.center,
+                  textHeight: 1.2,
                   text: serviceModel.name,
                   fontfamily: AppFont.FONT,
                   color: AppColors.BLACK,

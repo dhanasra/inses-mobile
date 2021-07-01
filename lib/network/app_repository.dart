@@ -39,8 +39,8 @@ class AppRepository {
     return await appApiClient.updateProfile(name, phone);
   }
 
-  Future<String> updatePassword(String password) async {
-    return await appApiClient.updatePassword(password);
+  Future<String> updatePassword(String old,String password) async {
+    return await appApiClient.updatePassword(old,password);
   }
 
   Future<String> addUserAddress(String address) async {
@@ -114,6 +114,12 @@ class AppRepository {
     );
   }
 
+  Future<String> deleteOffer({int id}) async {
+    return await appApiClient.deleteOffer(
+        id: id
+    );
+  }
+
   Future<String> addCategory({String name,File image}) async {
     return await appApiClient.addCategory(
         name: name,
@@ -130,7 +136,7 @@ class AppRepository {
   }
 
   Future<String> deleteCategory({int categoryId}) async {
-    return await appApiClient.editCategory(
+    return await appApiClient.deleteCategory(
         categoryId: categoryId
     );
   }

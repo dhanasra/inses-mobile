@@ -43,8 +43,10 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.userLogin(event.phone, event.password);
-        if(response == "success"){
-          yield LoginSuccess();
+        if(response == "1"){
+          yield LoginSuccess(id: "1");
+        }else if(response == "2"){
+          yield LoginSuccess(id: "2");
         }else if(response == "Error"){
           yield LoginError(error: "");
         }else{
@@ -109,7 +111,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is UpdatePassword) {
       yield Loading();
       try {
-        final String response = await appRepository.updatePassword(event.password);
+        final String response = await appRepository.updatePassword(event.old,event.password);
         if(response == "success"){
           yield Success();
         }else if(response == "Error"){
@@ -298,6 +300,10 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
           yield Success();
         }else if(response == "Error"){
           yield Error(error: "");
+        }else if(response == "icon error"){
+          yield Error(error: "Icon Size is Too Large");
+        }else if(response == "image error"){
+          yield Error(error: "Image Size is Too Large");
         }else{
           yield Error(error: response);
         }
@@ -320,6 +326,10 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
           yield Success();
         }else if(response == "Error"){
           yield Error(error: "");
+        }else if(response == "icon error"){
+          yield Error(error: "Icon Size is Too Large");
+        }else if(response == "image error"){
+          yield Error(error: "Image Size is Too Large");
         }else{
           yield Error(error: response);
         }
@@ -374,14 +384,39 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     }
 
     if (event is DeleteCategory) {
+      print(2);
       yield Loading();
       try {
         final String response = await appRepository.deleteCategory(
             categoryId: event.categoryId,
         );
         if(response == "success"){
+          print(2);
           yield Success();
         }else if(response == "Error"){
+          print(2);
+          yield Error(error: "");
+        }else{
+          yield Error(error: response);
+        }
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
+    if (event is DeleteOffer) {
+      print(2);
+      yield Loading();
+      try {
+        final String response = await appRepository.deleteOffer(
+          id: event.id,
+        );
+        if(response == "success"){
+          print(2);
+          yield Success();
+        }else if(response == "Error"){
+          print(2);
           yield Error(error: "");
         }else{
           yield Error(error: response);

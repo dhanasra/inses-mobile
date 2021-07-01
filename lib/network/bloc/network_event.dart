@@ -36,9 +36,10 @@ class UpdateProfile extends NetworkEvent {
 }
 
 class UpdatePassword extends NetworkEvent {
+  final String old;
   final String password;
 
-  UpdatePassword({this.password});
+  UpdatePassword({this.old,this.password});
 }
 
 class AddUserAddress extends NetworkEvent {
@@ -125,6 +126,11 @@ class EditOfferEvent extends NetworkEvent {
 class DeleteCategory extends NetworkEvent {
   final int categoryId;
   DeleteCategory({this.categoryId});
+}
+
+class DeleteOffer extends NetworkEvent {
+  final int id;
+  DeleteOffer({this.id});
 }
 
 class GetCategories extends NetworkEvent {}

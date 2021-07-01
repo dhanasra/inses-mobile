@@ -11,6 +11,8 @@ class ProfileViewModel {
   FocusNode nameFocus;
   var passwordController;
   FocusNode passwordFocus;
+  var oldpasswordController;
+  FocusNode oldpasswordFocus;
   var phoneController;
   FocusNode phoneFocus;
 
@@ -30,6 +32,8 @@ class ProfileViewModel {
   void _init() {
     nameFocus = FocusNode();
     nameController = TextEditingController(text: "");
+    oldpasswordFocus = FocusNode();
+    oldpasswordController = TextEditingController(text: "");
     passwordFocus = FocusNode();
     passwordController = TextEditingController(text: "");
     messageFocus = FocusNode();
@@ -41,6 +45,12 @@ class ProfileViewModel {
       String password = passwordController.text.toString();
       if (password.isNotEmpty && (password[0] == " " || password[0] == "."))
         passwordController.text = "";
+    });
+
+    oldpasswordController.addListener(() {
+      String password = oldpasswordController.text.toString();
+      if (password.isNotEmpty && (password[0] == " " || password[0] == "."))
+        oldpasswordController.text = "";
     });
 
     nameController.addListener(() {

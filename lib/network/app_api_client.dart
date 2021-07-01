@@ -59,7 +59,7 @@ class AppApiClient {
         await AppPreferences().setPhoneNumber(phone: phone);
         await AppPreferences().setLoginStatus(status: roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN);
 
-        await updateFCMToken();
+        await updateFCMToken(rToken);
 
         return "success";
       }else if(status==422){
@@ -78,10 +78,11 @@ class AppApiClient {
 
   }
 
-  Future<void> updateFCMToken()async{
-    String token = await FirebaseMessaging.instance.getToken(vapidKey: AppUrl.VAPID_KEY);
+  Future<void> updateFCMToken(String rToken)async{
+    String token = await FirebaseMessaging.instance.getToken();
     var headers = {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'x-refresh-token': rToken
     };
     var request = http.Request('POST', Uri.parse('${_baseUrl}fcm-token'));
     request.body = jsonEncode({
@@ -130,7 +131,7 @@ class AppApiClient {
         await AppPreferences().setName(firstName: name);
         await AppPreferences().setPhoneNumber(phone: phone);
 
-        await updateFCMToken();
+        await updateFCMToken(rToken);
 
         String address = await getUserAddress();
         ProfileViewModel.address = address;
@@ -138,7 +139,12 @@ class AppApiClient {
         await AppPreferences().setLoginStatus(status: roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN);
         HomeViewModel.loginStatus = roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN;
         print(roleId);
-        return "success";
+
+        if(roleId==1){
+          return "1";
+        }else{
+          return "2";
+        }
       }else if(status==422){
         String error = json['data']['errors'][0]['rule'];
         print(error);
@@ -242,7 +248,7 @@ class AppApiClient {
     }
   }
 
-  Future<String> updatePassword(String password) async {
+  Future<String> updatePassword(String old,String password) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -250,6 +256,7 @@ class AppApiClient {
       'Content-Type': 'application/json'
     };
     var body = jsonEncode({
+      "old_password":old,
       "password": password
     });
     var response = await http.post(Uri.parse('${_baseUrl}user/update-password'),body: body,headers: headers);
@@ -570,18 +577,42 @@ class AppApiClient {
     print(id);
     try {
       print('${_baseUrl}service/$id');
+      var request;
+      if(icon ==null && image==null){
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+          ..fields['name'] = name
+          ..fields['category_id'] = categoryId.toString()
+          ..fields['price'] = price.toString();
+      }else if(icon==null){
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+          ..fields['name'] = name
+          ..fields['category_id'] = categoryId.toString()
+          ..fields['price'] = price.toString()
+          ..files.add(await http.MultipartFile.fromPath('image', image.path,
+            contentType:MediaType('image','png/jpeg/jpg'),
+          ));
+      }else if(image==null){
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+          ..fields['name'] = name
+          ..fields['category_id'] = categoryId.toString()
+          ..fields['price'] = price.toString()
 
-      var request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
-        ..fields['name'] = name
-        ..fields['category_id'] = categoryId.toString()
-        ..fields['price'] = price.toString()
+          ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
+            contentType:MediaType('image','png/jpeg/jpg'),)
+          );
+      }else{
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+          ..fields['name'] = name
+          ..fields['category_id'] = categoryId.toString()
+          ..fields['price'] = price.toString()
 
-        ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
-          contentType:MediaType('image','png/jpeg/jpg'),)
-        )
-        ..files.add(await http.MultipartFile.fromPath('image', image.path,
-          contentType:MediaType('image','png/jpeg/jpg'),
-        ));
+          ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
+            contentType:MediaType('image','png/jpeg/jpg'),)
+          )
+          ..files.add(await http.MultipartFile.fromPath('image', image.path,
+            contentType:MediaType('image','png/jpeg/jpg'),
+          ));
+      }
 
         request.headers.addAll(headers);
 
@@ -699,33 +730,43 @@ class AppApiClient {
     };
     try {
       print('${_baseUrl}category');
+      final bytes1 = image.readAsBytesSync().lengthInBytes;
+      final kb1 = bytes1 / 1024;
+      final mb1 = kb1 / 1024;
 
-      var request = http.MultipartRequest('POST', Uri.parse('${_baseUrl}category'))
-        ..fields['name'] = name
-        ..files.add(await http.MultipartFile.fromPath('image', image.path,
-          contentType:MediaType('image','png/jpeg/jpg'),
-        ));
+      print(mb1.toString()+" "+mb1.toString());
 
-      request.headers.addAll(headers);
+       if(mb1>1){
+        return "image error";
+      }else {
+         var request = http.MultipartRequest(
+             'POST', Uri.parse('${_baseUrl}category'))
+           ..fields['name'] = name
+           ..files.add(await http.MultipartFile.fromPath('image', image.path,
+             contentType: MediaType('image', 'png/jpeg/jpg'),
+           ));
 
-      http.StreamedResponse response = await request.send();
+         request.headers.addAll(headers);
 
-      String responseStr = await response.stream.bytesToString();
+         http.StreamedResponse response = await request.send();
 
-      print(responseStr);
+         String responseStr = await response.stream.bytesToString();
 
-      Map<String, dynamic> json = jsonDecode(responseStr);
+         print(responseStr);
 
-      if (response.statusCode == 200) {
-        int status = json['status'];
-        if (status == 200) {
-          return 'success';
-        }
-      }
-      else {
-        print(response.reasonPhrase);
-        return 'Error';
-      }
+         Map<String, dynamic> json = jsonDecode(responseStr);
+
+         if (response.statusCode == 200) {
+           int status = json['status'];
+           if (status == 200) {
+             return 'success';
+           }
+         }
+         else {
+           print(response.reasonPhrase);
+           return 'Error';
+         }
+       }
 
     }catch(e){
       print(e);
@@ -780,35 +821,45 @@ class AppApiClient {
     try {
       print('${_baseUrl}category');
 
-      var request = http.MultipartRequest('POST', Uri.parse('${_baseUrl}banner'))
-        ..fields['text'] = text
-        ..fields['price'] = price.toString()
-        ..fields['offer_price'] = offer.toString()
-        ..files.add(await http.MultipartFile.fromPath('image', image.path,
-          contentType:MediaType('image','png/jpeg/jpg'),
-        ));
+      final bytes1 = image.readAsBytesSync().lengthInBytes;
+      final kb1 = bytes1 / 1024;
+      final mb1 = kb1 / 1024;
 
-      request.headers.addAll(headers);
+      print(mb1.toString()+" "+mb1.toString());
 
-      http.StreamedResponse response = await request.send();
+     if(mb1>1){
+        return "image error";
+      }else {
+       var request = http.MultipartRequest(
+           'POST', Uri.parse('${_baseUrl}banner'))
+         ..fields['text'] = text
+         ..fields['price'] = price.toString()
+         ..fields['offer_price'] = offer.toString()
+         ..files.add(await http.MultipartFile.fromPath('image', image.path,
+           contentType: MediaType('image', 'png/jpeg/jpg'),
+         ));
 
-      String responseStr = await response.stream.bytesToString();
+       request.headers.addAll(headers);
 
-      print(responseStr);
+       http.StreamedResponse response = await request.send();
 
-      Map<String, dynamic> json = jsonDecode(responseStr);
+       String responseStr = await response.stream.bytesToString();
 
-      if (response.statusCode == 200) {
-        int status = json['status'];
-        if (status == 200) {
-          return 'success';
-        }
-      }
-      else {
-        print(response.reasonPhrase);
-        return 'Error';
-      }
+       print(responseStr);
 
+       Map<String, dynamic> json = jsonDecode(responseStr);
+
+       if (response.statusCode == 200) {
+         int status = json['status'];
+         if (status == 200) {
+           return 'success';
+         }
+       }
+       else {
+         print(response.reasonPhrase);
+         return 'Error';
+       }
+     }
     }catch(e){
       print(e);
     }
@@ -824,14 +875,23 @@ class AppApiClient {
     };
     try {
       print('${_baseUrl}banner/$id');
+      var request;
 
-      var request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
-        ..fields['price'] = price.toString()
-        ..fields['offer_price'] = offer.toString()
-        ..fields['text'] = text
-        ..files.add(await http.MultipartFile.fromPath('image', image.path,
-          contentType:MediaType('image','png/jpeg/jpg'),
-        ));
+
+      if(image==null){
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
+          ..fields['price'] = price.toString()
+          ..fields['offer_price'] = offer.toString()
+          ..fields['text'] = text;
+      }else{
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
+          ..fields['price'] = price.toString()
+          ..fields['offer_price'] = offer.toString()
+          ..fields['text'] = text
+          ..files.add(await http.MultipartFile.fromPath('image', image.path,
+            contentType:MediaType('image','png/jpeg/jpg'),
+          ));
+      }
 
       request.headers.addAll(headers);
 
@@ -869,15 +929,17 @@ class AppApiClient {
     };
     try {
       print('${_baseUrl}category/$categoryId');
-
-
-
-
-      var request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}category/$categoryId'))
-        ..fields['name'] = name
-        ..files.add(await http.MultipartFile.fromPath('image', image.path,
-          contentType:MediaType('image','png/jpeg/jpg'),
-        ));
+      var request;
+      if(image==null){
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}category/$categoryId'))
+          ..fields['name'] = name;
+      }else{
+        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}category/$categoryId'))
+          ..fields['name'] = name
+          ..files.add(await http.MultipartFile.fromPath('image', image.path,
+            contentType:MediaType('image','png/jpeg/jpg'),
+          ));
+      }
 
       request.headers.addAll(headers);
 
@@ -896,12 +958,12 @@ class AppApiClient {
         }
       }
       else {
-        print(response.statusCode+response.hashCode );
-     //   print(response.reasonPhrase);
+       print(response.reasonPhrase);
         return 'Error';
       }
 
     }catch(e){
+      print(e);
       print(e.hashCode);
     }
 
@@ -915,15 +977,12 @@ class AppApiClient {
       'Content-Type': 'application/json',
     };
     try {
-      print('${_baseUrl}category');
-
-
       var request = http.Request('DELETE', Uri.parse('${_baseUrl}category/$categoryId'));
-
+      print(2);
       request.headers.addAll(headers);
-
+      print(2);
       http.StreamedResponse response = await request.send();
-
+      print(2);
       String responseStr = await response.stream.bytesToString();
 
       print(responseStr);
@@ -947,6 +1006,43 @@ class AppApiClient {
 
   }
 
+
+  Future<String> deleteOffer({int id}) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json',
+    };
+    try {
+      var request = http.Request('DELETE', Uri.parse('${_baseUrl}banner/$id'));
+      print(2);
+      request.headers.addAll(headers);
+      print(2);
+      http.StreamedResponse response = await request.send();
+      print(2);
+      String responseStr = await response.stream.bytesToString();
+
+      print(responseStr);
+
+      Map<String, dynamic> json = jsonDecode(responseStr);
+
+      if (response.statusCode == 200) {
+        int status = json['status'];
+        if (status == 200) {
+          return 'success';
+        }
+      }
+      else {
+        print(response.reasonPhrase);
+        return 'Error';
+      }
+
+    }catch(e){
+      print(e);
+    }
+
+  }
   Future<String> bookService(Order order) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);

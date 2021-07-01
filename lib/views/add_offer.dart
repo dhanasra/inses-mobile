@@ -67,7 +67,24 @@ class _AddOfferState extends State<AddOffer> {
                 if(state is Empty || state is Loading){
                   return buildView(true);
                 }else if(state is Error){
-                  return ErrorItem();
+                  Future.delayed(Duration.zero, () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Wrap(
+                              children: [
+                                Content(
+                                  padding: EdgeInsets.only(top: 5,bottom: 5),
+                                  text: state.error??(state.error.isNotEmpty?state.error:"Error Occured"),
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                  fontfamily: AppFont.FONT,
+                                ),
+                              ],
+                            )
+                        )
+                    );
+                  });
+                  return buildView(false);
                 }else if(state is Initial || state is Success){
                   if(state is Success){
                     Future.delayed(Duration.zero, () async {
@@ -220,14 +237,32 @@ class _AddOfferState extends State<AddOffer> {
                 ),
                 onTap: (){
                   if(_formKey.currentState.validate()) {
-                    editBloc.add(
-                        AddOfferEvent(
-                            text: _viewmodel.nameController.text.toString(),
-                            price: int.parse( _viewmodel.oldPriceController.text),
-                            offer: int.parse( _viewmodel.offerPriceController.text),
-                            image: EditViewModel.image
-                        )
-                    );
+                    if(picked1) {
+                      editBloc.add(
+                          AddOfferEvent(
+                              text: _viewmodel.nameController.text.toString(),
+                              price: int.parse(
+                                  _viewmodel.oldPriceController.text),
+                              offer: int.parse(
+                                  _viewmodel.offerPriceController.text),
+                              image: EditViewModel.image
+                          )
+                      );
+                    }else{
+                      SnackBar(
+                          content: Wrap(
+                            children: [
+                              Content(
+                                padding: EdgeInsets.only(top: 5,bottom: 5),
+                                text: ("Select Image"),
+                                fontSize: AppDimen.TEXT_SMALL,
+                                fontWeight: FontWeight.w400,
+                                fontfamily: AppFont.FONT,
+                              ),
+                            ],
+                          )
+                      );
+                    }
                   }
                 },
               )

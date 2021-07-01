@@ -49,6 +49,8 @@ class _EdServiceState extends State<EdService> {
   void initState() {
     _viewmodel = EditViewModel(App());
     editBloc = NetworkBloc(appRepository: appRepository);
+    EditViewModel.icon = null;
+    EditViewModel.image = null;
     _viewmodel.nameController.text = EditViewModel.service.name;
     _viewmodel.priceController.text = EditViewModel.service.price.toString();
     super.initState();
@@ -78,7 +80,24 @@ class _EdServiceState extends State<EdService> {
               if(state is Empty || state is Loading){
                 return buildView(true);
               }else if(state is Error){
-                return ErrorItem();
+                Future.delayed(Duration.zero, () async {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Wrap(
+                            children: [
+                              Content(
+                                padding: EdgeInsets.only(top: 5,bottom: 5),
+                                text: state.error??(state.error.isNotEmpty?state.error:"Error Occured"),
+                                fontSize: AppDimen.TEXT_SMALL,
+                                fontWeight: FontWeight.w400,
+                                fontfamily: AppFont.FONT,
+                              ),
+                            ],
+                          )
+                      )
+                  );
+                });
+                return buildView(false);
               }else if(state is Initial || state is Success){
                 if(state is Success){
                   Future.delayed(Duration.zero, () async {

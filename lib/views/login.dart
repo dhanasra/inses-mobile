@@ -55,8 +55,11 @@ class _LoginState extends State<Login> {
         builder: (context,state){
           if(state is LoginSuccess){
             print("success");
-
-            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+            if(state.id=="1") {
+              App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+            }else{
+              App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+            }
           }else if(state is LoginError){
             print("error");
             if(state.error==""){

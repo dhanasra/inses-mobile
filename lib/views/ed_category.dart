@@ -48,6 +48,7 @@ class _EdCategoryState extends State<EdCategory> {
     _viewmodel = EditViewModel(App());
     editBloc = NetworkBloc(appRepository: appRepository);
     _viewmodel.nameController.text = EditViewModel.category.name;
+    EditViewModel.image = null;
     super.initState();
   }
 
@@ -63,6 +64,7 @@ class _EdCategoryState extends State<EdCategory> {
             child: IconButton(
               icon: Icon(Icons.delete),
               onPressed: (){
+                print(2);
                 editBloc.add(DeleteCategory(categoryId: EditViewModel.category.id));
               },
             ),
@@ -76,7 +78,24 @@ class _EdCategoryState extends State<EdCategory> {
                 if(state is Empty || state is Loading){
                   return buildView(true);
                 }else if(state is Error){
-                  return ErrorItem();
+                  Future.delayed(Duration.zero, () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Wrap(
+                              children: [
+                                Content(
+                                  padding: EdgeInsets.only(top: 5,bottom: 5),
+                                  text: state.error??(state.error.isNotEmpty?state.error:"Error Occured"),
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                  fontfamily: AppFont.FONT,
+                                ),
+                              ],
+                            )
+                        )
+                    );
+                  });
+                  return buildView(false);
                 }else if(state is Initial || state is Success){
                   if(state is Success){
                     Future.delayed(Duration.zero, () async {

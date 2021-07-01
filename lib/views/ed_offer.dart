@@ -49,6 +49,7 @@ class _EdOfferState extends State<EdOffer> {
   void initState() {
     _viewmodel = EditViewModel(App());
     editBloc = NetworkBloc(appRepository: appRepository);
+    EditViewModel.image = null;
     _viewmodel.nameController.text = EditViewModel.offer.txt;
     _viewmodel.priceController.text = EditViewModel.offer.old.toString();
     _viewmodel.offerPriceController.text = EditViewModel.offer.offer.toString();
@@ -61,12 +62,15 @@ class _EdOfferState extends State<EdOffer> {
         appBar: App().appBarBack(
           context,
           'Edit Offer',
-          child: IconButton(
+          child: SizedBox(
+            width: 45,
+            height: 45,
+            child:IconButton(
             icon: Icon(Icons.delete),
             onPressed: (){
-              editBloc.add(DeleteService(serviceId: EditViewModel.service.id));
+              editBloc.add(DeleteOffer(id: EditViewModel.offer.id));
             },
-          ),
+          ),)
         ),
         body:Form(
             key: _formKey,
@@ -76,7 +80,24 @@ class _EdOfferState extends State<EdOffer> {
                 if(state is Empty || state is Loading){
                   return buildView(true);
                 }else if(state is Error){
-                  return ErrorItem();
+                  Future.delayed(Duration.zero, () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Wrap(
+                              children: [
+                                Content(
+                                  padding: EdgeInsets.only(top: 5,bottom: 5),
+                                  text: state.error??(state.error.isNotEmpty?state.error:"Error Occured"),
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                  fontfamily: AppFont.FONT,
+                                ),
+                              ],
+                            )
+                        )
+                    );
+                  });
+                  return buildView(false);
                 }else if(state is Initial || state is Success){
                   if(state is Success){
                     Future.delayed(Duration.zero, () async {

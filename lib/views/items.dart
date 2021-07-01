@@ -89,7 +89,6 @@ class _ItemsState extends State<Items> {
             padding: EdgeInsets.all(20),
             child: Column(
               children: [
-                MiniTitle(text: 'Select what you need',margin: EdgeInsets.only(bottom: 20),),
                 isLoading?Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
