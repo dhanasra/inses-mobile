@@ -321,8 +321,8 @@ class _HomeState extends State<Home> {
             color: AppColors.TAMIL,
             size: 30,
           ),
-          text1: 'Lowest Prices',
-          text2: 'No surprises at the time of service, no hidden costs',
+          text1: 'Suitable Prices',
+          text2: 'Appropriate cost ,neither lesser nor higher',
         ),
         PromiseItem(
           img: Icon(
@@ -330,8 +330,8 @@ class _HomeState extends State<Home> {
             color: AppColors.SUCCESS_COLOR,
             size: 30,
           ),
-          text1: 'Free Cancellation & Reschedule',
-          text2: 'Book now, cancel or change anytime later. No questions asked',
+          text1: 'Free cancellation & reschedule',
+          text2: 'Wanna cancel or reschedule?  not a problem. No charges',
         ),
         PromiseItem(
           img: Icon(
@@ -339,9 +339,9 @@ class _HomeState extends State<Home> {
             color: AppColors.INFO_COLOR,
             size: 30,
           ),
-          text1: 'Top Quality Trusted Professionals',
+          text1: 'Ace Professionals',
           text2:
-              'Best-in-class service professionals are chosen after stringent quality checks',
+              'Best professionals. Hand-picked gems. We never trade-off quality',
         ),
         Line(
           width: double.infinity,

@@ -55,6 +55,9 @@ class _BookingDescState extends State<BookingDesc> {
           appBar: App().appBarBack(
             context,
             OrderViewModel.booking.categoryName,
+            onPressed: (){
+              App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+            }
           ),
           body: Container(
               padding: EdgeInsets.only(bottom: 0),

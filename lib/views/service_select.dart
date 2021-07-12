@@ -227,31 +227,6 @@ class _ServiceSelectState extends State<ServiceSelect> {
               )
             ],
           ),
-        Content(
-          margin: EdgeInsets.only(top: 30),
-          padding: EdgeInsets.all(15),
-          text: '${OrderViewModel.category} Service Includes',
-          alignment: Alignment.centerLeft,
-          textAlign: TextAlign.start,
-          textHeight: 1.5,
-          color: AppColors.BLACK,
-          bgColor: AppColors.WHITE_1,
-          fontfamily: AppFont.FONT,
-          letterSpacing: 0.5,
-          fontSize: AppDimen.TEXT_H7,
-          fontWeight: FontWeight.w500,
-        ),
-        Container(
-          margin: EdgeInsets.only(bottom: 30),
-          padding: EdgeInsets.only(top: 10),
-          color: AppColors.WHITE_1,
-          child: SizedBox(
-            height: 130.0,
-            child: ListView(scrollDirection: Axis.horizontal,
-              children: [1,2,3,4].map((e) {return MiniCardItem();}).toList(),
-            ),
-          ),
-        ),
         Sub(
           text: 'How it works',
         ),
@@ -261,8 +236,8 @@ class _ServiceSelectState extends State<ServiceSelect> {
             color: AppColors.TAMIL,
             size: 30,
           ),
-          text1: 'Select The Service You Need',
-          text2: 'Get lowest priced for plumbing service',
+          text1: 'How can we serve you?',
+          text2: 'Get our quality service at appropriate price',
         ),
         PromiseItem(
           img: Icon(
@@ -270,8 +245,8 @@ class _ServiceSelectState extends State<ServiceSelect> {
             color: AppColors.SUCCESS_COLOR,
             size: 30,
           ),
-          text1: 'Pay Booking Advance',
-          text2: 'Make advance payment to book your service or ontime cash',
+          text1: 'Pay in advance',
+          text2: 'Pay on time or prior',
         ),
         PromiseItem(
           img: Icon(
@@ -279,9 +254,9 @@ class _ServiceSelectState extends State<ServiceSelect> {
             color: AppColors.INFO_COLOR,
             size: 30,
           ),
-          text1: 'Get Hassle Free Service Delivery',
+          text1: 'Get hassle free service delivery:',
           text2:
-          'Inses arrives at your doorstep to provide service',
+          'Sit back ,relax, watch your door step for our service on time',
         ),
         Line(
           width: double.infinity,
@@ -298,8 +273,8 @@ class _ServiceSelectState extends State<ServiceSelect> {
             color: AppColors.TAMIL,
             size: 30,
           ),
-          text1: 'Lowest Prices',
-          text2: 'No surprises at the time of service, no hidden costs',
+          text1: 'Suitable prices',
+          text2: 'Appropriate cost ,neither lesser nor higher',
         ),
         PromiseItem(
           img: Icon(
@@ -308,7 +283,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
             size: 30,
           ),
           text1: 'Free Cancellation & Reschedule',
-          text2: 'Book now, cancel or change anytime later. No questions asked',
+        text2: 'Wanna cancel or reschedule?  not a problem. No charges',
         ),
         PromiseItem(
           img: Icon(
@@ -316,9 +291,9 @@ class _ServiceSelectState extends State<ServiceSelect> {
             color: AppColors.INFO_COLOR,
             size: 30,
           ),
-          text1: 'Top Quality Trusted Professionals',
+          text1: 'Ace Professionals',
           text2:
-          'Best-in-class service professionals are chosen after stringent quality checks',
+          'Best professionals. Hand-picked gems. We never trade-off quality ',
         ),
         Line(
           width: double.infinity,
