@@ -11,7 +11,7 @@ class PromiseItem extends StatelessWidget {
   final String text1;
   final String text2;
 
-  PromiseItem({this.img,this.text2,this.text1});
+  PromiseItem({required this.img,required this.text2,required this.text1});
 
   @override
   Widget build(BuildContext context) {

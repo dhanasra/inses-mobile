@@ -10,7 +10,7 @@ class TimeItem extends StatelessWidget {
   final String time;
   final bool isSelected;
 
-  TimeItem({this.isSelected,this.time});
+  TimeItem({required this.isSelected,required this.time});
 
   @override
   Widget build(BuildContext context) {

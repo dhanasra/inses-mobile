@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
@@ -19,7 +19,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inses_app/view_models/edit_view_model.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/widgets/error_item.dart';
-import 'package:inses_app/widgets/grey_micro.dart';
 import 'package:inses_app/widgets/input_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/sub_title.dart';
@@ -33,8 +32,8 @@ class AddReview extends StatefulWidget {
 class _AddReviewState extends State<AddReview> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  EditViewModel _viewmodel;
-  NetworkBloc editBloc;
+  late EditViewModel _viewmodel;
+  late NetworkBloc editBloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
@@ -152,10 +151,10 @@ class _AddReviewState extends State<AddReview> {
                   fontWeight: FontWeight.w400,
                 ),
                 onTap: (){
-                  if(_formKey.currentState.validate()) {
+                  if(_formKey.currentState!.validate()) {
                     editBloc.add(
                         ev.AddReview(
-                            id: OrderViewModel.booking.id,
+                            id: OrderViewModel.booking!.id,
                             rating: EditViewModel.rating,
                             comment: _viewmodel.nameController.text
                         )

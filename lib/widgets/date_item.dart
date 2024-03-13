@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
@@ -11,7 +10,7 @@ class DateItem extends StatelessWidget {
   final String day;
   final bool isSelected;
 
-  DateItem({this.date,this.day,this.isSelected});
+  DateItem({required this.date,required this.day,required this.isSelected});
 
   @override
   Widget build(BuildContext context) {

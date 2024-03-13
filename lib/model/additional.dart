@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 class AdditionalModel extends Equatable {
-  final int id;
+  final int? id;
   final String description;
   final String price;
 
   const AdditionalModel(
-      { this.id,
-        this.description,
-        this.price,});
+      {this.id,
+       required this.description,
+       required this.price,});
 
   @override
   List<Object> get props =>

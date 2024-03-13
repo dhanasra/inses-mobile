@@ -1,7 +1,6 @@
 
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -11,7 +10,6 @@ import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
-import 'package:inses_app/comps/primary_button.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/app_repository.dart';
@@ -22,8 +20,6 @@ import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/edit_view_model.dart';
-import 'package:inses_app/view_models/home_view_model.dart';
-import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/grey_micro.dart';
 import 'package:inses_app/widgets/input_item.dart';
 import 'package:inses_app/widgets/loader.dart';
@@ -36,13 +32,13 @@ class EdService extends StatefulWidget {
 }
 
 class _EdServiceState extends State<EdService> {
-  EditViewModel _viewmodel;
+  late EditViewModel _viewmodel;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool picked1 = false;
   bool picked2 = false;
-  String path1;
-  String path2;
-  NetworkBloc editBloc;
+  String? path1;
+  String? path2;
+  late NetworkBloc editBloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
@@ -51,8 +47,8 @@ class _EdServiceState extends State<EdService> {
     editBloc = NetworkBloc(appRepository: appRepository);
     EditViewModel.icon = null;
     EditViewModel.image = null;
-    _viewmodel.nameController.text = EditViewModel.service.name;
-    _viewmodel.priceController.text = EditViewModel.service.price.toString();
+    _viewmodel.nameController.text = EditViewModel.service?.name;
+    _viewmodel.priceController.text = EditViewModel.service?.price.toString();
     super.initState();
   }
 
@@ -68,7 +64,7 @@ class _EdServiceState extends State<EdService> {
           child: IconButton(
           icon: Icon(Icons.delete),
           onPressed: (){
-            editBloc.add(DeleteService(serviceId: EditViewModel.service.id));
+            editBloc.add(DeleteService(serviceId: EditViewModel.service!.id!));
           },
         ),),
       ),
@@ -87,7 +83,7 @@ class _EdServiceState extends State<EdService> {
                             children: [
                               Content(
                                 padding: EdgeInsets.only(top: 5,bottom: 5),
-                                text: state.error??(state.error.isNotEmpty?state.error:"Error Occured"),
+                                text: state.error??(state.error!.isNotEmpty?state.error:"Error Occured")??'',
                                 fontSize: AppDimen.TEXT_SMALL,
                                 fontWeight: FontWeight.w400,
                                 fontfamily: AppFont.FONT,
@@ -174,7 +170,7 @@ class _EdServiceState extends State<EdService> {
                         width: 120,
                         height: 120,
                         child: Image.file(
-                            File(path1)
+                            File(path1!)
                         ),
                       )
                   ):
@@ -184,7 +180,7 @@ class _EdServiceState extends State<EdService> {
                     child: ImageView(
                       margin: EdgeInsets.all(20),
                       width: 80,
-                      url: EditViewModel.service.icon,
+                      url: EditViewModel.service!.icon,
                     ),
                   ),
                   OnTapField(
@@ -201,8 +197,9 @@ class _EdServiceState extends State<EdService> {
                               textAlign: TextAlign.center,
                             ),
                             onTap: ()async{
-                              PickedFile file = await ImagePicker().getImage(
+                              PickedFile? file = await ImagePicker().getImage(
                                   source: ImageSource.gallery);
+                              if(file==null) return;    
                               EditViewModel.icon = File(file.path);
                               setState(() {
                                 path1 = file.path;
@@ -232,7 +229,7 @@ class _EdServiceState extends State<EdService> {
                         width: 220,
                         height: 120,
                         child: Image.file(
-                            File(path2)
+                            File(path2!)
                         ),
                       )
                   ):
@@ -242,7 +239,7 @@ class _EdServiceState extends State<EdService> {
                     child: ImageView(
                       margin: EdgeInsets.all(20),
                       width: 180,
-                      url: EditViewModel.service.image,
+                      url: EditViewModel.service!.image,
                     ),
                   ),
                   OnTapField(
@@ -259,8 +256,9 @@ class _EdServiceState extends State<EdService> {
                               textAlign: TextAlign.center,
                             ),
                             onTap: ()async{
-                              PickedFile file = await ImagePicker().getImage(
+                              PickedFile? file = await ImagePicker().getImage(
                                   source: ImageSource.gallery);
+                              if(file==null) return;
                               EditViewModel.image = File(file.path);
                               setState(() {
                                 path2 = file.path;
@@ -300,11 +298,11 @@ class _EdServiceState extends State<EdService> {
                   fontWeight: FontWeight.w400,
                 ),
                 onTap: (){
-                  if(_formKey.currentState.validate()) {
+                  if(_formKey.currentState!.validate()) {
                     editBloc.add(
                         EditService(
-                            id: EditViewModel.service.id,
-                            categoryId: EditViewModel.service.categoryId,
+                            id: EditViewModel.service!.id!,
+                            categoryId: EditViewModel.service!.categoryId!,
                             name: _viewmodel.nameController.text,
                             price: int.parse( _viewmodel.priceController.text),
                             icon: EditViewModel.icon,

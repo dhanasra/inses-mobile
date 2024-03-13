@@ -1,16 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
-import 'package:inses_app/comps/elevated_button.dart';
-import 'package:inses_app/comps/image_container.dart';
-import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/tap_field.dart';
-import 'package:inses_app/comps/two_wave_clipper.dart';
 import 'package:inses_app/model/offer.dart';
-import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -18,7 +11,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ScrollCard extends StatefulWidget {
   final List<OfferModel> offers;
-  ScrollCard({this.offers});
+  ScrollCard({required this.offers});
 
   @override
   _ScrollCardState createState() => _ScrollCardState();
@@ -26,9 +19,9 @@ class ScrollCard extends StatefulWidget {
 
 class _ScrollCardState extends State<ScrollCard> {
   int _currentPage = 0;
-  PageController _pageController;
+  late PageController _pageController;
 
-  List<OfferModel> scrolls;
+  late List<OfferModel> scrolls;
 
   @override
   void initState() {
@@ -85,7 +78,7 @@ class _ScrollCardState extends State<ScrollCard> {
     );
   }
 
-  Widget pageItem({OfferModel offer}) {
+  Widget pageItem({required OfferModel offer}) {
     return OnTapField(
         child: Container(
             padding: EdgeInsets.all(10),

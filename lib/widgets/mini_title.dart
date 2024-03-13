@@ -1,14 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:inses_app/comps/content.dart';
-import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 
 class MiniTitle extends StatelessWidget {
   final String text;
-  final EdgeInsetsGeometry margin;
-  MiniTitle({this.text,this.margin});
+  final EdgeInsetsGeometry? margin;
+  MiniTitle({required this.text,this.margin});
   @override
   Widget build(BuildContext context) {
     return Content(

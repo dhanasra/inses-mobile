@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
@@ -12,7 +11,7 @@ class AdminItem extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  AdminItem({this.name,this.icon,this.onPressed});
+  AdminItem({required this.name,required this.icon,required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +26,14 @@ class AdminItem extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(icon,color: AppColors.PRIMARY_COLOR,)
+                    Icon(
+                      icon,
+                      color: AppColors.PRIMARY_COLOR,
+                    )
                   ],
                 ),
                 Content(
-                  padding: EdgeInsets.only(top: 8,bottom: 8),
+                  padding: EdgeInsets.only(top: 8, bottom: 8),
                   alignment: Alignment.center,
                   text: name,
                   color: AppColors.BLACK_3,
@@ -40,10 +42,10 @@ class AdminItem extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
                 Content(
-                  padding: EdgeInsets.only(top: 8,bottom: 15),
+                  padding: EdgeInsets.only(top: 8, bottom: 15),
                   alignment: Alignment.center,
                   text: 'Add / Edit $name',
-                  color: AppColors.GRAY,
+                  color: AppColors.PRIMARY_COLOR_LIGHT,
                   fontfamily: AppFont.FONT,
                   fontSize: AppDimen.TEXT_SMALLEST,
                   fontWeight: FontWeight.w600,
@@ -51,14 +53,16 @@ class AdminItem extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.arrow_forward,color: AppColors.GRAY,)
+                    Icon(
+                      Icons.arrow_forward,
+                      color: AppColors.GRAY,
+                    )
                   ],
                 )
               ],
             ),
           ),
         ),
-        onTap: onPressed
-    );
+        onTap: onPressed);
   }
 }

@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:inses_app/views/about.dart';
 import 'package:inses_app/views/add_additional_charge.dart';
@@ -30,18 +29,18 @@ import 'package:inses_app/views/service_select.dart';
 import 'package:inses_app/views/service_summary.dart';
 import 'package:inses_app/views/settings.dart';
 import 'package:inses_app/views/update_booking_status.dart';
+import 'package:inses_app/views/forget_password.dart';
 
 class AppRoutes {
   //Authentication pages
   static const String APP_SPLASH = '/splash';
   static const String APP_NAME_FIELDS = '/name_fields';
   static const String APP_REGISTER = '/register';
-  static const String APP_FORGOT_PASSWORD = '/forgot_password';
+  static const String APP_FORGOT_PASSWORD = '/forget_password';
   static const String APP_LOGIN = '/login';
   static const String APP_AUTH_LOAD = '/auth_load';
   static const String APP_SPLASH_LOAD = '/splash_load';
   static const String APP_LAUNCH = '/launch';
-
 
   static const String APP_HOME_MAIN = '/home_main';
 
@@ -457,6 +456,10 @@ class AppRoutes {
       case APP_REGISTER:
         {
           return Register();
+        }
+      case APP_FORGOT_PASSWORD:
+        {
+          return ForgetPasswordSettings();
         }
       case APP_NAME_FIELDS:
         {

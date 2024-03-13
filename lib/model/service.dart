@@ -3,16 +3,16 @@ import 'package:equatable/equatable.dart';
 class ServiceModel extends Equatable {
   final String name;
   final String icon;
-  final String image;
-  final int id;
-  final int price;
-  final int categoryId;
+  final String? image;
+  final int? id;
+  final int? price;
+  final int? categoryId;
 
   const ServiceModel(
       {
-        this.name,
+        required this.name,
         this.image,
-        this.icon,
+        required this.icon,
         this.id,
         this.price,
         this.categoryId
@@ -20,7 +20,7 @@ class ServiceModel extends Equatable {
 
   @override
   List<Object> get props =>
-      [image,name,icon,id,price,categoryId];
+      [name,icon];
 
   static ServiceModel fromJson(dynamic json) {
     return ServiceModel(

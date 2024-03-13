@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
@@ -20,25 +18,20 @@ import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/register_view_model.dart';
 import 'package:inses_app/widgets/double_color_button.dart';
 import 'package:inses_app/widgets/grey_micro.dart';
-import 'package:inses_app/widgets/grey_mini.dart';
 import 'package:inses_app/widgets/input_item.dart';
-import 'package:inses_app/widgets/or_item.dart';
 import 'package:inses_app/widgets/sub_title.dart';
-import 'package:line_icons/line_icons.dart';
 
 class Login extends StatefulWidget {
-
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-
-  RegisterViewModel _viewmodel;
+  late RegisterViewModel _viewmodel;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  NetworkBloc bloc;
-  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
-
+  late NetworkBloc bloc;
+  AppRepository appRepository =
+      AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
   void initState() {
@@ -50,63 +43,58 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:BlocBuilder<NetworkBloc,NetworkState>(
-        bloc: bloc,
-        builder: (context,state){
-          if(state is LoginSuccess){
-            print("success");
-            if(state.id=="1") {
-              App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
-            }else{
-              App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
-            }
-          }else if(state is LoginError){
-            print("error");
-            if(state.error==""){
-
-            }else{
-              Future.delayed(Duration.zero, () async {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Wrap(
-                          children: [
-                            Content(
-                              padding: EdgeInsets.only(top: 5,bottom: 5),
-                              text: state.error,
-                              fontSize: AppDimen.TEXT_SMALL,
-                              fontWeight: FontWeight.w400,
-                              fontfamily: AppFont.FONT,
-                            ),
-                          ],
-                        )
-                    )
-                );
-              });
-            }
+        body: BlocBuilder<NetworkBloc, NetworkState>(
+      bloc: bloc,
+      builder: (context, state) {
+        if (state is LoginSuccess) {
+          print("success");
+          if (state.id == "1") {
+            App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+          } else {
+            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
           }
-          return Container(
-              color: AppColors.WHITE,
-              child:  Form(
-                key: _formKey,
-                child: buildView(),
-              )
-          );
-        },
-      )
-    );
+        } else if (state is LoginError) {
+          print("error");
+          if (state.error == "") {
+          } else {
+            Future.delayed(Duration.zero, () async {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Wrap(
+                children: [
+                  Content(
+                    padding: EdgeInsets.only(top: 5, bottom: 5),
+                    text: state.error??'',
+                    fontSize: AppDimen.TEXT_SMALL,
+                    fontWeight: FontWeight.w400,
+                    fontfamily: AppFont.FONT,
+                  ),
+                ],
+              )));
+            });
+          }
+        }
+        return Container(
+            color: AppColors.WHITE,
+            child: Form(
+              key: _formKey,
+              child: buildView(),
+            ));
+      },
+    ));
   }
 
-  Widget buildView(){
+  Widget buildView() {
     return ListView(
       children: [
         ImageView(
-          margin: EdgeInsets.only(left: 20,right: 20,top: 40),
+          margin: EdgeInsets.only(left: 20, right: 20, top: 40),
           alignment: Alignment.centerLeft,
-          width: 70,asset: 'logo-h2.png',
-          height: 40,
+          width: 70,
+          asset: 'logo-h2.png',
+          height: 50,
         ),
         SubTitle(
-          margin: EdgeInsets.only(left: 20,right: 20,top: 10),
+          margin: EdgeInsets.only(left: 20, right: 20, top: 10),
           text: 'Login Your Account',
         ),
         GreyMicro(
@@ -118,7 +106,7 @@ class _LoginState extends State<Login> {
           controller: _viewmodel.phoneController,
           prefixIcon: Icon(Icons.phone),
           autoFocus: true,
-          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
           text: 'Phone number',
           emptyError: 'Phone number should not be empty',
           lengthError: 'Enter a valid phone number',
@@ -127,67 +115,75 @@ class _LoginState extends State<Login> {
           maxLength: 10,
           inputType: TextInputType.phone,
           isObscurred: false,
-          regExp:(RegExp(r'[0-9]')),
+          regExp: (RegExp(r'[0-9]')),
         ),
         InputItem(
           focusNode: _viewmodel.passwordFocus,
           autoFocus: false,
           controller: _viewmodel.passwordController,
           prefixIcon: Icon(Icons.lock),
-          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
           text: 'Password',
           emptyError: 'Password should not be empty',
           lengthError: 'Password length should greater than 5',
           minLength: 6,
-          isObscurred: true,
+          isObscurred: false,
         ),
         Container(
-            margin: EdgeInsets.only(top: 70,left: 20,right: 20),
+            margin: EdgeInsets.only(top: 70, left: 20, right: 20),
             alignment: Alignment.center,
-            child:Wrap(
-                children:[
-                  PrimaryButton(
-                      text: 'LOGIN',
-                      txtColor: AppColors.WHITE,
-                      bgColor: AppColors.PRIMARY_COLOR,
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w500,
-                      fontSize: AppDimen.TEXT_SMALL,
-                      radius: 5,
-                      onPressed:(){
-                        if(_formKey.currentState.validate()) {
-                          bloc.add(
-                              LoginUser(
-                                  phone: _viewmodel.phoneController.text,
-                                  password: _viewmodel.passwordController.text
-                              )
-                          );
-                        }
-                      }),
-                ]
-            )
-        ),
-        Or(),
+            child: Wrap(children: [
+              PrimaryButton(
+                  text: 'LOGIN',
+                  txtColor: AppColors.WHITE,
+                  bgColor: AppColors.PRIMARY_COLOR,
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w500,
+                  fontSize: AppDimen.TEXT_SMALL,
+                  radius: 5,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      bloc.add(LoginUser(
+                          phone: _viewmodel.phoneController.text,
+                          password: _viewmodel.passwordController.text));
+                    }
+                  }),
+            ])),
         Container(
-            padding: EdgeInsets.only(left: 15,right: 15),
+            padding: EdgeInsets.only(left: 15, right: 15),
             margin: EdgeInsets.only(top: 40),
             alignment: Alignment.center,
-            child:Wrap(
-                children:[
-                  DoubleColorButton(
-                      text1: "Don't have an account? ",
-                      text2: 'Create',
-                      txtColor: AppColors.BLACK,
-                      width: 250,
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppDimen.TEXT_SMALL,
-                      onPressed:(){
-                        App().setNavigation(context, AppRoutes.APP_REGISTER);
-                      })
-                ]
-            )
-        ),
+            child: Wrap(children: [
+              DoubleColorButton(
+                  text1: "",
+                  text2: 'Forget Password',
+                  txtColor: AppColors.BLACK,
+                  width: 250,
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w600,
+                  fontSize: AppDimen.TEXT_SMALL,
+                  onPressed: () {
+                    App().setNavigation(context, AppRoutes.APP_FORGOT_PASSWORD);
+                  })
+            ])),
+        // Or(),
+        Container(
+            padding: EdgeInsets.only(left: 15, right: 15),
+            margin: EdgeInsets.only(top: 40),
+            alignment: Alignment.center,
+            child: Wrap(children: [
+              DoubleColorButton(
+                  text1: "Don't have an account? ",
+                  text2: 'Create',
+                  txtColor: AppColors.BLACK,
+                  width: 250,
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w600,
+                  fontSize: AppDimen.TEXT_SMALL,
+                  onPressed: () {
+                    App().setNavigation(context, AppRoutes.APP_REGISTER);
+                  })
+            ])),
       ],
     );
   }

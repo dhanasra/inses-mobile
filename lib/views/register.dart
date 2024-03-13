@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
@@ -25,17 +24,16 @@ import 'package:inses_app/widgets/or_item.dart';
 import 'package:inses_app/widgets/sub_title.dart';
 
 class Register extends StatefulWidget {
-
   @override
   _RegisterState createState() => _RegisterState();
 }
 
 class _RegisterState extends State<Register> {
-
-  RegisterViewModel _viewmodel;
+  late RegisterViewModel _viewmodel;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  NetworkBloc bloc;
-  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+  late NetworkBloc bloc;
+  AppRepository appRepository =
+      AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
   void initState() {
@@ -47,61 +45,57 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<NetworkBloc,NetworkState>(
-        bloc: bloc,
-        builder: (context,state){
-          if(state is RegisterSuccess){
-            print("success");
-            ProfileViewModel.name = _viewmodel.nameController.text;
-            ProfileViewModel.phone =  _viewmodel.phoneController.text;
-            App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
-          }else if(state is RegisterError){
-            print("error");
-            if(state.error==""){
-
-            }else{
-              Future.delayed(Duration.zero, () async {
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Wrap(
-                          children: [
-                            Content(
-                              padding: EdgeInsets.only(top: 5,bottom: 5),
-                              text: state.error,
-                              fontSize: AppDimen.TEXT_SMALL,
-                              fontWeight: FontWeight.w400,
-                              fontfamily: AppFont.FONT,
-                            ),
-                          ],
-                        )
-                    )
-                );
-              });
-            }
+        body: BlocBuilder<NetworkBloc, NetworkState>(
+      bloc: bloc,
+      builder: (context, state) {
+        if (state is RegisterSuccess) {
+          print("success");
+          ProfileViewModel.name = _viewmodel.nameController.text;
+          ProfileViewModel.phone = _viewmodel.phoneController.text;
+          //  ProfileViewModel.email = _viewmodel.emailController.text;
+          App().setNavigation(context, AppRoutes.APP_NAME_FIELDS);
+        } else if (state is RegisterError) {
+          print("error");
+          if (state.error == "") {
+          } else {
+            Future.delayed(Duration.zero, () async {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Wrap(
+                children: [
+                  Content(
+                    padding: EdgeInsets.only(top: 5, bottom: 5),
+                    text: state.error,
+                    fontSize: AppDimen.TEXT_SMALL,
+                    fontWeight: FontWeight.w400,
+                    fontfamily: AppFont.FONT,
+                  ),
+                ],
+              )));
+            });
           }
-          return Container(
-              color: AppColors.WHITE,
-              child:  Form(
-                key: _formKey,
-                child: buildView(),
-              )
-          );
-        },
-      )
-    );
+        }
+        return Container(
+            color: AppColors.WHITE,
+            child: Form(
+              key: _formKey,
+              child: buildView(),
+            ));
+      },
+    ));
   }
 
-  Widget buildView(){
+  Widget buildView() {
     return ListView(
       children: [
         ImageView(
-          margin: EdgeInsets.only(left: 20,right: 20,top: 40),
+          margin: EdgeInsets.only(left: 20, right: 20, top: 40),
           alignment: Alignment.centerLeft,
-          width: 70,asset: 'logo-h2.png',
+          width: 70,
+          asset: 'logo-h2.png',
           height: 40,
         ),
         SubTitle(
-          margin: EdgeInsets.only(left: 20,right: 20,top: 10),
+          margin: EdgeInsets.only(left: 20, right: 20, top: 10),
           text: 'Create Account',
         ),
         GreyMicro(
@@ -113,7 +107,7 @@ class _RegisterState extends State<Register> {
           controller: _viewmodel.nameController,
           autoFocus: true,
           prefixIcon: Icon(Icons.person),
-          margin: EdgeInsets.only(top: 30,left: 20,right: 20),
+          margin: EdgeInsets.only(top: 30, left: 20, right: 20),
           text: 'Name',
           emptyError: 'Name should not be empty',
           isObscurred: false,
@@ -123,7 +117,7 @@ class _RegisterState extends State<Register> {
           controller: _viewmodel.phoneController,
           prefixIcon: Icon(Icons.phone),
           autoFocus: false,
-          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
           text: 'Phone number',
           emptyError: 'Phone number should not be empty',
           lengthError: 'Enter a valid phone number',
@@ -132,68 +126,73 @@ class _RegisterState extends State<Register> {
           maxLength: 10,
           inputType: TextInputType.phone,
           isObscurred: false,
-          regExp:(RegExp(r'[0-9]')),
+          regExp: (RegExp(r'[0-9]')),
+        ),
+        InputItem(
+          focusNode: _viewmodel.emailFocus,
+          controller: _viewmodel.emailController,
+          prefixIcon: Icon(Icons.email),
+          autoFocus: false,
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          text: 'E-Mail',
+          emptyError: 'Enter should not be empty',
+          lengthError: 'Enter a valid E-Mail Address',
+          patternError: 'Enter a valid E-Mail Address',
+          inputType: TextInputType.emailAddress,
+          isObscurred: false,
         ),
         InputItem(
           focusNode: _viewmodel.passwordFocus,
           autoFocus: false,
           controller: _viewmodel.passwordController,
           prefixIcon: Icon(Icons.lock),
-          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
           text: 'Password',
           emptyError: 'Password should not be empty',
           lengthError: 'Password length should greater than 5',
           minLength: 6,
-          isObscurred: true,
+          isObscurred: false,
         ),
         Container(
-            margin: EdgeInsets.only(top: 70,left: 20,right: 20),
+            margin: EdgeInsets.only(top: 70, left: 20, right: 20),
             alignment: Alignment.center,
-            child:Wrap(
-                children:[
-                  PrimaryButton(
-                      text: 'CREATE',
-                      txtColor: AppColors.WHITE,
-                      bgColor: AppColors.PRIMARY_COLOR,
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w500,
-                      fontSize: AppDimen.TEXT_SMALL,
-                      radius: 5,
-                      onPressed:(){
-                          if(_formKey.currentState.validate()) {
-                            bloc.add(
-                                AddUser(
-                                  name: _viewmodel.nameController.text,
-                                  phone: _viewmodel.phoneController.text,
-                                  password: _viewmodel.passwordController.text
-                                )
-                            );
-                          }
-                      }),
-                ]
-            )
-        ),
+            child: Wrap(children: [
+              PrimaryButton(
+                  text: 'CREATE',
+                  txtColor: AppColors.WHITE,
+                  bgColor: AppColors.PRIMARY_COLOR,
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w500,
+                  fontSize: AppDimen.TEXT_SMALL,
+                  radius: 5,
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      bloc.add(AddUser(
+                          name: _viewmodel.nameController.text,
+                          email: _viewmodel.emailController.text,
+                          phone: _viewmodel.phoneController.text,
+                          password: _viewmodel.passwordController.text));
+                    }
+                  }),
+            ])),
         Or(),
         Container(
-            padding: EdgeInsets.only(left: 15,right: 15),
+            padding: EdgeInsets.only(left: 15, right: 15),
             margin: EdgeInsets.only(top: 40),
             alignment: Alignment.center,
-            child:Wrap(
-                children:[
-                  DoubleColorButton(
-                      text1: 'Already have an account? ',
-                      text2: 'Signin',
-                      txtColor: AppColors.BLACK,
-                      width: 250,
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppDimen.TEXT_SMALL,
-                      onPressed:(){
-                        App().setNavigation(context, AppRoutes.APP_LOGIN);
-                      })
-                ]
-            )
-        ),
+            child: Wrap(children: [
+              DoubleColorButton(
+                  text1: 'Already have an account? ',
+                  text2: 'Signin',
+                  txtColor: AppColors.BLACK,
+                  width: 250,
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w600,
+                  fontSize: AppDimen.TEXT_SMALL,
+                  onPressed: () {
+                    App().setNavigation(context, AppRoutes.APP_LOGIN);
+                  })
+            ])),
       ],
     );
   }

@@ -1,27 +1,26 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/resources/app_style.dart';
 
 class Content extends StatelessWidget {
   final String text;
-  final Color color;
-  final Color bgColor;
-  final double fontSize;
-  final FontWeight fontWeight;
-  final String fontfamily;
-  final EdgeInsetsGeometry margin;
-  final EdgeInsetsGeometry padding;
-  final AlignmentGeometry alignment;
-  final double width;
-  final double letterSpacing;
-  final double textHeight;
-  final int maxline;
-  final TextDecoration decoration;
-  final TextOverflow overflow;
-  final double height;
-  final TextAlign textAlign;
+  final Color? color;
+  final Color? bgColor;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final String? fontfamily;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry? alignment;
+  final double? width;
+  final double? letterSpacing;
+  final double? textHeight;
+  final int? maxline;
+  final TextDecoration? decoration;
+  final TextOverflow? overflow;
+  final double? height;
+  final TextAlign? textAlign;
   Content(
-      {@required this.text,
+      {required this.text,
       this.color,
       this.fontSize,
       this.fontWeight,

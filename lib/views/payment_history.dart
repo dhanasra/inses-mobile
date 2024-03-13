@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -9,7 +9,6 @@ import 'package:inses_app/network/app_repository.dart';
 import 'package:inses_app/network/bloc/network_bloc.dart';
 import 'package:inses_app/network/bloc/network_event.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
-import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:inses_app/widgets/booking_empty.dart';
 import 'package:inses_app/widgets/error_item.dart';
@@ -24,9 +23,9 @@ class PaymentHistory extends StatefulWidget {
 
 class _PaymentHistoryState extends State<PaymentHistory> {
 
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
-  ProfileViewModel viewModel;
+  late ProfileViewModel viewModel;
 
   @override
   void initState() {

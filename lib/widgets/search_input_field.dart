@@ -1,17 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/input_field.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
-import 'package:line_icons/line_icons.dart';
 
 class SearchInputField extends StatelessWidget {
 
   final TextEditingController controller;
 
-  SearchInputField({this.controller});
+  SearchInputField({required this.controller});
 
   @override
   Widget build(BuildContext context) {

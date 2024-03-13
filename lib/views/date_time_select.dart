@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
@@ -24,9 +24,9 @@ class DateTimeSelect extends StatefulWidget {
 
 class _DateTimeSelectState extends State<DateTimeSelect> {
 
-  StreamController dateController;
-  StreamController timeController;
-  OrderViewModel viewModel;
+  late StreamController dateController;
+  late StreamController timeController;
+  late OrderViewModel viewModel;
 
   @override
   void initState() {
@@ -113,7 +113,7 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
                         dateController.add('pick');
                       }
                   ):OnTapField(
-                      child: DateItem(date: 'pick',day: OrderViewModel.date,isSelected: shot.hasData?shot.data=='pick'?true:false:false,),
+                      child: DateItem(date: 'pick',day: OrderViewModel.date!,isSelected: shot.hasData?shot.data=='pick'?true:false:false,),
                       onTap: (){
                         selectDate(context);
                         dateController.add('pick');
@@ -247,7 +247,7 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
 
   Future<Null> selectDate(BuildContext context) async {
 
-    final DateTime picked = await showDatePicker(
+    final DateTime? picked = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
@@ -262,11 +262,11 @@ class _DateTimeSelectState extends State<DateTimeSelect> {
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                primary: AppColors.GRAY, // button text color
+                foregroundColor: AppColors.GRAY, // button text color
               ),
             ),
           ),
-          child: child,
+          child: child!,
         );
       },
     );

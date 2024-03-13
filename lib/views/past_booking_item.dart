@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inses_app/model/bookings.dart';
@@ -21,9 +21,9 @@ class PastBooking extends StatefulWidget {
 
 class _PastBookingState extends State<PastBooking> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
-  ScrollController controller;
+  late ScrollController controller;
 
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override

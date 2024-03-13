@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inses_app/model/bookings.dart';
 import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
-import 'package:inses_app/model/payment_history.dart';
 import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/app_repository.dart';
@@ -15,22 +13,21 @@ import 'network_event.dart';
 class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
   final AppRepository appRepository;
 
-  NetworkBloc({@required this.appRepository})
-      : assert(appRepository != null),
-        super(Initial());
+  NetworkBloc({required this.appRepository})
+      : super(Initial());
 
   @override
   Stream<NetworkState> mapEventToState(NetworkEvent event) async* {
-
     if (event is AddUser) {
       yield Loading();
       try {
-        final String response = await appRepository.addUser(event.name, event.phone, event.password);
-        if(response == "success"){
+        final String response = await appRepository.addUser(
+            event.name, event.email, event.phone, event.password);
+        if (response == "success") {
           yield RegisterSuccess();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield RegisterError(error: "");
-        }else{
+        } else {
           yield RegisterError(error: response);
         }
       } catch (e) {
@@ -42,14 +39,15 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is LoginUser) {
       yield Loading();
       try {
-        final String response = await appRepository.userLogin(event.phone, event.password);
-        if(response == "1"){
+        final String response =
+            await appRepository.userLogin(event.phone, event.password);
+        if (response == "1") {
           yield LoginSuccess(id: "1");
-        }else if(response == "2"){
+        } else if (response == "2") {
           yield LoginSuccess(id: "2");
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield LoginError(error: "");
-        }else{
+        } else {
           yield LoginError(error: response);
         }
       } catch (e) {
@@ -63,11 +61,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       print('object');
       try {
         final String response = await appRepository.logout();
-        if(response == "success"){
+        if (response == "success") {
           yield LogoutSuccess();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield LoginError(error: "");
-        }else{
+        } else {
           yield LoginError(error: response);
         }
       } catch (e) {
@@ -91,15 +89,16 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       print('object');
       try {
-        final String response = await appRepository.updateProfile(event.name, event.phone);
+        final String response =
+            await appRepository.updateProfile(event.name, event.phone);
         print(response);
-        if(response == "success"){
+        if (response == "success") {
           ProfileViewModel.name = event.name;
           ProfileViewModel.phone = event.phone;
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -111,12 +110,30 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is UpdatePassword) {
       yield Loading();
       try {
-        final String response = await appRepository.updatePassword(event.old,event.password);
-        if(response == "success"){
+        final String response =
+            await appRepository.updatePassword(event.old, event.password);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
+          yield Error(error: response);
+        }
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+    if (event is ForgetPassword) {
+      yield Loading();
+      try {
+        final String response =
+            await appRepository.forgetPassword(event.phone, event.password);
+        if (response == "success") {
+          yield Success();
+        } else if (response == "Error") {
+          yield Error(error: "");
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -128,12 +145,13 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is AddUserAddress) {
       yield Loading();
       try {
-        final String response = await appRepository.addUserAddress(event.address);
-        if(response == "success"){
+        final String response =
+            await appRepository.addUserAddress(event.address);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -146,11 +164,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.getUserAddress();
-        if(response == "success"){
+        if (response == "success") {
           yield LogoutSuccess();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield LoginError(error: "");
-        }else{
+        } else {
           yield LoginError(error: response);
         }
       } catch (e) {
@@ -162,10 +180,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is GetCategories) {
       yield Loading();
       try {
-        final List<CategoryModel> categories = await appRepository.getCategories();
-        if(categories.isEmpty){
+        final List<CategoryModel> categories =
+            await appRepository.getCategories();
+        if (categories.isEmpty) {
           yield Empty();
-        }else{
+        } else {
           yield GotCategories(categories: categories);
         }
       } catch (e) {
@@ -178,9 +197,9 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final List<OfferModel> offers = await appRepository.getOffers();
-        if(offers.isEmpty){
+        if (offers.isEmpty) {
           yield Empty();
-        }else{
+        } else {
           yield GotOffers(offers: offers);
         }
       } catch (e) {
@@ -192,10 +211,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is GetCategoryServices) {
       yield Loading();
       try {
-        final List<ServiceModel> services = await appRepository.getCategoryServices(event.id);
-        if(services.isEmpty){
+        final List<ServiceModel> services =
+            await appRepository.getCategoryServices(event.id);
+        if (services.isEmpty) {
           yield Empty();
-        }else{
+        } else {
           yield GotServices(services: services);
         }
       } catch (e) {
@@ -208,9 +228,9 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final List<ServiceModel> services = await appRepository.getServices();
-        if(services.isEmpty){
+        if (services.isEmpty) {
           yield Empty();
-        }else{
+        } else {
           yield GotServices(services: services);
         }
       } catch (e) {
@@ -224,20 +244,19 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       try {
         final String response = await appRepository.addService(
             name: event.name,
-            image: event.image,
-            icon: event.icon,
+            image: event.image!,
+            icon: event.icon!,
             price: event.price,
-          categoryId: event.categoryId
-        );
-        if(response == "success"){
+            categoryId: event.categoryId);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else if(response == "icon error"){
+        } else if (response == "icon error") {
           yield Error(error: "Icon Size is Too Large");
-        }else if(response == "image error"){
+        } else if (response == "image error") {
           yield Error(error: "Image Size is Too Large");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -250,18 +269,17 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.editService(
-          name: event.name,
-          id: event.id,
-          categoryId: event.categoryId,
-          price: event.price,
-          icon: event.icon,
-          image: event.image
-        );
-        if(response == "success"){
+            name: event.name,
+            id: event.id,
+            categoryId: event.categoryId,
+            price: event.price,
+            icon: event.icon!,
+            image: event.image!);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -276,11 +294,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
         final String response = await appRepository.deleteService(
           serviceId: event.serviceId,
         );
-        if(response == "success"){
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -293,18 +311,16 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.addCategory(
-            name: event.name,
-            image: event.image
-        );
-        if(response == "success"){
+            name: event.name, image: event.image!);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else if(response == "icon error"){
+        } else if (response == "icon error") {
           yield Error(error: "Icon Size is Too Large");
-        }else if(response == "image error"){
+        } else if (response == "image error") {
           yield Error(error: "Image Size is Too Large");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -318,19 +334,18 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       try {
         final String response = await appRepository.addOffer(
             txt: event.text,
-            image: event.image,
-            price:event.price,
-          offer: event.offer
-        );
-        if(response == "success"){
+            image: event.image!,
+            price: event.price,
+            offer: event.offer);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else if(response == "icon error"){
+        } else if (response == "icon error") {
           yield Error(error: "Icon Size is Too Large");
-        }else if(response == "image error"){
+        } else if (response == "image error") {
           yield Error(error: "Image Size is Too Large");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -343,15 +358,12 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.editCategory(
-            name: event.name,
-            categoryId: event.categoryId,
-            image: event.image
-        );
-        if(response == "success"){
+            name: event.name, categoryId: event.categoryId, image: event.image!);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -364,17 +376,16 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.editOffer(
-          id: event.id,
+            id: event.id,
             txt: event.txt,
-            image: event.image,
-            price:event.price,
-            offer: event.price
-        );
-        if(response == "success"){
+            image: event.image!,
+            price: event.price,
+            offer: event.price);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -388,15 +399,15 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.deleteCategory(
-            categoryId: event.categoryId,
+          categoryId: event.categoryId,
         );
-        if(response == "success"){
+        if (response == "success") {
           print(2);
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           print(2);
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -412,13 +423,13 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
         final String response = await appRepository.deleteOffer(
           id: event.id,
         );
-        if(response == "success"){
+        if (response == "success") {
           print(2);
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           print(2);
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -431,13 +442,12 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.addReview(
-          event.id,event.rating,event.comment
-        );
-        if(response == "success"){
+            event.id, event.rating, event.comment);
+        if (response == "success") {
           yield Success();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -461,11 +471,11 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.deleteAdditional(event.id);
-        if(response == "success"){
+        if (response == "success") {
           yield AdditionalRemoved();
-        }else if(response == "Error"){
+        } else if (response == "Error") {
           yield Error(error: "");
-        }else{
+        } else {
           yield Error(error: response);
         }
       } catch (e) {
@@ -477,11 +487,12 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is GetBookings) {
       yield Loading();
       try {
-        final List<BookingModel> bookings = await appRepository.getBookings("pending");
+        final List<BookingModel> bookings =
+            await appRepository.getBookings("pending");
 
-        if(bookings.isEmpty){
+        if (bookings.isEmpty) {
           yield Empty();
-        }else{
+        } else {
           yield GotBookings(bookings: bookings);
         }
       } catch (e) {
@@ -493,11 +504,12 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is GetBookingHistory) {
       yield Loading();
       try {
-        final List<BookingModel> bookings = await appRepository.getBookings("completed");
+        final List<BookingModel> bookings =
+            await appRepository.getBookings("completed");
 
-        if(bookings.isEmpty){
+        if (bookings.isEmpty) {
           yield Empty();
-        }else{
+        } else {
           yield GotBookings(bookings: bookings);
         }
       } catch (e) {
@@ -510,8 +522,21 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.bookService(event.order);
-        if(response=='success') {
+        if (response == 'success') {
           yield ServiceBooked();
+        }
+      } catch (e) {
+        print(e);
+        yield Error();
+      }
+    }
+
+    if (event is CancelService) {
+      yield Loading();
+      try {
+        final String response = await appRepository.cancelService(event.orderId);
+        if (response == 'success') {
+          yield ServiceCancelled();
         }
       } catch (e) {
         print(e);
@@ -522,8 +547,9 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is ApproveOrder) {
       yield Loading();
       try {
-        final String response = await appRepository.updateOrder(event.categoryId, 'approval');
-        if(response=='success') {
+        final String response =
+            await appRepository.updateOrder(event.categoryId, 'approval');
+        if (response == 'success') {
           yield Approved();
         }
       } catch (e) {
@@ -535,7 +561,8 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is GetBookingDetails) {
       yield Loading();
       try {
-        final BookingModel bookingModel = await appRepository.getBookingDetails(event.id);
+        final BookingModel? bookingModel =
+            await appRepository.getBookingDetails(event.id);
         yield GotBooking(booking: bookingModel);
       } catch (e) {
         print(e);
@@ -546,8 +573,9 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is CompleteOrder) {
       yield Loading();
       try {
-        final String response = await appRepository.updateOrder(event.categoryId, 'complete');
-        if(response=='success') {
+        final String response =
+            await appRepository.updateOrder(event.categoryId, 'complete');
+        if (response == 'success') {
           yield Completed();
         }
       } catch (e) {
@@ -560,7 +588,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response = await appRepository.addMessage(event.message);
-        if(response=='success') {
+        if (response == 'success') {
           yield MessageAdded();
         }
       } catch (e) {
@@ -572,8 +600,9 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is UpdatePaymentStatus) {
       yield Loading();
       try {
-        final String response = await appRepository.paymentStatus(event.orderId,event.paymentId,event.method);
-        if(response=='success') {
+        final String response = await appRepository.paymentStatus(
+            event.orderId, event.paymentId, event.method);
+        if (response == 'success') {
           yield PaymentStatusUpdated();
         }
       } catch (e) {
@@ -585,8 +614,9 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is AddAdditionalCharge) {
       yield Loading();
       try {
-        final String response = await appRepository.addAdditionalCharges(event.orderId,event.price,event.desc);
-        if(response=='success') {
+        final String response = await appRepository.addAdditionalCharges(
+            event.orderId, event.price, event.desc);
+        if (response == 'success') {
           yield Added();
         }
       } catch (e) {
@@ -594,6 +624,5 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
         yield Error();
       }
     }
-
   }
 }

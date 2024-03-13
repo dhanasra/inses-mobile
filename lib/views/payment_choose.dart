@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentChoose extends StatefulWidget {
@@ -11,7 +10,7 @@ class PaymentChoose extends StatefulWidget {
 class _PaymentChooseState extends State<PaymentChoose> {
   static const platform = const MethodChannel("razorpay_flutter");
 
-  Razorpay _razorpay;
+  late Razorpay _razorpay;
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +23,8 @@ class _PaymentChooseState extends State<PaymentChoose> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  RaisedButton(onPressed: openCheckout, child: Text('Open'))
-                ])),
+              TextButton(onPressed: openCheckout, child: Text('Open'))
+            ])),
       ),
     );
   }
@@ -47,7 +46,7 @@ class _PaymentChooseState extends State<PaymentChoose> {
 
   void openCheckout() async {
     var options = {
-      'key': 'rzp_test_1DP5mmOlF5G5ag',
+      'key': 'rzp_test_TT8pzg3ycZ72px',
       'amount': 2000,
       'name': 'Acme Corp.',
       'description': 'Fine T-Shirt',
@@ -64,15 +63,9 @@ class _PaymentChooseState extends State<PaymentChoose> {
     }
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {}
 
-  }
+  void _handlePaymentError(PaymentFailureResponse response) {}
 
-  void _handlePaymentError(PaymentFailureResponse response) {
-
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-
-  }
+  void _handleExternalWallet(ExternalWalletResponse response) {}
 }

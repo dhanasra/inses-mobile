@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,7 +16,6 @@ import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
-import 'package:inses_app/widgets/input_item_two.dart';
 import 'package:inses_app/widgets/location_dialogue.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 
@@ -29,12 +27,12 @@ class AddressSelect extends StatefulWidget {
 
 class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveClientMixin{
 
-  Completer<GoogleMapController> _controller;
-  CameraPosition _kGooglePlex;
-  StreamController<Position> mapController;
-  StreamController<String> addressController;
-  List<AreaModel> areas;
-  OrderViewModel viewModel;
+  late Completer<GoogleMapController> _controller;
+  CameraPosition? _kGooglePlex;
+  late StreamController<Position> mapController;
+  late StreamController<String> addressController;
+  List<AreaModel> areas = [];
+  late OrderViewModel viewModel;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -52,6 +50,7 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: App().appBarBack(
           context,
@@ -81,7 +80,7 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
                   ),
                 ),
                 onTap:(){
-                    if(_formKey.currentState.validate()) {
+                    if(_formKey.currentState!.validate()) {
                       OrderViewModel.address = viewModel.addressController.text;
                       App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_4);
                     }
@@ -106,7 +105,16 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
           height: 180,
           child: StreamBuilder(
             stream: mapController.stream,
-            initialData: Position(latitude: 9.925201,longitude: 78.119774),
+            initialData: Position(
+              latitude: 9.925201,
+              longitude: 78.119774,
+              accuracy: 0,
+              altitude: 0,
+              speedAccuracy: 0,
+              timestamp: DateTime.now(),
+              heading: 0,
+              speed: 0
+            ),
             builder: (context,AsyncSnapshot shot){
               _kGooglePlex = CameraPosition(
                   target: LatLng(shot.data.latitude, shot.data.longitude),
@@ -122,7 +130,7 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
               )];
               return GoogleMap(
                 mapType: MapType.normal,
-                initialCameraPosition: _kGooglePlex,
+                initialCameraPosition: _kGooglePlex!,
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },

@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -26,10 +26,10 @@ class Contact extends StatefulWidget {
 }
 
 class _ContactState extends State<Contact> {
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  ProfileViewModel viewModel;
+  late ProfileViewModel viewModel;
 
   @override
   void initState() {
@@ -126,7 +126,7 @@ class _ContactState extends State<Contact> {
                 fontWeight: FontWeight.w400,
               ),
               onTap: (){
-                  if(_formKey.currentState.validate()) {
+                  if(_formKey.currentState!.validate()) {
                     bloc.add(AddMessage(message: viewModel.messageController.text));
                   }
                 },

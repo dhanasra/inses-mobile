@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:inses_app/database/app_preferences.dart';
 import 'package:inses_app/database/constants.dart';
@@ -10,13 +11,10 @@ import 'package:inses_app/model/bookings.dart';
 import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/order.dart';
-import 'package:inses_app/model/payment_history.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/utils/url.dart';
-import 'package:http/http.dart' as http;
 import 'package:inses_app/view_models/home_view_model.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
@@ -24,19 +22,15 @@ import 'package:inses_app/view_models/profile_view_model.dart';
 class AppApiClient {
   final _baseUrl = AppUrl.BASE_URL;
   final http.Client httpClient;
-  AppApiClient({@required this.httpClient}) : assert(httpClient != null);
+  AppApiClient({required this.httpClient});
 
-  Future<String> addUser(String name,String phone,String password) async {
-    var headers = {
-      'Content-Type': 'application/json'
-    };
+  Future<String> addUser(
+      String name, String email, String phone, String password) async {
+    var headers = {'Content-Type': 'application/json'};
     var request = http.Request('POST', Uri.parse('${_baseUrl}auth/register'));
 
-    request.body = jsonEncode({
-      "name": name,
-      "phone": phone,
-      "password": password
-    });
+    request.body = jsonEncode(
+        {"name": name, "email": email, "phone": phone, "password": password});
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
@@ -47,7 +41,7 @@ class AppApiClient {
     if (response.statusCode == 200) {
       int status = json['status'];
       print(status);
-      if(status==200){
+      if (status == 200) {
         String token = json['data']['token']['token'];
         String rToken = json['data']['token']['refreshToken'];
 
@@ -57,53 +51,50 @@ class AppApiClient {
         await AppPreferences().setRefreshToken(refreshToken: rToken);
         await AppPreferences().setName(firstName: name);
         await AppPreferences().setPhoneNumber(phone: phone);
-        await AppPreferences().setLoginStatus(status: roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN);
+        await AppPreferences().setLoginStatus(
+            status: roleId == 1
+                ? AppConstants.LOGGED_IN_ADMIN
+                : AppConstants.LOGGED_IN);
 
         await updateFCMToken(rToken);
 
         return "success";
-      }else if(status==422){
+      } else if (status == 422) {
         String error = json['data']['errors'][0]['rule'];
-        if(error=="alreadyExists"){
+        if (error == "alreadyExists") {
           return "Phone number already exists.";
-        }else{
+        } else {
           return "Error";
         }
+      }else{
+        return "Error";
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return "Error";
     }
-
   }
 
-  Future<void> updateFCMToken(String rToken)async{
-    String token = await FirebaseMessaging.instance.getToken();
+  Future<void> updateFCMToken(String rToken) async {
+    String? token = await FirebaseMessaging.instance.getToken();
     var headers = {
       'Content-Type': 'application/json',
       'x-refresh-token': rToken
     };
     var request = http.Request('POST', Uri.parse('${_baseUrl}fcm-token'));
-    request.body = jsonEncode({
-      "token": token
-    });
+    request.body = jsonEncode({"token": token});
     print(token);
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     String responseStr = await response.stream.bytesToString();
+    print(responseStr);
   }
 
-  Future<String> userLogin(String phone,String password) async {
-    var headers = {
-      'Content-Type': 'application/json'
-    };
+  Future<String> userLogin(String phone, String password) async {
+    var headers = {'Content-Type': 'application/json'};
     var request = http.Request('POST', Uri.parse('${_baseUrl}auth/login'));
 
-    request.body = jsonEncode({
-      "phone": phone,
-      "password": password
-    });
+    request.body = jsonEncode({"phone": phone, "password": password});
     request.headers.addAll(headers);
     print(1);
     http.StreamedResponse response = await request.send();
@@ -115,7 +106,7 @@ class AppApiClient {
     if (response.statusCode == 200) {
       int status = json['status'];
       print(status);
-      if(status==200){
+      if (status == 200) {
         String token = json['data']['token']['token'];
         String rToken = json['data']['token']['refreshToken'];
 
@@ -136,26 +127,31 @@ class AppApiClient {
         String address = await getUserAddress();
         ProfileViewModel.address = address;
 
-        await AppPreferences().setLoginStatus(status: roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN);
-        HomeViewModel.loginStatus = roleId==1?AppConstants.LOGGED_IN_ADMIN:AppConstants.LOGGED_IN;
+        await AppPreferences().setLoginStatus(
+            status: roleId == 1
+                ? AppConstants.LOGGED_IN_ADMIN
+                : AppConstants.LOGGED_IN);
+        HomeViewModel.loginStatus =
+            roleId == 1 ? AppConstants.LOGGED_IN_ADMIN : AppConstants.LOGGED_IN;
         print(roleId);
 
-        if(roleId==1){
+        if (roleId == 1) {
           return "1";
-        }else{
+        } else {
           return "2";
         }
-      }else if(status==422){
+      } else if (status == 422) {
         String error = json['data']['errors'][0]['rule'];
         print(error);
-        if(error=="invalid"){
+        if (error == "invalid") {
           return "Invalid password";
-        }else{
+        } else {
           return "Error";
         }
+      }else{
+        return "Error";
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return "Error";
     }
@@ -164,9 +160,7 @@ class AppApiClient {
   Future<String> logout() async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
-    var headers = {
-      'x-refresh-token': token
-    };
+    var headers = {'x-refresh-token': token};
     var request = http.Request('POST', Uri.parse('${_baseUrl}auth/logout'));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -177,12 +171,13 @@ class AppApiClient {
     if (response.statusCode == 200) {
       int status = json['status'];
       print(status);
-      if(status==200){
+      if (status == 200) {
         await AppPreferences().setLoginStatus(status: AppConstants.LOGGED_OUT);
         return "success";
+      }else{
+        return "Error";
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return "Error";
     }
@@ -191,9 +186,7 @@ class AppApiClient {
   Future<NetworkState> getUserDetails() async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
-    var headers = {
-      'x-refresh-token': token
-    };
+    var headers = {'x-refresh-token': token};
     var request = http.Request('GET', Uri.parse('${_baseUrl}user/me'));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -202,20 +195,21 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         String name = json['data']['user']['name'];
         String phone = json['data']['user']['phone'];
-        return GotUserDetails(name: name,phone: phone);
+        return GotUserDetails(name: name, phone: phone);
+      }else{
+        return Error(error: 'Error');
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return Error(error: 'Error');
     }
   }
 
-  Future<String> updateProfile(String name,String phone) async {
+  Future<String> updateProfile(String name, String phone) async {
     print(name);
     print(phone);
     String token = await AppPreferences().getRefreshToken();
@@ -224,54 +218,80 @@ class AppApiClient {
       'x-refresh-token': token,
       'Content-Type': 'application/json'
     };
-    var body = jsonEncode({
-      "name":name,
-      "phone":phone
-    });
-    var response = await http.post(Uri.parse('${_baseUrl}user/update-profile'),body: body,headers: headers);
+    var body = jsonEncode({"name": name, "phone": phone});
+    var response = await http.post(Uri.parse('${_baseUrl}user/update-profile'),
+        body: body, headers: headers);
 
     String responseStr = response.body.toString();
 
     Map<String, dynamic> json1 = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json1['status'];
-      if(status==200){
+      int status = json1['status'];
+      if (status == 200) {
         await AppPreferences().setName(firstName: name);
         await AppPreferences().setPhoneNumber(phone: phone);
         return 'success';
+      }else{
+        return 'Error';
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return 'Error';
     }
   }
 
-  Future<String> updatePassword(String old,String password) async {
+  Future<String> updatePassword(String old, String password) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
       'x-refresh-token': token,
       'Content-Type': 'application/json'
     };
-    var body = jsonEncode({
-      "old_password":old,
-      "password": password
-    });
-    var response = await http.post(Uri.parse('${_baseUrl}user/update-password'),body: body,headers: headers);
+    var body = jsonEncode({"old_password": old, "password": password});
+    var response = await http.post(Uri.parse('${_baseUrl}user/update-password'),
+        body: body, headers: headers);
 
     String responseStr = response.body.toString();
     print(responseStr);
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         return 'success';
+      }else{
+        return 'Error';
       }
+    } else {
+      print(response.reasonPhrase);
+      return 'Error';
     }
-    else {
+  }
+
+  Future<String> forgetPassword(String phone, String password) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json'
+    };
+    var body = jsonEncode({"phone": phone, "password": password});
+    var response = await http.post(Uri.parse('${_baseUrl}user/forget-password'),
+        body: body, headers: headers);
+
+    String responseStr = response.body.toString();
+    print(responseStr);
+    Map<String, dynamic> json = jsonDecode(responseStr);
+
+    if (response.statusCode == 200) {
+      int status = json['status'];
+      if (status == 200) {
+        return 'success';
+      }else{
+        return 'Error';
+      }
+    } else {
       print(response.reasonPhrase);
       return 'Error';
     }
@@ -284,10 +304,9 @@ class AppApiClient {
       'x-refresh-token': token,
       'Content-Type': 'application/json'
     };
-    var body = jsonEncode({
-      "address": address
-    });
-    var response = await http.post(Uri.parse('${_baseUrl}user-address'),body: body,headers: headers);
+    var body = jsonEncode({"address": address});
+    var response = await http.post(Uri.parse('${_baseUrl}user-address'),
+        body: body, headers: headers);
 
     String responseStr = response.body.toString();
     print(responseStr);
@@ -295,12 +314,13 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         return 'success';
+      }else{
+        return 'Error';
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return 'Error';
     }
@@ -321,20 +341,21 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
-        try{
+      int status = json['status'];
+      if (status == 200) {
+        try {
           print(1);
           String address = json['data']['userAddresses'][0]['address'];
           print(1);
           return address;
-        }catch(e){
+        } catch (e) {
           print(e);
           return "";
         }
+      }else{
+        return 'Error';
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return 'Error';
     }
@@ -356,22 +377,20 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         List category = json['data']['categories'];
         category.forEach((element) {
-          categories.add(
-            CategoryModel(
+          categories.add(CategoryModel(
               id: element['id'],
               name: element['name'],
-              image: element['image']
-            )
-          );
+              image: element['image']));
         });
         return categories;
+      }else{
+        return [];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return [];
     }
@@ -393,29 +412,26 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         List category = json['data']['banners'];
         category.forEach((element) {
-          offers.add(
-              OfferModel(
-                  id: element['id'],
-                  old: element['price'].toString(),
-                  offer: element['offer_price'].toString(),
-                  txt: element['text'],
-                  img: element['image']
-              )
-          );
+          offers.add(OfferModel(
+              id: element['id'],
+              old: element['price'].toString(),
+              offer: element['offer_price'].toString(),
+              txt: element['text'],
+              img: element['image']));
         });
         return offers;
+      }else{
+        return [];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return [];
     }
   }
-
 
   Future<List<ServiceModel>> getCategoryServices(int id) async {
     final List<ServiceModel> services = [];
@@ -426,7 +442,8 @@ class AppApiClient {
       'x-refresh-token': token,
       'Content-Type': 'application/json'
     };
-    var request = http.Request('GET', Uri.parse('${_baseUrl}category/$id/services'));
+    var request =
+        http.Request('GET', Uri.parse('${_baseUrl}category/$id/services'));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     String responseStr = await response.stream.bytesToString();
@@ -435,24 +452,22 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         List category = json['data']['services'];
         category.forEach((element) {
-          services.add(
-              ServiceModel(
-                  id: element['id'],
-                  name: element['name'],
-                  image: element['image'],
-                  icon: element['icon'],
-                  price: element['price']
-              )
-          );
+          services.add(ServiceModel(
+              id: element['id'],
+              name: element['name'],
+              image: element['image'],
+              icon: element['icon'],
+              price: element['price']));
         });
         return services;
+      }else{
+        return [];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return [];
     }
@@ -475,31 +490,30 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         List category = json['data']['services'];
         category.forEach((element) {
-          services.add(
-              ServiceModel(
-                  id: element['id'],
-                  name: element['name'],
-                  image: element['image'],
-                  icon: element['icon'],
-                  price: element['price'],
-                categoryId: element['category_id']
-              )
-          );
+          services.add(ServiceModel(
+              id: element['id'],
+              name: element['name'],
+              image: element['image'],
+              icon: element['icon'],
+              price: element['price'],
+              categoryId: element['category_id']));
         });
         return services;
+      }else{
+        return [];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return [];
     }
   }
 
-  Future<String> addService({int categoryId,String name,int price,File icon,File image}) async {
+  Future<String> addService(
+      {required int categoryId, required String name, required int price, required File icon, required File image}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -517,24 +531,28 @@ class AppApiClient {
       final kb1 = bytes1 / 1024;
       final mb1 = kb1 / 1024;
 
-      print(mb.toString()+" "+mb1.toString());
+      print(mb.toString() + " " + mb1.toString());
 
-      if(mb>1){
+      if (mb > 1) {
         return "icon error";
-      }else if(mb1>1){
+      } else if (mb1 > 1) {
         return "image error";
-      }else {
-        var request = http.MultipartRequest(
-            'POST', Uri.parse('${_baseUrl}service'))
-          ..fields['name'] = name
-          ..fields['category_id'] = categoryId.toString()
-          ..fields['price'] = price.toString()
-          ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
-            contentType: MediaType('icon', 'png/jpeg/jpg'),
-          ))
-          ..files.add(await http.MultipartFile.fromPath('image', image.path,
-            contentType: MediaType('image', 'png/jpeg/jpg'),
-          ));
+      } else {
+        var request =
+            http.MultipartRequest('POST', Uri.parse('${_baseUrl}service'))
+              ..fields['name'] = name
+              ..fields['category_id'] = categoryId.toString()
+              ..fields['price'] = price.toString()
+              ..files.add(await http.MultipartFile.fromPath(
+                'icon',
+                icon.path,
+                contentType: MediaType('icon', 'png/jpeg/jpg'),
+              ))
+              ..files.add(await http.MultipartFile.fromPath(
+                'image',
+                image.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
 
         request.headers.addAll(headers);
 
@@ -550,24 +568,32 @@ class AppApiClient {
           int status = json['status'];
           if (status == 200) {
             return 'success';
+          }else{
+            return 'Error';
           }
-        }
-        else {
+        } else {
           print(response.statusCode);
           print(response.hashCode);
           print(response.reasonPhrase);
           return 'Error';
         }
       }
-
-    }catch(e){
+    } catch (e) {
       print(e.toString());
-      print(e.toString().contains("<center><h1>413 Request Entity Too Large</h1></center>"));
+      print(e
+          .toString()
+          .contains("<center><h1>413 Request Entity Too Large</h1></center>"));
+      return 'Error';
     }
-
   }
 
-  Future<String> editService({int categoryId,int id,String name,int price,File icon,File image}) async {
+  Future<String> editService(
+      {required int categoryId,
+      required int id,
+      required String name,
+      required int price,
+      File? icon,
+      File? image}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -578,81 +604,51 @@ class AppApiClient {
     try {
       print('${_baseUrl}service/$id');
       var request;
-      if(icon ==null && image==null){
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
-          ..fields['name'] = name
-          ..fields['category_id'] = categoryId.toString()
-          ..fields['price'] = price.toString();
-      }else if(icon==null){
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
-          ..fields['name'] = name
-          ..fields['category_id'] = categoryId.toString()
-          ..fields['price'] = price.toString()
-          ..files.add(await http.MultipartFile.fromPath('image', image.path,
-            contentType:MediaType('image','png/jpeg/jpg'),
-          ));
-      }else if(image==null){
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
-          ..fields['name'] = name
-          ..fields['category_id'] = categoryId.toString()
-          ..fields['price'] = price.toString()
-
-          ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
-            contentType:MediaType('image','png/jpeg/jpg'),)
-          );
-      }else{
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
-          ..fields['name'] = name
-          ..fields['category_id'] = categoryId.toString()
-          ..fields['price'] = price.toString()
-
-          ..files.add(await http.MultipartFile.fromPath('icon', icon.path,
-            contentType:MediaType('image','png/jpeg/jpg'),)
-          )
-          ..files.add(await http.MultipartFile.fromPath('image', image.path,
-            contentType:MediaType('image','png/jpeg/jpg'),
-          ));
+      if (icon == null && image == null) {
+        request =
+            http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+              ..fields['name'] = name
+              ..fields['category_id'] = categoryId.toString()
+              ..fields['price'] = price.toString();
+      } else if (icon == null) {
+        request =
+            http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+              ..fields['name'] = name
+              ..fields['category_id'] = categoryId.toString()
+              ..fields['price'] = price.toString()
+              ..files.add(await http.MultipartFile.fromPath(
+                'image',
+                image!.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
+      } else if (image == null) {
+        request =
+            http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+              ..fields['name'] = name
+              ..fields['category_id'] = categoryId.toString()
+              ..fields['price'] = price.toString()
+              ..files.add(await http.MultipartFile.fromPath(
+                'icon',
+                icon.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
+      } else {
+        request =
+            http.MultipartRequest('PUT', Uri.parse('${_baseUrl}service/$id'))
+              ..fields['name'] = name
+              ..fields['category_id'] = categoryId.toString()
+              ..fields['price'] = price.toString()
+              ..files.add(await http.MultipartFile.fromPath(
+                'icon',
+                icon.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ))
+              ..files.add(await http.MultipartFile.fromPath(
+                'image',
+                image.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
       }
-
-        request.headers.addAll(headers);
-
-        http.StreamedResponse response = await request.send();
-
-        String responseStr = await response.stream.bytesToString();
-
-        print(responseStr);
-
-        Map<String, dynamic> json = jsonDecode(responseStr);
-
-        if (response.statusCode == 200) {
-          int status = json['status'];
-          if (status == 200) {
-            return 'success';
-          }
-        }
-        else {
-          print(response.reasonPhrase);
-          return 'Error';
-        }
-
-    }catch(e){
-      print(e);
-    }
-
-  }
-
-  Future<String> deleteService({int serviceId}) async {
-    String token = await AppPreferences().getRefreshToken();
-    print(token);
-    var headers = {
-      'x-refresh-token': token,
-      'Content-Type': 'application/json',
-    };
-    try {
-      print('${_baseUrl}category');
-
-
-      var request = http.Request('DELETE', Uri.parse('${_baseUrl}service/$serviceId'));
 
       request.headers.addAll(headers);
 
@@ -668,17 +664,57 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
     }
+  }
 
+  Future<String> deleteService({required int serviceId}) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json',
+    };
+    try {
+      print('${_baseUrl}category');
+
+      var request =
+          http.Request('DELETE', Uri.parse('${_baseUrl}service/$serviceId'));
+
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      String responseStr = await response.stream.bytesToString();
+
+      print(responseStr);
+
+      Map<String, dynamic> json = jsonDecode(responseStr);
+
+      if (response.statusCode == 200) {
+        int status = json['status'];
+        if (status == 200) {
+          return 'success';
+        }else{
+          return 'Error';
+        }
+      } else {
+        print(response.reasonPhrase);
+        return 'Error';
+      }
+    } catch (e) {
+      print(e);
+      return 'Error';
+    }
   }
 
   Future<String> deleteAdditional(int id) async {
@@ -691,8 +727,8 @@ class AppApiClient {
     try {
       print('${_baseUrl}additional-charge/$id');
 
-
-      var request = http.Request('DELETE', Uri.parse('${_baseUrl}additional-charge/$id'));
+      var request =
+          http.Request('DELETE', Uri.parse('${_baseUrl}additional-charge/$id'));
 
       request.headers.addAll(headers);
 
@@ -708,20 +744,20 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
 
-  Future<String> addCategory({String name,File image}) async {
+  Future<String> addCategory({required String name,required File image}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -734,47 +770,49 @@ class AppApiClient {
       final kb1 = bytes1 / 1024;
       final mb1 = kb1 / 1024;
 
-      print(mb1.toString()+" "+mb1.toString());
+      print(mb1.toString() + " " + mb1.toString());
 
-       if(mb1>1){
+      if (mb1 > 1) {
         return "image error";
-      }else {
-         var request = http.MultipartRequest(
-             'POST', Uri.parse('${_baseUrl}category'))
-           ..fields['name'] = name
-           ..files.add(await http.MultipartFile.fromPath('image', image.path,
-             contentType: MediaType('image', 'png/jpeg/jpg'),
-           ));
+      } else {
+        var request =
+            http.MultipartRequest('POST', Uri.parse('${_baseUrl}category'))
+              ..fields['name'] = name
+              ..files.add(await http.MultipartFile.fromPath(
+                'image',
+                image.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
 
-         request.headers.addAll(headers);
+        request.headers.addAll(headers);
 
-         http.StreamedResponse response = await request.send();
+        http.StreamedResponse response = await request.send();
 
-         String responseStr = await response.stream.bytesToString();
+        String responseStr = await response.stream.bytesToString();
 
-         print(responseStr);
+        print(responseStr);
 
-         Map<String, dynamic> json = jsonDecode(responseStr);
+        Map<String, dynamic> json = jsonDecode(responseStr);
 
-         if (response.statusCode == 200) {
-           int status = json['status'];
-           if (status == 200) {
-             return 'success';
-           }
-         }
-         else {
-           print(response.reasonPhrase);
-           return 'Error';
-         }
-       }
-
-    }catch(e){
+        if (response.statusCode == 200) {
+          int status = json['status'];
+          if (status == 200) {
+            return 'success';
+          }else{
+            return 'Error';
+          }
+        } else {
+          print(response.reasonPhrase);
+          return 'Error';
+        }
+      }
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
 
-  Future<String> addReview({int id,int rating,String comment}) async {
+  Future<String> addReview({required int id,required int rating,required String comment}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -782,12 +820,10 @@ class AppApiClient {
       'Content-Type': 'application/json',
     };
     try {
-      var body = jsonEncode({
-        "order_id": id,
-        "rating":rating,
-        "comment":comment
-      });
-      var response = await http.post(Uri.parse('${_baseUrl}review'),body: body,headers: headers);
+      var body =
+          jsonEncode({"order_id": id, "rating": rating, "comment": comment});
+      var response = await http.post(Uri.parse('${_baseUrl}review'),
+          body: body, headers: headers);
 
       String responseStr = response.body.toString();
       print(responseStr);
@@ -795,23 +831,24 @@ class AppApiClient {
       Map<String, dynamic> json = jsonDecode(responseStr);
 
       if (response.statusCode == 200) {
-        int status =  json['status'];
-        if(status==200){
+        int status = json['status'];
+        if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
 
-  Future<String> addOffer({String text,File image,int price,int offer}) async {
+  Future<String> addOffer(
+      {required String text,required File image,required int price, required int offer}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -825,48 +862,52 @@ class AppApiClient {
       final kb1 = bytes1 / 1024;
       final mb1 = kb1 / 1024;
 
-      print(mb1.toString()+" "+mb1.toString());
+      print(mb1.toString() + " " + mb1.toString());
 
-     if(mb1>1){
+      if (mb1 > 1) {
         return "image error";
-      }else {
-       var request = http.MultipartRequest(
-           'POST', Uri.parse('${_baseUrl}banner'))
-         ..fields['text'] = text
-         ..fields['price'] = price.toString()
-         ..fields['offer_price'] = offer.toString()
-         ..files.add(await http.MultipartFile.fromPath('image', image.path,
-           contentType: MediaType('image', 'png/jpeg/jpg'),
-         ));
+      } else {
+        var request =
+            http.MultipartRequest('POST', Uri.parse('${_baseUrl}banner'))
+              ..fields['text'] = text
+              ..fields['price'] = price.toString()
+              ..fields['offer_price'] = offer.toString()
+              ..files.add(await http.MultipartFile.fromPath(
+                'image',
+                image.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
 
-       request.headers.addAll(headers);
+        request.headers.addAll(headers);
 
-       http.StreamedResponse response = await request.send();
+        http.StreamedResponse response = await request.send();
 
-       String responseStr = await response.stream.bytesToString();
+        String responseStr = await response.stream.bytesToString();
 
-       print(responseStr);
+        print(responseStr);
 
-       Map<String, dynamic> json = jsonDecode(responseStr);
+        Map<String, dynamic> json = jsonDecode(responseStr);
 
-       if (response.statusCode == 200) {
-         int status = json['status'];
-         if (status == 200) {
-           return 'success';
-         }
-       }
-       else {
-         print(response.reasonPhrase);
-         return 'Error';
-       }
-     }
-    }catch(e){
+        if (response.statusCode == 200) {
+          int status = json['status'];
+          if (status == 200) {
+            return 'success';
+          }else{
+            return 'Error';
+          }
+        } else {
+          print(response.reasonPhrase);
+          return 'Error';
+        }
+      }
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
 
-  Future<String> editOffer({int id, String text,File image,int price,int offer}) async {
+  Future<String> editOffer(
+      {required int id,required String text, File? image,required int price,required int offer}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -877,20 +918,23 @@ class AppApiClient {
       print('${_baseUrl}banner/$id');
       var request;
 
-
-      if(image==null){
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
-          ..fields['price'] = price.toString()
-          ..fields['offer_price'] = offer.toString()
-          ..fields['text'] = text;
-      }else{
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
-          ..fields['price'] = price.toString()
-          ..fields['offer_price'] = offer.toString()
-          ..fields['text'] = text
-          ..files.add(await http.MultipartFile.fromPath('image', image.path,
-            contentType:MediaType('image','png/jpeg/jpg'),
-          ));
+      if (image == null) {
+        request =
+            http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
+              ..fields['price'] = price.toString()
+              ..fields['offer_price'] = offer.toString()
+              ..fields['text'] = text;
+      } else {
+        request =
+            http.MultipartRequest('PUT', Uri.parse('${_baseUrl}banner/$id'))
+              ..fields['price'] = price.toString()
+              ..fields['offer_price'] = offer.toString()
+              ..fields['text'] = text
+              ..files.add(await http.MultipartFile.fromPath(
+                'image',
+                image.path,
+                contentType: MediaType('image', 'png/jpeg/jpg'),
+              ));
       }
 
       request.headers.addAll(headers);
@@ -907,20 +951,20 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
 
-  Future<String> editCategory({int categoryId,String name,File image}) async {
+  Future<String> editCategory({required int categoryId,required String name, File? image}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -930,14 +974,18 @@ class AppApiClient {
     try {
       print('${_baseUrl}category/$categoryId');
       var request;
-      if(image==null){
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}category/$categoryId'))
+      if (image == null) {
+        request = http.MultipartRequest(
+            'PUT', Uri.parse('${_baseUrl}category/$categoryId'))
           ..fields['name'] = name;
-      }else{
-        request = http.MultipartRequest('PUT', Uri.parse('${_baseUrl}category/$categoryId'))
+      } else {
+        request = http.MultipartRequest(
+            'PUT', Uri.parse('${_baseUrl}category/$categoryId'))
           ..fields['name'] = name
-          ..files.add(await http.MultipartFile.fromPath('image', image.path,
-            contentType:MediaType('image','png/jpeg/jpg'),
+          ..files.add(await http.MultipartFile.fromPath(
+            'image',
+            image.path,
+            contentType: MediaType('image', 'png/jpeg/jpg'),
           ));
       }
 
@@ -955,21 +1003,20 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
-       print(response.reasonPhrase);
+      } else {
+        print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
-      print(e.hashCode);
+      return 'Error';
     }
-
   }
 
-  Future<String> deleteCategory({int categoryId}) async {
+  Future<String> deleteCategory({required int categoryId}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -977,7 +1024,8 @@ class AppApiClient {
       'Content-Type': 'application/json',
     };
     try {
-      var request = http.Request('DELETE', Uri.parse('${_baseUrl}category/$categoryId'));
+      var request =
+          http.Request('DELETE', Uri.parse('${_baseUrl}category/$categoryId'));
       print(2);
       request.headers.addAll(headers);
       print(2);
@@ -993,21 +1041,20 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
 
-
-  Future<String> deleteOffer({int id}) async {
+  Future<String> deleteOffer({required int id}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -1031,23 +1078,24 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
     }
-
   }
+
   Future<String> bookService(Order order) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     print(1);
-    try{
+    try {
       print(1);
       var headers = {
         'x-refresh-token': token,
@@ -1059,12 +1107,12 @@ class AppApiClient {
       request.headers.addAll(headers);
 
       request.body = jsonEncode({
-        "date":order.date,
-        "start_time":order.start_time,
-        "end_time":order.end_time,
-        "address":order.address,
-        "service_id":order.service_id,
-        "quantity":order.quantity
+        "date": order.date,
+        "start_time": order.start_time,
+        "end_time": order.end_time,
+        "address": order.address,
+        "service_id": order.service_id,
+        "quantity": order.quantity
       });
 
       http.StreamedResponse response = await request.send();
@@ -1076,18 +1124,61 @@ class AppApiClient {
       Map<String, dynamic> json = jsonDecode(responseStr);
 
       if (response.statusCode == 200) {
-        int status =  json['status'];
+        int status = json['status'];
         OrderViewModel.orderId = json['data']['order']['id'];
-        if(status==200){
+        if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-    }catch(e){
+    } catch (e) {
       print(e);
+      return 'Error';
+    }
+  }
+
+
+  Future<String> cancelService(int orderId) async {
+    String token = await AppPreferences().getRefreshToken();
+
+    try {
+      print(1);
+      var headers = {
+        'x-refresh-token': token,
+        'Content-Type': 'application/json'
+      };
+
+      var request = http.Request('PUT', Uri.parse('${_baseUrl}order/$orderId/cancel'));
+
+      request.headers.addAll(headers);
+
+      http.StreamedResponse response = await request.send();
+
+      String responseStr = await response.stream.bytesToString();
+
+      print(responseStr);
+
+      Map<String, dynamic> json = jsonDecode(responseStr);
+
+      if (response.statusCode == 200) {
+        int status = json['status'];
+        // OrderViewModel.orderId = json['data']['order']['id'];
+        if (status == 200) {
+          return 'success';
+        }else{
+          return 'Error';
+        }
+      } else {
+        print(response.reasonPhrase);
+        return 'Error';
+      }
+    } catch (e) {
+      print(e);
+      return 'Error';
     }
   }
 
@@ -1099,7 +1190,8 @@ class AppApiClient {
       'x-refresh-token': token,
       'Content-Type': 'application/json'
     };
-    var request = http.Request('GET', Uri.parse('${_baseUrl}order?status=$type'));
+    var request =
+        http.Request('GET', Uri.parse('${_baseUrl}order?status=$type'));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     String responseStr = await response.stream.bytesToString();
@@ -1108,36 +1200,32 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         List orders = json['data']['orders'];
-          orders.forEach((element) {
-            try {
-              bookings.add(
-                  BookingModel(
-                      id: element['id'],
-                      name: element['service']['name'],
-                      categoryName: element['service']['category_name'],
-                      address: element['address'],
-                      totalPrice: element['total'],
-                      startTime: element['start_time'],
-                      endTime: element['end_time'],
-                      status: element['status'],
-                      payStatus: element['payment_status'],
-                      payMethod: element['payment_method'],
-                      icon: element['service']['icon'],
-                      date: element['date'],
-                      quantity: element['quantity']
-                  )
-              );
-            }catch(e){
-
-            }
-          });
+        orders.forEach((element) {
+          try {
+            bookings.add(BookingModel(
+                id: element['id'],
+                name: element['service']['name'],
+                categoryName: element['service']['category_name'],
+                address: element['address'],
+                totalPrice: element['total'],
+                startTime: element['start_time'],
+                endTime: element['end_time'],
+                status: element['status'],
+                payStatus: element['payment_status'],
+                payMethod: element['payment_method'],
+                icon: element['service']['icon'],
+                date: element['date'],
+                quantity: element['quantity']));
+          } catch (e) {}
+        });
         return bookings;
+      }else{
+        return [];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return [];
     }
@@ -1146,9 +1234,7 @@ class AppApiClient {
   Future<List<String>> getUserDetail(int id) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
-    var headers = {
-      'x-refresh-token': token
-    };
+    var headers = {'x-refresh-token': token};
     var request = http.Request('GET', Uri.parse('${_baseUrl}user/$id'));
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
@@ -1159,18 +1245,19 @@ class AppApiClient {
     List<String> userDetails = [];
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         String name = json['data']['user']['name'];
         String phone = json['data']['user']['phone'];
         userDetails.add(name);
         userDetails.add(phone);
         return userDetails;
+      }else{
+        return ["", ""];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
-      return ["",""];
+      return ["", ""];
     }
   }
 
@@ -1191,34 +1278,32 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
+      int status = json['status'];
+      if (status == 200) {
         List orders = json['data']['reviews'];
 
         orders.forEach((element) {
           String date = element['created_at'].toString();
           int idx = date.indexOf("T");
 
-          reviews.add(
-              ReviewModel(
-                  name: element['user']['name'],
-                  date: date.substring(0,idx).trim(),
-                  stars: element['rating'],
-                  review: element['comment'],
-                  img: element['user']['name'].toString().substring(0,1)
-              )
-          );
+          reviews.add(ReviewModel(
+              name: element['user']['name'],
+              date: date.substring(0, idx).trim(),
+              stars: element['rating'],
+              review: element['comment'],
+              img: element['user']['name'].toString().substring(0, 1)));
         });
         return reviews;
+      }else{
+        return [];
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
       return [];
     }
   }
 
-  Future<BookingModel> getBooking(int id) async {
+  Future<BookingModel?> getBooking(int id) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -1234,22 +1319,24 @@ class AppApiClient {
     Map<String, dynamic> json = jsonDecode(responseStr);
 
     if (response.statusCode == 200) {
-      int status =  json['status'];
-      if(status==200){
-        int additionalPrice ;
-        int additionalId ;
+      int status = json['status'];
+      if (status == 200) {
+        int additionalPrice;
+        int additionalId;
         String desc;
-        try{
-          additionalPrice = json['data']['order']['additional_charges'][0]['price'];
+        try {
+          additionalPrice =
+              json['data']['order']['additional_charges'][0]['price'];
           desc = json['data']['order']['additional_charges'][0]['description'];
           additionalId = json['data']['order']['additional_charges'][0]['id'];
-        }catch(e){
+        } catch (e) {
           additionalPrice = 0;
           additionalId = 0;
           desc = "";
         }
 
-        List<String> userDetails = await getUserDetail(json['data']['order']['user_id']);
+        List<String> userDetails =
+            await getUserDetail(json['data']['order']['user_id']);
 
         return BookingModel(
             id: json['data']['order']['id'],
@@ -1270,17 +1357,17 @@ class AppApiClient {
             payMethod: json['data']['order']['payment_method'],
             icon: json['data']['order']['service']['icon'],
             date: json['data']['order']['date'],
-            quantity:json['data']['order']['quantity']
-        );
+            quantity: json['data']['order']['quantity']);
+      }else{
+        return null;
       }
-    }
-    else {
+    } else {
       print(response.reasonPhrase);
-      return BookingModel();
+      return null;
     }
   }
 
-  Future<String> updateOrder(int id,String status) async {
+  Future<String> updateOrder(int id, String status) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
@@ -1291,12 +1378,13 @@ class AppApiClient {
     try {
       print('${_baseUrl}order/$id/$status');
 
-      var request = http.Request('PUT', Uri.parse('${_baseUrl}order/$id/$status'));
+      var request =
+          http.Request('PUT', Uri.parse('${_baseUrl}order/$id/$status'));
 
       request.headers.addAll(headers);
 
       request.body = jsonEncode({
-        "status":"success",
+        "status": "success",
       });
 
       http.StreamedResponse response = await request.send();
@@ -1311,19 +1399,18 @@ class AppApiClient {
         int status = json['status'];
         if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-
-    }catch(e){
+    } catch (e) {
       print(e);
+      return '';
     }
-
   }
-
 
   Future<String> addMessage(String message) async {
     // var url = Uri.https(_baseUrl, '/exam/get');
@@ -1333,11 +1420,12 @@ class AppApiClient {
     return 'success';
   }
 
-  Future<String> paymentStatus(int orderId,String paymentId,String method) async {
+  Future<String> paymentStatus(
+      int orderId, String paymentId, String method) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     print(1);
-    try{
+    try {
       print(1);
       var headers = {
         'x-refresh-token': token,
@@ -1346,17 +1434,13 @@ class AppApiClient {
 
       print("======================$orderId======$paymentId=========$method");
 
-      var request = http.Request('PUT', Uri.parse('${_baseUrl}order/$orderId/payment'));
+      var request =
+          http.Request('PUT', Uri.parse('${_baseUrl}order/$orderId/payment'));
 
       request.headers.addAll(headers);
 
       request.body = jsonEncode(
-          {
-            "status":"success",
-            "transaction_id":paymentId,
-            "method":method
-          }
-      );
+          {"status": "success", "transaction_id": paymentId, "method": method});
 
       http.StreamedResponse response = await request.send();
 
@@ -1367,40 +1451,41 @@ class AppApiClient {
       Map<String, dynamic> json = jsonDecode(responseStr);
 
       if (response.statusCode == 200) {
-        int status =  json['status'];
-        if(status==200){
+        int status = json['status'];
+        if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-    }catch(e){
+    } catch (e) {
       print(e);
+      return '';
     }
   }
 
-  Future<String> addAdditionalCharge(int orderId,int price,String desc) async {
+  Future<String> addAdditionalCharge(
+      int orderId, int price, String desc) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     print(1);
-    try{
+    try {
       print(1);
       var headers = {
         'x-refresh-token': token,
         'Content-Type': 'application/json'
       };
 
-      var request = http.Request('POST', Uri.parse('${_baseUrl}additional-charge'));
+      var request =
+          http.Request('POST', Uri.parse('${_baseUrl}additional-charge'));
 
       request.headers.addAll(headers);
 
-      request.body = jsonEncode({
-        "order_id": orderId,
-        "price": price,
-        "description": desc
-      });
+      request.body = jsonEncode(
+          {"order_id": orderId, "price": price, "description": desc});
 
       http.StreamedResponse response = await request.send();
 
@@ -1411,17 +1496,19 @@ class AppApiClient {
       Map<String, dynamic> json = jsonDecode(responseStr);
 
       if (response.statusCode == 200) {
-        int status =  json['status'];
-        if(status==200){
+        int status = json['status'];
+        if (status == 200) {
           return 'success';
+        }else{
+          return 'Error';
         }
-      }
-      else {
+      } else {
         print(response.reasonPhrase);
         return 'Error';
       }
-    }catch(e){
+    } catch (e) {
       print(e);
+      return '';
     }
   }
 }

@@ -1,10 +1,9 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
-import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/model/category.dart';
 import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/service.dart';
@@ -18,7 +17,6 @@ import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 import 'package:inses_app/widgets/service_item.dart';
-import 'package:inses_app/widgets/service_sub_item.dart';
 
 
 class SelectCategory extends StatefulWidget {
@@ -29,7 +27,7 @@ class SelectCategory extends StatefulWidget {
 
 class _SelectCategoryState extends State<SelectCategory> {
 
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
 

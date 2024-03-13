@@ -1,10 +1,23 @@
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:inses_app/utils/url.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final FirebaseApp app =  await Firebase.initializeApp();
+  await Firebase.initializeApp();
+  
+  try{
+    final FirebaseRemoteConfig remoteConfig =
+                  FirebaseRemoteConfig.instance;
+    await remoteConfig.fetchAndActivate();
+    var ep = remoteConfig.getString('endpoint');
+    if(ep.isNotEmpty){
+      AppUrl.BASE_URL = ep;
+    }
+  }catch(error){}
+
   runApp(
       RestartWidget(
         child: App(),
@@ -13,12 +26,12 @@ Future<void> main() async {
 }
 
 class RestartWidget extends StatefulWidget {
-  RestartWidget({this.child});
+  RestartWidget({required this.child});
 
   final Widget child;
 
   static void restartApp(BuildContext context) {
-    context.findAncestorStateOfType<_RestartWidgetState>().restartApp();
+    context.findAncestorStateOfType<_RestartWidgetState>()!.restartApp();
   }
 
   @override

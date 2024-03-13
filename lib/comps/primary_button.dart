@@ -1,27 +1,26 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatefulWidget {
   final String text;
-  final double width;
-  final double height;
-  final Color bgColor;
-  final Color borderColor;
-  final Color txtColor;
-  final double fontSize;
-  final EdgeInsetsGeometry margin;
-  final EdgeInsetsGeometry padding;
-  final AlignmentGeometry alignment;
-  final FontWeight fontWeight;
-  final bool isShadow;
-  final String fontfamily;
-  final bool isLoadButton;
-  final double radius;
-  final VoidCallback onPressed;
+  final double? width;
+  final double? height;
+  final Color? bgColor;
+  final Color? borderColor;
+  final Color? txtColor;
+  final double? fontSize;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry? alignment;
+  final FontWeight? fontWeight;
+  final bool? isShadow;
+  final String? fontfamily;
+  final bool? isLoadButton;
+  final double? radius;
+  final VoidCallback? onPressed;
 
   PrimaryButton(
-      {@required this.text,
-      @required this.width,
+      {required this.text,
+      this.width,
       this.height,
       this.bgColor,
       this.borderColor,
@@ -35,7 +34,7 @@ class PrimaryButton extends StatefulWidget {
       this.isShadow,
       this.fontfamily,
       this.radius,
-      @required this.onPressed});
+      required this.onPressed});
   @override
   _PrimaryButtonState createState() => _PrimaryButtonState();
 }
@@ -66,17 +65,15 @@ class _PrimaryButtonState extends State<PrimaryButton> {
         decoration: BoxDecoration(
 
           borderRadius:
-              BorderRadius.circular(widget.radius != null ? widget.radius : 2),
+              BorderRadius.circular(widget.radius ?? 2),
           color: widget.bgColor != null ? widget.bgColor : Colors.transparent,
           border: Border.all(
-              color: widget.borderColor != null
-                  ? widget.borderColor
-                  : Colors.transparent),
+              color: widget.borderColor ?? Colors.transparent),
           boxShadow: [
             BoxShadow(
               offset: Offset(0, 2),
               blurRadius: 10,
-              color: widget.isShadow != null && widget.isShadow
+              color: widget.isShadow != null && widget.isShadow!
                   ? Color(0x19000000)
                   : Colors.transparent,
             ),

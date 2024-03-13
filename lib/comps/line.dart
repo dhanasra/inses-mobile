@@ -3,14 +3,14 @@ import 'package:flutter/cupertino.dart';
 class Line extends StatelessWidget {
   final double width;
   final double height;
-  final Color color;
-  final Color bgColor;
+  final Color? color;
+  final Color? bgColor;
 
-  final EdgeInsetsGeometry margin;
+  final EdgeInsetsGeometry? margin;
 
   Line({
-    @required this.width,
-    @required this.height,
+    required this.width,
+    required this.height,
     this.color,
     this.bgColor,
     this.margin,

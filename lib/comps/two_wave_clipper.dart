@@ -1,14 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TwoWaveClipper extends StatelessWidget {
   final Widget child;
-  final Color waveColor;
-  final Color bgColor;
-  final double height;
+  final Color? waveColor;
+  final Color? bgColor;
+  final double? height;
 
   TwoWaveClipper(
-      {@required this.child, this.waveColor, this.bgColor, this.height});
+      {required this.child, this.waveColor, this.bgColor, this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +21,7 @@ class TwoWaveClipper extends StatelessWidget {
           child: ClipPath(
               clipper: CornerWaveClipper(),
               child: Container(
-                color: waveColor ?? Colors.accents,
+                color: waveColor ?? Colors.amber,
                 height: height,
               )),
         ),
@@ -34,12 +33,12 @@ class TwoWaveClipper extends StatelessWidget {
 
 class SingleWaveClipper extends StatelessWidget {
   final Widget child;
-  final Color waveColor;
-  final Color bgColor;
-  final double height;
+  final Color? waveColor;
+  final Color? bgColor;
+  final double? height;
 
   SingleWaveClipper(
-      {@required this.child, this.waveColor, this.bgColor, this.height});
+      {required this.child, this.waveColor, this.bgColor, this.height});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +52,7 @@ class SingleWaveClipper extends StatelessWidget {
           child: ClipPath(
               clipper: QuarterWaveClipper(),
               child: Container(
-                color: waveColor ?? Colors.accents,
+                color: waveColor ?? Colors.amber,
                 height: height,
               )),
         ),

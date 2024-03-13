@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
@@ -7,9 +5,6 @@ import 'app_dimen.dart';
 import 'app_font.dart';
 
 class AppStyle {
-
-
-
   static ThemeData lightTheme(BuildContext context) {
     final ThemeData base = ThemeData.light();
 
@@ -17,7 +12,7 @@ class AppStyle {
       primaryColor: AppColors.PRIMARY_COLOR,
       primaryColorLight: AppColors.PRIMARY_COLOR,
       primaryColorDark: AppColors.PRIMARY_COLOR,
-      accentColor: AppColors.ACCENT_COLOR,
+      // accentColor: AppColors.ACCENT_COLOR,
       splashColor: AppColors.TRANSPARANT,
       textTheme: Theme.of(context).textTheme.apply(
             bodyColor: AppColors.BLACK_2,
@@ -28,14 +23,20 @@ class AppStyle {
           selectionHandleColor: AppColors.TRANSPARANT),
       appBarTheme: AppBarTheme(
         color: AppColors.WHITE,
-        textTheme: base.textTheme.copyWith(
-          headline6: TextStyle(
+        titleTextStyle: TextStyle(
               fontSize: AppDimen.TEXT_H3,
               fontFamily: AppFont.FONT_STYLE,
               fontWeight: FontWeight.w500,
               color: AppColors.WHITE,
               height: 1.5),
-        ),
+        // textTheme: base.textTheme.copyWith(
+        //   headline6: TextStyle(
+        //       fontSize: AppDimen.TEXT_H3,
+        //       fontFamily: AppFont.FONT_STYLE,
+        //       fontWeight: FontWeight.w500,
+        //       color: AppColors.WHITE,
+        //       height: 1.5),
+        // ),
       ),
       snackBarTheme: SnackBarThemeData(
           contentTextStyle: TextStyle(

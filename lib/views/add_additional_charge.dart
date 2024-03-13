@@ -1,11 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
-import 'package:inses_app/comps/image_view.dart';
-import 'package:inses_app/comps/primary_button.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/app_repository.dart';
@@ -34,8 +31,8 @@ class AddAdditionalCharge extends StatefulWidget {
 class _AddAdditionalChargeState extends State<AddAdditionalCharge> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  EditViewModel _viewmodel;
-  NetworkBloc editBloc;
+  late EditViewModel _viewmodel;
+  late NetworkBloc editBloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
   @override
@@ -150,12 +147,12 @@ class _AddAdditionalChargeState extends State<AddAdditionalCharge> {
                   fontWeight: FontWeight.w400,
                 ),
                 onTap: (){
-                  if(_formKey.currentState.validate()) {
+                  if(_formKey.currentState!.validate()) {
                     editBloc.add(
                         ev.AddAdditionalCharge(
                           price: int.parse(_viewmodel.priceController.text),
                           desc: _viewmodel.nameController.text,
-                          orderId: OrderViewModel.booking.id
+                          orderId: OrderViewModel.booking!.id
                         )
                     );
                   }

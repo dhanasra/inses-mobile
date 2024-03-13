@@ -1,11 +1,8 @@
-
-import 'package:inses_app/app/app.dart';
-import 'package:inses_app/app/app_routes.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 import 'package:inses_app/app/app.dart';
+import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/tap_field.dart';
@@ -24,16 +21,16 @@ import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 
 class Settings extends StatefulWidget {
-
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
-  NetworkBloc bloc;
-  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+  late NetworkBloc bloc;
+  AppRepository appRepository =
+      AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  ProfileViewModel viewModel;
+  late  ProfileViewModel viewModel;
 
   @override
   void initState() {
@@ -52,52 +49,46 @@ class _SettingsState extends State<Settings> {
             ),
             body: Form(
                 key: _formKey,
-                child:BlocBuilder<NetworkBloc,NetworkState>(
+                child: BlocBuilder<NetworkBloc, NetworkState>(
                   bloc: bloc,
-                  builder: (context,state){
-                    if(state is Empty || state is Loading){
+                  builder: (context, state) {
+                    if (state is Empty || state is Loading) {
                       return buildView(true);
-                    }else if(state is Error){
+                    } else if (state is Error) {
                       return ErrorItem();
-                    }else if(state is Initial || state is Success){
-                      if(state is Success){
+                    } else if (state is Initial || state is Success) {
+                      if (state is Success) {
                         ProfileViewModel.name = viewModel.nameController.text;
                         ProfileViewModel.phone = viewModel.phoneController.text;
                         Future.delayed(Duration.zero, () async {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Wrap(
-                                    children: [
-                                      Content(
-                                        padding: EdgeInsets.only(top: 5,bottom: 5),
-                                        text: 'Profile is updated successfully',
-                                        fontSize: AppDimen.TEXT_SMALL,
-                                        fontWeight: FontWeight.w400,
-                                        fontfamily: AppFont.FONT,
-                                      ),
-                                    ],
-                                  )
-                              )
-                          );
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Wrap(
+                            children: [
+                              Content(
+                                padding: EdgeInsets.only(top: 5, bottom: 5),
+                                text: 'Profile is updated successfully',
+                                fontSize: AppDimen.TEXT_SMALL,
+                                fontWeight: FontWeight.w400,
+                                fontfamily: AppFont.FONT,
+                              ),
+                            ],
+                          )));
                         });
                       }
                       viewModel.phoneController.text = '';
                       return buildView(false);
-                    }else{
+                    } else {
                       return Container();
                     }
                   },
-                )
-            )
-        ),
-        onWillPop: () async{
+                ))),
+        onWillPop: () async {
           App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
           return true;
-        }
-    );
+        });
   }
 
-  Widget buildView(bool isLoading){
+  Widget buildView(bool isLoading) {
     return ListView(
       children: [
         MiniTitle(
@@ -108,7 +99,7 @@ class _SettingsState extends State<Settings> {
           controller: viewModel.nameController,
           autoFocus: true,
           prefixIcon: Icon(Icons.person),
-          margin: EdgeInsets.only(top: 30,left: 15,right: 15),
+          margin: EdgeInsets.only(top: 30, left: 15, right: 15),
           text: ProfileViewModel.name,
           emptyError: 'Name should not be empty',
           isObscurred: false,
@@ -119,7 +110,7 @@ class _SettingsState extends State<Settings> {
           maxLength: 10,
           prefixIcon: Icon(Icons.phone),
           autoFocus: false,
-          margin: EdgeInsets.only(top: 20,left: 15,right: 15),
+          margin: EdgeInsets.only(top: 20, left: 15, right: 15),
           text: ProfileViewModel.phone,
           emptyError: 'Phone number should not be empty',
           lengthError: 'Enter a valid phone number',
@@ -127,37 +118,40 @@ class _SettingsState extends State<Settings> {
           minLength: 10,
           inputType: TextInputType.phone,
           isObscurred: false,
-          regExp:(RegExp(r'[0-9]')),
+          regExp: (RegExp(r'[0-9]')),
         ),
         BorderContainer(
             radius: 4,
-            margin: EdgeInsets.only(left: 15,right: 15,top: 30),
-            padding: EdgeInsets.only(top: 5,bottom: 5),
+            margin: EdgeInsets.only(left: 15, right: 15, top: 30),
+            padding: EdgeInsets.only(top: 5, bottom: 5),
             bgColor: AppColors.SECONDARY_COLOR,
             child: OnTapField(
               child: isLoading
-                  ?Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  Loader(margin: EdgeInsets.all(0),)
-                ],
-              )
-                  :Content(
-                padding: EdgeInsets.only(top: 10,bottom: 10),
-                text: 'UPDATE',
-                color: AppColors.WHITE,
-                fontfamily: AppFont.FONT,
-                fontSize: AppDimen.TEXT_SMALL,
-                fontWeight: FontWeight.w400,
-              ),
-              onTap: (){
-                if(_formKey.currentState.validate()) {
-                  bloc.add(UpdateProfile(name: viewModel.nameController.text,phone: viewModel.phoneController.text));
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Loader(
+                          margin: EdgeInsets.all(0),
+                        )
+                      ],
+                    )
+                  : Content(
+                      padding: EdgeInsets.only(top: 10, bottom: 10),
+                      text: 'UPDATE',
+                      color: AppColors.BLACK,
+                      fontfamily: AppFont.FONT,
+                      fontSize: AppDimen.TEXT_SMALL,
+                      fontWeight: FontWeight.w400,
+                    ),
+              onTap: () {
+                if (_formKey.currentState!.validate()) {
+                  bloc.add(UpdateProfile(
+                      name: viewModel.nameController.text,
+                      phone: viewModel.phoneController.text));
                 }
               },
-            )
-        )
+            ))
       ],
     );
   }

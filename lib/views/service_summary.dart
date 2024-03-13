@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +28,6 @@ import 'package:inses_app/widgets/loader.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class ServiceSummary extends StatefulWidget {
-
   @override
   _ServiceSummaryState createState() => _ServiceSummaryState();
 }
@@ -37,12 +35,13 @@ class ServiceSummary extends StatefulWidget {
 class _ServiceSummaryState extends State<ServiceSummary> {
   static const platform = const MethodChannel("razorpay_flutter");
   int items = OrderViewModel.noOfService;
-  AlertDialog alert;
-  NetworkBloc bloc;
-  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
-  OrderViewModel viewModel;
+  AlertDialog? alert;
+  late NetworkBloc bloc;
+  AppRepository appRepository =
+      AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+  late OrderViewModel viewModel;
 
-  Razorpay _razorpay;
+  late Razorpay _razorpay;
 
   @override
   void initState() {
@@ -58,122 +57,116 @@ class _ServiceSummaryState extends State<ServiceSummary> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: App().appBarBack(
-        context,
-        'Summary of your service',
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(20),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-                child: OnTapField(
-                    child: BorderContainer(
-                      padding: EdgeInsets.all(20),
-                      bgColor: AppColors.PRIMARY_COLOR,
-                      radius: 7,
-                      child: Content(
-                        color:AppColors.WHITE,
-                        text: 'BOOK NOW',
-                        fontfamily: AppFont.FONT,
-                        fontWeight: FontWeight.w500,
-                        fontSize: AppDimen.TEXT_SMALL,
-                      ),
-                    ),
-                    onTap:(){
-                      bloc.add(BookService(order: Order(
-                        date: OrderViewModel.date,
-                        start_time:OrderViewModel.startTime,
-                        end_time: OrderViewModel.endTime,
-                        address: OrderViewModel.address,
-                        service_id: OrderViewModel.serviceId,
-                        quantity: OrderViewModel.noOfService
-                      )));
-                    }
-                )
-            )
-          ],
+        appBar: App().appBarBack(
+          context,
+          'Summary of your service',
         ),
-      ),
-      body: BlocBuilder<NetworkBloc,NetworkState>(
-        bloc: bloc,
-        builder: (context,state){
-          if(state is Initial || state is Loading || state is ServiceBooked || state is PaymentStatusUpdated){
+        bottomNavigationBar: Container(
+          padding: EdgeInsets.all(20),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                  child: OnTapField(
+                      child: BorderContainer(
+                        padding: EdgeInsets.all(20),
+                        bgColor: AppColors.PRIMARY_COLOR,
+                        radius: 7,
+                        child: Content(
+                          color: AppColors.WHITE,
+                          text: 'BOOK NOW',
+                          fontfamily: AppFont.FONT,
+                          fontWeight: FontWeight.w500,
+                          fontSize: AppDimen.TEXT_SMALL,
+                        ),
+                      ),
+                      onTap: () {
+                        bloc.add(BookService(
+                            order: Order(
+                                date: OrderViewModel.date!,
+                                start_time: OrderViewModel.startTime,
+                                end_time: OrderViewModel.endTime,
+                                address: OrderViewModel.address,
+                                service_id: OrderViewModel.serviceId!,
+                                quantity: OrderViewModel.noOfService)));
+                      }))
+            ],
+          ),
+        ),
+        body: BlocBuilder<NetworkBloc, NetworkState>(
+          bloc: bloc,
+          builder: (context, state) {
+            if (state is Initial ||
+                state is Loading ||
+                state is ServiceBooked ||
+                state is PaymentStatusUpdated) {
+              if (state is Loading) {
+                Future.delayed(Duration.zero, () async {
+                  showDialogue();
+                });
+              } else if (state is ServiceBooked) {
+                Navigator.of(context).pop();
+                Future.delayed(Duration.zero, () async {
+                  showConfirmDialogue();
+                });
+              } else if (state is PaymentStatusUpdated) {
+                Navigator.of(context).pop();
+                Future.delayed(Duration.zero, () async {
+                  showSuccessDialogue();
+                });
+              }
 
-            if(state is Loading){
-              Future.delayed(Duration.zero, () async {
-                showDialogue();
-              });
-            }else if(state is ServiceBooked){
-              Navigator.of(context).pop();
-              Future.delayed(Duration.zero, () async {
-                showConfirmDialogue();
-              });
-            }else if(state is PaymentStatusUpdated){
-              Navigator.of(context).pop();
-              Future.delayed(Duration.zero, () async {
-                showSuccessDialogue();
-              });
+              return buildView();
+            } else if (state is Error) {
+              return ErrorItem();
+            } else {
+              return Container();
             }
-
-            return buildView();
-          }else if(state is Error){
-            return ErrorItem();
-          }else{
-            return Container();
-          }
-        },
-      )
-    );
+          },
+        ));
   }
 
-  Widget buildView(){
+  Widget buildView() {
     return ListView(
       children: [
         Container(
-          color: AppColors.SECONDARY_COLOR,
-            padding: EdgeInsets.only(left: 15,right: 15,top: 10,bottom: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ImageView(
-                width: 100,
-                asset: 'logo-h2.png',
-              ),
-            ],
-          )
-        ),
+            color: AppColors.SECONDARY_COLOR,
+            padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                ImageView(width: 70, asset: 'logo-h2.png', height: 40),
+              ],
+            )),
         Container(
           color: AppColors.SECONDARY_COLOR,
-          padding: EdgeInsets.only(left: 15,right: 15,top: 10,bottom: 20),
-          child:  Row(
+          padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 20),
+          child: Row(
             children: [
               Expanded(
                   child: Column(
-                    children: [
-                      Content(
-                        color:AppColors.WHITE_3,
-                        text: 'Service Date',
-                        alignment: Alignment.centerLeft,
-                        textHeight: 2,
-                        fontfamily: AppFont.FONT,
-                        fontWeight: FontWeight.w400,
-                        fontSize: AppDimen.TEXT_SMALLEST,
-                      ),
-                      Content(
-                        alignment: Alignment.centerLeft,
-                        textHeight: 1.5,
-                        color:AppColors.WHITE,
-                        overflow: TextOverflow.ellipsis,
-                        text: '${OrderViewModel.date}, ${OrderViewModel.time}',
-                        fontfamily: AppFont.FONT,
-                        fontWeight: FontWeight.w500,
-                        fontSize: AppDimen.TEXT_SMALLER,
-                      ),
-                    ],
-                  )
-              ),
+                children: [
+                  Content(
+                    color: AppColors.WHITE_3,
+                    text: 'Service Date',
+                    alignment: Alignment.centerLeft,
+                    textHeight: 2,
+                    fontfamily: AppFont.FONT,
+                    fontWeight: FontWeight.w400,
+                    fontSize: AppDimen.TEXT_SMALLEST,
+                  ),
+                  Content(
+                    alignment: Alignment.centerLeft,
+                    textHeight: 1.5,
+                    color: AppColors.WHITE,
+                    overflow: TextOverflow.ellipsis,
+                    text: '${OrderViewModel.date}, ${OrderViewModel.time}',
+                    fontfamily: AppFont.FONT,
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimen.TEXT_SMALLER,
+                  ),
+                ],
+              )),
               Line(
                 width: 1,
                 height: 70,
@@ -182,29 +175,28 @@ class _ServiceSummaryState extends State<ServiceSummary> {
               ),
               Expanded(
                   child: Column(
-                    children: [
-                      Content(
-                        color:AppColors.WHITE_2,
-                        text: 'Address',
-                        fontfamily: AppFont.FONT,
-                        fontWeight: FontWeight.w500,
-                        fontSize: AppDimen.TEXT_SMALLEST,
-                        alignment: Alignment.centerLeft,
-                        textHeight: 2,
-                      ),
-                      Content(
-                        color:AppColors.WHITE,
-                        text: '${OrderViewModel.address}',
-                        overflow: TextOverflow.ellipsis,
-                        fontfamily: AppFont.FONT,
-                        fontWeight: FontWeight.w500,
-                        fontSize: AppDimen.TEXT_SMALLER,
-                        alignment: Alignment.centerLeft,
-                        textHeight: 1.5,
-                      ),
-                    ],
-                  )
-              )
+                children: [
+                  Content(
+                    color: AppColors.WHITE_2,
+                    text: 'Address',
+                    fontfamily: AppFont.FONT,
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimen.TEXT_SMALLEST,
+                    alignment: Alignment.centerLeft,
+                    textHeight: 2,
+                  ),
+                  Content(
+                    color: AppColors.WHITE,
+                    text: '${OrderViewModel.address}',
+                    overflow: TextOverflow.ellipsis,
+                    fontfamily: AppFont.FONT,
+                    fontWeight: FontWeight.w500,
+                    fontSize: AppDimen.TEXT_SMALLER,
+                    alignment: Alignment.centerLeft,
+                    textHeight: 1.5,
+                  ),
+                ],
+              ))
             ],
           ),
         ),
@@ -215,8 +207,8 @@ class _ServiceSummaryState extends State<ServiceSummary> {
           margin: EdgeInsets.only(top: 0, bottom: 10),
         ),
         Content(
-          margin: EdgeInsets.only(top: 10, bottom: 10,left: 15,right: 15),
-          color:AppColors.BLACK,
+          margin: EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
+          color: AppColors.BLACK,
           text: 'My Requirements',
           fontfamily: AppFont.FONT,
           alignment: Alignment.centerLeft,
@@ -248,13 +240,13 @@ class _ServiceSummaryState extends State<ServiceSummary> {
         //   margin: EdgeInsets.only(top: 20, bottom: 10),
         // ),
         Container(
-          margin: EdgeInsets.only(left: 15,right: 15,top: 20),
+          margin: EdgeInsets.only(left: 15, right: 15, top: 20),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ImageContainer(
-                margin: EdgeInsets.only(right: 15,left: 5),
+                margin: EdgeInsets.only(right: 15, left: 5),
                 radius: 5,
                 height: 50,
                 width: 50,
@@ -262,36 +254,35 @@ class _ServiceSummaryState extends State<ServiceSummary> {
               ),
               Expanded(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-
-                    children: [
-                      Content(
-                        padding: EdgeInsets.only(bottom: 12),
-                        text: '${OrderViewModel.service}',
-                        overflow: TextOverflow.ellipsis,
-                        color: AppColors.BLACK,
-                        alignment: Alignment.centerLeft,
-                        fontfamily: AppFont.FONT,
-                        fontSize: AppDimen.TEXT_SMALL,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      Content(
-                        text: '\u20B9 ${OrderViewModel.totalPrice}',
-                        color: AppColors.BLACK,
-                        alignment: Alignment.centerLeft,
-                        fontfamily: AppFont.FONT,
-                        fontSize: AppDimen.TEXT_SMALL,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ],
-                  )
-              ),
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Content(
+                    padding: EdgeInsets.only(bottom: 12),
+                    text: '${OrderViewModel.service}',
+                    overflow: TextOverflow.ellipsis,
+                    color: AppColors.BLACK,
+                    alignment: Alignment.centerLeft,
+                    fontfamily: AppFont.FONT,
+                    fontSize: AppDimen.TEXT_SMALL,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  Content(
+                    text: '\u20B9 ${OrderViewModel.totalPrice}',
+                    color: AppColors.BLACK,
+                    alignment: Alignment.centerLeft,
+                    fontfamily: AppFont.FONT,
+                    fontSize: AppDimen.TEXT_SMALL,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ],
+              )),
               BorderContainer(
                 bgColor: AppColors.SECONDARY_COLOR,
-                padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
                 radius: 4,
                 child: Content(
-                  color:AppColors.WHITE,
+                  color: AppColors.WHITE,
                   text: OrderViewModel.noOfService.toString(),
                   fontfamily: AppFont.FONT,
                   fontWeight: FontWeight.w500,
@@ -309,22 +300,26 @@ class _ServiceSummaryState extends State<ServiceSummary> {
         ),
         BorderContainer(
           bgColor: AppColors.WHITE_2,
-          margin: EdgeInsets.only(top: 20, bottom: 10,left: 15,right: 15),
-          padding: EdgeInsets.only(top: 10, bottom: 10,left: 15,right: 15),
+          margin: EdgeInsets.only(top: 20, bottom: 10, left: 15, right: 15),
+          padding: EdgeInsets.only(top: 10, bottom: 10, left: 15, right: 15),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle_outline,color: AppColors.SUCCESS_COLOR,size: 20,),
+              Icon(
+                Icons.check_circle_outline,
+                color: AppColors.SUCCESS_COLOR,
+                size: 20,
+              ),
               Flexible(
-                  child: Content(
-                    margin: EdgeInsets.only(left: 10),
-                    text: 'Free Cancellation and Date Change at anytime',
-                    color: AppColors.BLACK_3,
-                    alignment: Alignment.centerLeft,
-                    fontfamily: AppFont.FONT,
-                    fontSize: AppDimen.TEXT_SMALLEST,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Content(
+                  margin: EdgeInsets.only(left: 10),
+                  text: 'Free Cancellation and Date Change at anytime',
+                  color: AppColors.BLACK_3,
+                  alignment: Alignment.centerLeft,
+                  fontfamily: AppFont.FONT,
+                  fontSize: AppDimen.TEXT_SMALLEST,
+                  fontWeight: FontWeight.w500,
+                ),
               )
             ],
           ),
@@ -332,11 +327,12 @@ class _ServiceSummaryState extends State<ServiceSummary> {
       ],
     );
   }
+  //  "key": "rzp_live_PIb7s06FK67MLz",
 
   void openCheckout() async {
     var options = {
-      "key": "rzp_live_PIb7s06FK67MLz",
-      "amount": "${OrderViewModel.totalPrice*100}",
+      "key": "rzp_live_TT8pzg3ycZ72px",
+      "amount": "${OrderViewModel.totalPrice * 100}",
       "currency": "INR",
       "name": "INSES",
       "description": "${OrderViewModel.service}",
@@ -350,12 +346,8 @@ class _ServiceSummaryState extends State<ServiceSummary> {
       'external': {
         'wallets': ['paytm']
       },
-      "notes": {
-        "address": "${OrderViewModel.address}"
-      },
-      "theme": {
-        "color": "#0E4472"
-      },
+      "notes": {"address": "${OrderViewModel.address}"},
+      "theme": {"color": "#0E4472"},
       // "modal": {
       //   "ondismiss": () {
       //   }
@@ -365,13 +357,18 @@ class _ServiceSummaryState extends State<ServiceSummary> {
     try {
       _razorpay.open(options);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please try again later',style: TextStyle(fontSize: AppDimen.TEXT_SMALL))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Please try again later',
+              style: TextStyle(fontSize: AppDimen.TEXT_SMALL))));
     }
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     print(response.paymentId);
-    bloc.add(UpdatePaymentStatus(orderId:OrderViewModel.orderId,paymentId: response.paymentId,method: 'CARD'));
+    bloc.add(UpdatePaymentStatus(
+        orderId: OrderViewModel.orderId!,
+        paymentId: response.paymentId!,
+        method: 'CARD'));
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -379,239 +376,238 @@ class _ServiceSummaryState extends State<ServiceSummary> {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment Failed! Our experts will reach you soon',style: TextStyle(fontSize: AppDimen.TEXT_SMALL))));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Payment Failed! Our experts will reach you soon',
+            style: TextStyle(fontSize: AppDimen.TEXT_SMALL))));
   }
 
-
-  Widget showDialogue(){
+  void showDialogue() {
     alert = AlertDialog(
-      content: Row(
+        content: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [Loader()],
+    ));
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(onWillPop: () async{ return false;}, child: alert!);
+      },
+    );
+  }
+
+  void showConfirmDialogue() {
+    alert = AlertDialog(
+        content: SizedBox(
+      height: 250,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Loader()
+          Content(
+            margin: EdgeInsets.only(left: 10),
+            text: 'Successfully Booked Your Service',
+            color: AppColors.BLACK,
+            alignment: Alignment.centerLeft,
+            fontfamily: AppFont.FONT,
+            fontSize: AppDimen.TEXT_SMALL,
+            fontWeight: FontWeight.w500,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Icon(
+            Icons.check_circle_outline,
+            color: AppColors.SUCCESS_COLOR,
+            size: 100,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          OnTapField(
+              child: BorderContainer(
+                bgColor: AppColors.SECONDARY_COLOR,
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+                radius: 4,
+                child: Content(
+                  color: AppColors.WHITE,
+                  text: 'PAY NOW',
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w500,
+                  fontSize: AppDimen.TEXT_SMALL,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                openCheckout();
+              }),
+          SizedBox(
+            height: 20,
+          ),
+          OnTapField(
+              child: BorderContainer(
+                borderColor: AppColors.WHITE_1,
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+                radius: 4,
+                child: Content(
+                  color: AppColors.BLACK,
+                  text: 'ON TIME CASH',
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w500,
+                  fontSize: AppDimen.TEXT_SMALL,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+              })
         ],
-      )
-    );
+      ),
+    ));
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return WillPopScope(
-            onWillPop: (){},
-        child:alert);
+        return WillPopScope(onWillPop: ()async{return false;}, child: alert!);
       },
     );
   }
 
-  Widget showConfirmDialogue(){
+  void showSuccessDialogue() {
     alert = AlertDialog(
         content: SizedBox(
-          height: 250,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Content(
-                margin: EdgeInsets.only(left: 10),
-                text: 'Successfully Booked Your Service',
-                color: AppColors.BLACK,
-                alignment: Alignment.centerLeft,
-                fontfamily: AppFont.FONT,
-                fontSize: AppDimen.TEXT_SMALL,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Icon(Icons.check_circle_outline,color: AppColors.SUCCESS_COLOR,size: 100,),
-              SizedBox(
-                height: 20,
-              ),
-              OnTapField(
-                  child: BorderContainer(
-                    bgColor: AppColors.SECONDARY_COLOR,
-                    padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-                    radius: 4,
-                    child: Content(
-                      color:AppColors.WHITE,
-                      text: 'PAY NOW',
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w500,
-                      fontSize: AppDimen.TEXT_SMALL,
-                    ),
-                  ),
-                  onTap: (){
-                    Navigator.of(context).pop();
-                    openCheckout();
-                  }
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              OnTapField(
-                  child: BorderContainer(
-                    borderColor: AppColors.WHITE_1,
-                    padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-                    radius: 4,
-                    child: Content(
-                      color:AppColors.BLACK,
-                      text: 'ON TIME CASH',
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w500,
-                      fontSize: AppDimen.TEXT_SMALL,
-                    ),
-                  ),
-                  onTap: (){
-                    Navigator.of(context).pop();
-                    App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
-                  }
-              )
-            ],
+      height: 250,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Content(
+            margin: EdgeInsets.only(left: 10),
+            text: 'Payment Successful!',
+            color: AppColors.BLACK,
+            alignment: Alignment.centerLeft,
+            fontfamily: AppFont.FONT,
+            fontSize: AppDimen.TEXT_H7,
+            fontWeight: FontWeight.w500,
           ),
-        )
-    );
+          SizedBox(
+            height: 20,
+          ),
+          Icon(
+            Icons.check_circle_outline,
+            color: AppColors.SUCCESS_COLOR,
+            size: 100,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Content(
+            margin: EdgeInsets.only(left: 10),
+            text: 'Our Experts will reach you soon!',
+            color: AppColors.BLACK,
+            alignment: Alignment.centerLeft,
+            fontfamily: AppFont.FONT,
+            fontSize: AppDimen.TEXT_SMALL,
+            fontWeight: FontWeight.w500,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          OnTapField(
+              child: BorderContainer(
+                bgColor: AppColors.SECONDARY_COLOR,
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+                radius: 4,
+                child: Content(
+                  color: AppColors.WHITE,
+                  text: 'OK',
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w500,
+                  fontSize: AppDimen.TEXT_SMALL,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+              }),
+        ],
+      ),
+    ));
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return WillPopScope(
-            onWillPop: (){},
-        child:alert);
+        return WillPopScope(onWillPop: ()async{return false;}, child: alert!);
       },
     );
   }
 
-  Widget showSuccessDialogue(){
+  void showFailureDialogue() {
     alert = AlertDialog(
         content: SizedBox(
-          height: 250,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Content(
-                margin: EdgeInsets.only(left: 10),
-                text: 'Payment Successful!',
-                color: AppColors.BLACK,
-                alignment: Alignment.centerLeft,
-                fontfamily: AppFont.FONT,
-                fontSize: AppDimen.TEXT_H7,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Icon(Icons.check_circle_outline,color: AppColors.SUCCESS_COLOR,size: 100,),
-              SizedBox(
-                height: 20,
-              ),
-              Content(
-                margin: EdgeInsets.only(left: 10),
-                text: 'Our Experts will reach you soon!',
-                color: AppColors.BLACK,
-                alignment: Alignment.centerLeft,
-                fontfamily: AppFont.FONT,
-                fontSize: AppDimen.TEXT_SMALL,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              OnTapField(
-                  child: BorderContainer(
-                    bgColor: AppColors.SECONDARY_COLOR,
-                    padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-                    radius: 4,
-                    child: Content(
-                      color:AppColors.WHITE,
-                      text: 'OK',
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w500,
-                      fontSize: AppDimen.TEXT_SMALL,
-                    ),
-                  ),
-                  onTap: (){
-                    Navigator.of(context).pop();
-                    App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
-                  }
-              ),
-            ],
+      height: 250,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Content(
+            margin: EdgeInsets.only(left: 10),
+            text: 'Payment Failed!',
+            color: AppColors.BLACK,
+            alignment: Alignment.center,
+            fontfamily: AppFont.FONT,
+            fontSize: AppDimen.TEXT_H7,
+            fontWeight: FontWeight.w500,
           ),
-        )
-    );
+          SizedBox(
+            height: 20,
+          ),
+          Icon(
+            Icons.close,
+            color: AppColors.WARNING_COLOR,
+            size: 100,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Content(
+            margin: EdgeInsets.only(left: 10, top: 10, bottom: 10),
+            text: 'Use On Time Case!',
+            color: AppColors.BLACK,
+            alignment: Alignment.center,
+            fontfamily: AppFont.FONT,
+            fontSize: AppDimen.TEXT_SMALL,
+            fontWeight: FontWeight.w500,
+          ),
+          OnTapField(
+              child: BorderContainer(
+                bgColor: AppColors.SECONDARY_COLOR,
+                padding:
+                    EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10),
+                radius: 4,
+                child: Content(
+                  color: AppColors.WHITE,
+                  text: 'OK',
+                  fontfamily: AppFont.FONT,
+                  fontWeight: FontWeight.w500,
+                  fontSize: AppDimen.TEXT_SMALL,
+                ),
+              ),
+              onTap: () {
+                Navigator.of(context).pop();
+                App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+              }),
+        ],
+      ),
+    ));
     showDialog(
       barrierDismissible: false,
       context: context,
       builder: (BuildContext context) {
-        return WillPopScope(
-            onWillPop: (){},
-        child:alert);
-      },
-    );
-  }
-
-  Widget showFailureDialogue(){
-    alert = AlertDialog(
-        content: SizedBox(
-          height: 250,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Content(
-                margin: EdgeInsets.only(left: 10),
-                text: 'Payment Failed!',
-                color: AppColors.BLACK,
-                alignment: Alignment.center,
-                fontfamily: AppFont.FONT,
-                fontSize: AppDimen.TEXT_H7,
-                fontWeight: FontWeight.w500,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Icon(Icons.close,color: AppColors.WARNING_COLOR,size: 100,),
-              SizedBox(
-                height: 20,
-              ),
-              Content(
-                margin: EdgeInsets.only(left: 10,top: 10,bottom: 10),
-                text: 'Use On Time Case!',
-                color: AppColors.BLACK,
-                alignment: Alignment.center,
-                fontfamily: AppFont.FONT,
-                fontSize: AppDimen.TEXT_SMALL,
-                fontWeight: FontWeight.w500,
-              ),
-              OnTapField(
-                  child: BorderContainer(
-                    bgColor: AppColors.SECONDARY_COLOR,
-                    padding: EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-                    radius: 4,
-                    child: Content(
-                      color:AppColors.WHITE,
-                      text: 'OK',
-                      fontfamily: AppFont.FONT,
-                      fontWeight: FontWeight.w500,
-                      fontSize: AppDimen.TEXT_SMALL,
-                    ),
-                  ),
-                  onTap: (){
-                    Navigator.of(context).pop();
-                    App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
-                  }
-              ),
-            ],
-          ),
-        )
-    );
-    showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return WillPopScope(
-            onWillPop: (){},
-        child:alert);
+        return WillPopScope(onWillPop: ()async{return false;}, child: alert!);
       },
     );
   }
@@ -622,5 +618,4 @@ class _ServiceSummaryState extends State<ServiceSummary> {
     _razorpay.clear();
     super.dispose();
   }
-
 }

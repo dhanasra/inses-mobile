@@ -1,24 +1,24 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/model/bookings.dart';
 import 'package:intl/intl.dart';
 
 class OrderViewModel {
-  static OrderViewModel _instance;
-  var addressController;
-  FocusNode addressFocus;
+  static OrderViewModel? _instance;
+  late TextEditingController addressController;
+  late FocusNode addressFocus;
 
   DateFormat dayformatter = DateFormat('MMM');
   DateFormat dateformatter = DateFormat('dd');
   DateFormat dateTimeformatter = DateFormat('dd MMM');
 
-  static int categoryId ;
-  static int serviceId ;
-  static int orderId ;
+  static int? categoryId ;
+  static int? serviceId ;
+  static int? orderId ;
   static String serviceIcon = '' ;
   static String serviceImage = '' ;
   static String category='';
@@ -31,17 +31,17 @@ class OrderViewModel {
   static bool load2 = false;
   static bool load3 = false;
   static bool load4 = false;
-  static String date;
+  static String? date;
   static String time = '';
   static String startTime = '';
   static String endTime = '';
   static String isCash = '';
   static String isPaid = '';
-  static BookingModel booking ;
+  static BookingModel? booking ;
 
   factory OrderViewModel(App app) {
     _instance ??= OrderViewModel._internal();
-    return _instance;
+    return _instance!;
   }
 
   OrderViewModel._internal() {
@@ -77,9 +77,13 @@ class OrderViewModel {
         }
       }
       Position position = await Geolocator.getCurrentPosition();
-      List<Address> address = await Geocoder.local.findAddressesFromCoordinates(
-          Coordinates(position.latitude, position.longitude));
-      addressController.text = address[0].addressLine.toString();
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if(placemarks.isNotEmpty){
+        var placemark = placemarks[0];
+        var address = '${placemark.name!=null? '${placemark.name}, ':''}${placemark.street!=null? '${placemark.street}, ':''}${placemark.locality!=null? '${placemark.locality}, ':''}${placemark.subLocality!=null? '${placemark.subLocality}, ':''}${placemark.administrativeArea!=null? '${placemark.administrativeArea}, ':''}${placemark.subAdministrativeArea!=null? '${placemark.subAdministrativeArea}, ':''}${placemark.country!=null? '${placemark.country}, ':''}${placemark.postalCode!=null? '${placemark.postalCode}':''}';
+        addressController.text = address.toString();
+
+      }
     }
   }
 

@@ -1,20 +1,22 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:inses_app/app/app.dart';
 
 class RegisterViewModel {
-  static RegisterViewModel _instance;
+  static RegisterViewModel? _instance;
   var passwordController;
   var nameController;
   var phoneController;
+  var emailController;
   var addressController;
-  FocusNode phoneFocus;
-  FocusNode passwordFocus;
-  FocusNode nameFocus;
-  FocusNode addressFocus;
+  late FocusNode phoneFocus;
+  late FocusNode emailFocus;
+  late FocusNode passwordFocus;
+  late FocusNode nameFocus;
+  late FocusNode addressFocus;
   StreamController<bool> loadController = StreamController<bool>.broadcast();
 
   static String name = '';
@@ -28,7 +30,7 @@ class RegisterViewModel {
 
   factory RegisterViewModel(App app) {
     _instance ??= RegisterViewModel._internal();
-    return _instance;
+    return _instance!;
   }
 
   RegisterViewModel._internal() {
@@ -40,11 +42,12 @@ class RegisterViewModel {
     passwordFocus = FocusNode();
     nameFocus = FocusNode();
     addressFocus = FocusNode();
+    emailFocus = FocusNode();
     passwordController = TextEditingController(text: "");
     nameController = TextEditingController(text: "");
     addressController = TextEditingController(text: "");
     phoneController = TextEditingController(text: "");
-
+    emailController = TextEditingController(text: "");
     passwordController.addListener(() {
       String password = passwordController.text.toString();
       if (password.isNotEmpty && (password[0] == " " || password[0] == "."))
@@ -68,6 +71,11 @@ class RegisterViewModel {
       if (fName.isNotEmpty && (fName[0] == " " || fName[0] == "."))
         addressController.text = "";
     });
+    emailController.addListener(() {
+      String fName = emailController.text.toString();
+      if (fName.isNotEmpty && (fName[0] == " " || fName[0] == "."))
+        emailController.text = "";
+    });
   }
 
   Future<void> getPosition() async {
@@ -77,20 +85,19 @@ class RegisterViewModel {
       LocationPermission permission;
 
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-
-      }
+      if (!serviceEnabled) {}
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-
-        }
+        if (permission == LocationPermission.denied) {}
       }
       Position position = await Geolocator.getCurrentPosition();
-      List<Address> address = await Geocoder.local.findAddressesFromCoordinates(
-          Coordinates(position.latitude, position.longitude));
-      addressController.text = address[0].addressLine.toString();
+      List<Placemark> placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if(placemarks.isNotEmpty){
+        var placemark = placemarks[0];
+        var address = '${placemark.name!=null? '${placemark.name}, ':''}${placemark.street!=null? '${placemark.street}, ':''}${placemark.locality!=null? '${placemark.locality}, ':''}${placemark.subLocality!=null? '${placemark.subLocality}, ':''}${placemark.administrativeArea!=null? '${placemark.administrativeArea}, ':''}${placemark.subAdministrativeArea!=null? '${placemark.subAdministrativeArea}, ':''}${placemark.country!=null? '${placemark.country}, ':''}${placemark.postalCode!=null? '${placemark.postalCode}':''}';
+        addressController.text = address.toString();
+      }
     }
   }
 }

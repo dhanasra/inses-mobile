@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
-import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/model/bookings.dart';
@@ -32,7 +30,7 @@ class _BookingItemState extends State<BookingItem> {
       elevation: 4,
       child: OnTapField(
         onTap: (){
-          print(HomeViewModel.loginStatus+AppConstants.LOGGED_IN);
+          // print(HomeViewModel.loginStatus+AppConstants.LOGGED_IN);
           OrderViewModel.booking = widget.bookingModel;
           OrderViewModel.orderId = widget.bookingModel.id;
           HomeViewModel.loginStatus==AppConstants.LOGGED_IN?

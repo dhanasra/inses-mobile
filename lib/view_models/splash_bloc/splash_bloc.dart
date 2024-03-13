@@ -1,9 +1,6 @@
-import 'package:connectivity/connectivity.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
-import 'package:inses_app/app/app.dart';
 import 'package:inses_app/database/app_preferences.dart';
 import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/network/app_api_client.dart';
@@ -43,19 +40,20 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       await Future.delayed(Duration(seconds: 3));
       yield Loading();
       String loginStatus = await AppPreferences().getLoginStatus();
+      print(loginStatus);
       if (loginStatus == AppConstants.LOGGED_IN || loginStatus==AppConstants.LOGGED_IN_ADMIN) {
         HomeViewModel.loginStatus = loginStatus;
-
+        try {
 
         String address = await AppApiClient(httpClient: Client()).getUserAddress();
 
         ProfileViewModel.address = address;
-        try {
+        
           Net.GotUserDetails userDetails = await AppApiClient(
-              httpClient: Client()).getUserDetails();
+              httpClient: Client()).getUserDetails() as Net.GotUserDetails;
 
-          ProfileViewModel.name = userDetails.name;
-          ProfileViewModel.phone = userDetails.phone;
+          ProfileViewModel.name = userDetails.name??'';
+          ProfileViewModel.phone = userDetails.phone??'';
           yield Welcome();
         }catch(e){
           yield Error();

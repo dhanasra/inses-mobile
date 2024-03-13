@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -7,7 +7,6 @@ import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_container.dart';
-import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/network/app_api_client.dart';
@@ -21,8 +20,6 @@ import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/loader.dart';
-import 'package:inses_app/widgets/mini_title.dart';
-import 'package:inses_app/widgets/service_sub_item.dart';
 
 class BookingDesc extends StatefulWidget {
 
@@ -31,20 +28,20 @@ class BookingDesc extends StatefulWidget {
 }
 
 class _BookingDescState extends State<BookingDesc> {
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
 
-  String type;
-  String payType;
-  String additional;
+  late String type;
+  late String payType;
+  String? additional;
 
   @override
   void initState() {
-    type = OrderViewModel.booking.status;
-    payType = OrderViewModel.booking.payStatus;
+    type = OrderViewModel.booking!.status;
+    payType = OrderViewModel.booking!.payStatus;
     bloc = NetworkBloc(appRepository: appRepository);
     OrderViewModel.load4 = true;
-    bloc.add(GetBookingDetails(id: OrderViewModel.booking.id));
+    bloc.add(GetBookingDetails(id: OrderViewModel.booking!.id));
     super.initState();
   }
 
@@ -54,7 +51,7 @@ class _BookingDescState extends State<BookingDesc> {
         child: Scaffold(
           appBar: App().appBarBack(
             context,
-            OrderViewModel.booking.categoryName,
+            OrderViewModel.booking!.categoryName,
             onPressed: (){
               App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
             }
@@ -69,13 +66,14 @@ class _BookingDescState extends State<BookingDesc> {
                   }else if(state is Error){
                     return ErrorItem();
                   }else if(state is GotBooking ){
-                    if(state is GotBooking){
-                      OrderViewModel.booking = state.booking;
-                      type = OrderViewModel.booking.status;
-                      additional = OrderViewModel.booking.additionalPrice!=0?"ADDED":"ADD";
-                      print(additional);
-                    }
+                    OrderViewModel.booking = state.booking;
+                    type = OrderViewModel.booking!.status;
+                    additional = OrderViewModel.booking!.additionalPrice!=0?"ADDED":"ADD";
+                    print(additional);
                     return buildView(false);
+                  }else if(state is ServiceCancelled){
+                    App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+                    return Container();
                   }else{
                     return Container();
                   }
@@ -195,7 +193,7 @@ class _BookingDescState extends State<BookingDesc> {
                     fontfamily: AppFont.FONT,
                     textHeight: 1.5,
                     letterSpacing: 1,
-                    text: OrderViewModel.booking.categoryName,
+                    text: OrderViewModel.booking!.categoryName,
                     color: AppColors.WHITE,
                     fontWeight: FontWeight.w600,
                     fontSize: AppDimen.TEXT_H1,
@@ -205,7 +203,7 @@ class _BookingDescState extends State<BookingDesc> {
                     alignment: Alignment.centerLeft,
                     fontfamily: AppFont.FONT,
                     textHeight: 1.5,
-                    text: 'Get lowest prices for ${OrderViewModel.booking.categoryName} in Madurai',
+                    text: 'Get lowest prices for ${OrderViewModel.booking!.categoryName} in Madurai',
                     color: AppColors.WHITE_1,
                     fontWeight: FontWeight.w400,
                     fontSize: AppDimen.TEXT_SMALL,
@@ -227,7 +225,7 @@ class _BookingDescState extends State<BookingDesc> {
                           bgColor: AppColors.SUCCESS_COLOR,
                           child: Content(
                             width: 80,
-                            text: OrderViewModel.booking.status,
+                            text: OrderViewModel.booking!.status,
                             color: AppColors.WHITE,
                             fontfamily: AppFont.FONT,
                             fontSize: AppDimen.TEXT_MINI,
@@ -248,7 +246,7 @@ class _BookingDescState extends State<BookingDesc> {
                         textHeight: 1.5,
                         margin: EdgeInsets.only(top: 5),
                         color:AppColors.BLACK,
-                        text: OrderViewModel.booking.name,
+                        text: OrderViewModel.booking!.name,
                         fontfamily: AppFont.FONT,
                         fontWeight: FontWeight.w500,
                         fontSize: AppDimen.TEXT_SMALLER,
@@ -268,7 +266,7 @@ class _BookingDescState extends State<BookingDesc> {
                         textHeight: 1.5,
                         margin: EdgeInsets.only(top: 5),
                         color:AppColors.BLACK,
-                        text: OrderViewModel.booking.date,
+                        text: OrderViewModel.booking!.date,
                         fontfamily: AppFont.FONT,
                         fontWeight: FontWeight.w500,
                         fontSize: AppDimen.TEXT_SMALLER,
@@ -286,7 +284,7 @@ class _BookingDescState extends State<BookingDesc> {
                       Content(
                         color:AppColors.BLACK,
                         margin: EdgeInsets.only(top: 5),
-                        text: OrderViewModel.booking.address,
+                        text: OrderViewModel.booking!.address,
                         overflow: TextOverflow.ellipsis,
                         fontfamily: AppFont.FONT,
                         fontWeight: FontWeight.w500,
@@ -306,7 +304,7 @@ class _BookingDescState extends State<BookingDesc> {
                       ),
                       Content(
                         color:AppColors.BLACK,
-                        text: '\u20B9 ${OrderViewModel.booking.totalPrice}',
+                        text: '\u20B9 ${OrderViewModel.booking!.totalPrice}',
                         margin: EdgeInsets.only(top: 5),
                         overflow: TextOverflow.ellipsis,
                         fontfamily: AppFont.FONT,
@@ -328,7 +326,7 @@ class _BookingDescState extends State<BookingDesc> {
                       Content(
                         color:AppColors.BLACK,
                         margin: EdgeInsets.only(top: 5,bottom: 15),
-                        text: OrderViewModel.booking.payMethod,
+                        text: OrderViewModel.booking!.payMethod,
                         overflow: TextOverflow.ellipsis,
                         fontfamily: AppFont.FONT,
                         fontWeight: FontWeight.w500,
@@ -354,7 +352,7 @@ class _BookingDescState extends State<BookingDesc> {
                               Expanded(child: Content(
                                 color:AppColors.BLACK,
                                 margin: EdgeInsets.only(top: 5),
-                                text: '\u20B9 ${OrderViewModel.booking.additionalPrice}',
+                                text: '\u20B9 ${OrderViewModel.booking!.additionalPrice}',
                                 overflow: TextOverflow.ellipsis,
                                 fontfamily: AppFont.FONT,
                                 fontWeight: FontWeight.w500,
@@ -383,7 +381,7 @@ class _BookingDescState extends State<BookingDesc> {
                               Expanded(child: Content(
                                 color:AppColors.BLACK,
                                 margin: EdgeInsets.only(top: 5),
-                                text: OrderViewModel.booking.additionalDesc,
+                                text: OrderViewModel.booking!.additionalDesc!,
                                 overflow: TextOverflow.ellipsis,
                                 fontfamily: AppFont.FONT,
                                 fontWeight: FontWeight.w500,
@@ -394,11 +392,38 @@ class _BookingDescState extends State<BookingDesc> {
                             ],
                           )
                       ),
-                      Visibility(
-                        visible: !OrderViewModel.booking.reviewed,
-                          child: BorderContainer(
+                      BorderContainer(
                               radius: 4,
                               margin: EdgeInsets.only(left: 15,right: 15,top: 30),
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              borderColor: AppColors.PRIMARY_COLOR,
+                              child: OnTapField(
+                                child: isLoading
+                                    ?Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Loader(margin: EdgeInsets.all(0),)
+                                  ],
+                                )
+                                    :Content(
+                                  padding: EdgeInsets.only(top: 10,bottom: 10),
+                                  text: 'CANCEL BOOKING',
+                                  color: AppColors.PRIMARY_COLOR,
+                                  fontfamily: AppFont.FONT,
+                                  fontSize: AppDimen.TEXT_SMALL,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                onTap: (){
+                                  bloc.add(CancelService(orderId: OrderViewModel.booking!.id));
+                                },
+                              )
+                          ),
+                      Visibility(
+                        visible: !OrderViewModel.booking!.reviewed!,
+                          child: BorderContainer(
+                              radius: 4,
+                              margin: EdgeInsets.only(left: 15,right: 15,top: 15),
                               padding: EdgeInsets.only(top: 5,bottom: 5),
                               bgColor: AppColors.SECONDARY_COLOR,
                               child: OnTapField(

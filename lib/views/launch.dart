@@ -9,7 +9,6 @@ import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/widgets/double_color_button.dart';
 import 'package:inses_app/widgets/launch_slider_item.dart';
-import 'package:inses_app/widgets/loader.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class Launch extends StatefulWidget {
@@ -21,7 +20,7 @@ class Launch extends StatefulWidget {
 class _LaunchState extends State<Launch> {
 
   int _currentPage = 0;
-  PageController _pageController;
+  late PageController _pageController;
 
   @override
   void initState() {

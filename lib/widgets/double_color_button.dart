@@ -8,22 +8,22 @@ class DoubleColorButton extends StatelessWidget {
   final String text1;
   final String text2;
   final double width;
-  final double height;
-  final Color bgColor;
-  final Color borderColor;
-  final Color txtColor;
-  final double fontSize;
-  final EdgeInsetsGeometry margin;
-  final EdgeInsetsGeometry padding;
-  final AlignmentGeometry alignment;
-  final FontWeight fontWeight;
-  final bool isShadow;
-  final String fontfamily;
-  final bool isLoadButton;
-  final double radius;
+  final double? height;
+  final Color? bgColor;
+  final Color? borderColor;
+  final Color? txtColor;
+  final double? fontSize;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
+  final AlignmentGeometry? alignment;
+  final FontWeight? fontWeight;
+  final bool? isShadow;
+  final String? fontfamily;
+  final bool? isLoadButton;
+  final double? radius;
   final VoidCallback onPressed;
-  DoubleColorButton({this.text1,this.text2,
-  @required this.width,
+  DoubleColorButton({required this.text1,required this.text2,
+    required this.width,
     this.height,
     this.bgColor,
     this.borderColor,
@@ -37,7 +37,7 @@ class DoubleColorButton extends StatelessWidget {
     this.isShadow,
     this.fontfamily,
     this.radius,
-    @required this.onPressed});
+    required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +75,15 @@ class DoubleColorButton extends StatelessWidget {
         )),
     decoration: BoxDecoration(
         borderRadius:
-          BorderRadius.circular( radius != null ?  radius : 2),
+          BorderRadius.circular( radius ?? 2),
           color:  bgColor != null ?  bgColor : Colors.transparent,
           border: Border.all(
-          color:  borderColor != null
-          ?  borderColor
-              : Colors.transparent),
+          color:  borderColor ?? Colors.transparent),
           boxShadow: [
           BoxShadow(
           offset: Offset(0, 2),
           blurRadius: 10,
-          color:  isShadow != null &&  isShadow
+          color:  isShadow != null &&  isShadow!
               ? Color(0x19000000)
                   : Colors.transparent,
         ),

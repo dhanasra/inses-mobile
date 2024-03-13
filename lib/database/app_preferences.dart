@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
@@ -20,23 +19,23 @@ class AppPreferences {
 
   //User Info
 
-  Future<void> setName({@required String firstName}) => setPreference(
+  Future<void> setName({required String firstName}) => setPreference(
       prefName: AppConstants.NAME,
       prefType: PREF_TYPE_STRING,
       prefValue: firstName);
-  Future<void> setPhoneNumber({@required String phone}) => setPreference(
+  Future<void> setPhoneNumber({required String phone}) => setPreference(
       prefName: AppConstants.PHONE_NUMBER,
       prefType: PREF_TYPE_STRING,
       prefValue: phone);
-  Future<void> setLoginStatus({@required String status}) => setPreference(
+  Future<void> setLoginStatus({required String status}) => setPreference(
       prefName: AppConstants.LOGIN_STATUS,
       prefType: PREF_TYPE_STRING,
       prefValue: status);
-  Future<void> setToken({@required String token}) => setPreference(
+  Future<void> setToken({required String token}) => setPreference(
       prefName: AppConstants.TOKEN,
       prefType: PREF_TYPE_STRING,
       prefValue: token);
-  Future<void> setRefreshToken({@required String refreshToken}) => setPreference(
+  Future<void> setRefreshToken({required String refreshToken}) => setPreference(
       prefName: AppConstants.R_TOKEN,
       prefType: PREF_TYPE_STRING,
       prefValue: refreshToken);
@@ -57,9 +56,9 @@ class AppPreferences {
           "";
 
  Future<void> setPreference(
-      {@required String prefName,
-      @required dynamic prefValue,
-      @required String prefType}) async {
+      {required String prefName,
+      required dynamic prefValue,
+      required String prefType}) async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     switch (prefType) {
       // prefType is bool
@@ -89,7 +88,7 @@ class AppPreferences {
     }
   }
 
-  Future<dynamic> _getPreference({@required prefName}) async {
+  Future<dynamic> _getPreference({required prefName}) async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     return _preferences.get(prefName);
   }

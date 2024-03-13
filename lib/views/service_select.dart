@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -21,7 +21,6 @@ import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/loader.dart';
-import 'package:inses_app/widgets/mini_card_item.dart';
 import 'package:inses_app/widgets/mini_title.dart';
 import 'package:inses_app/widgets/promise_item.dart';
 import 'package:inses_app/widgets/review_scroll_card.dart';
@@ -37,17 +36,17 @@ class ServiceSelect extends StatefulWidget {
 
 class _ServiceSelectState extends State<ServiceSelect> {
 
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
-  OrderViewModel viewModel;
-  NetworkBloc reviewBloc;
+  late OrderViewModel viewModel;
+  late NetworkBloc reviewBloc;
 
   @override
   void initState() {
     super.initState();
     viewModel = OrderViewModel(App());
     bloc = NetworkBloc(appRepository: appRepository);
-    bloc.add(GetCategoryServices(id: OrderViewModel.categoryId));
+    bloc.add(GetCategoryServices(id: OrderViewModel.categoryId!));
     reviewBloc = NetworkBloc(appRepository: appRepository);
     reviewBloc.add(GetReview());
   }
@@ -308,7 +307,7 @@ class _ServiceSelectState extends State<ServiceSelect> {
           bloc: reviewBloc,
           builder: (context,state){
             if(state is GotReviews){
-              return ReviewScrollCard(reviews: state.reviews,);
+              return ReviewScrollCard(reviews: state.reviews!,);
             }else if(state is Loading){
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,

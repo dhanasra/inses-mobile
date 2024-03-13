@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
@@ -10,7 +9,7 @@ import 'package:inses_app/resources/app_font.dart';
 class PaymentCardItem extends StatelessWidget {
   final PaymentHistoryModel payment;
 
-  PaymentCardItem({this.payment});
+  PaymentCardItem({required this.payment});
 
   @override
   Widget build(BuildContext context) {
@@ -32,15 +31,18 @@ class PaymentCardItem extends StatelessWidget {
           ),
           Container(
             margin: EdgeInsets.only(top: 5),
-            child:
-            Row(
+            child: Row(
               children: [
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Icon(Icons.access_time,size: 15,color: AppColors.GRAY,),
+                      Icon(
+                        Icons.access_time,
+                        size: 15,
+                        color: AppColors.GRAY,
+                      ),
                       Content(
                         margin: EdgeInsets.only(left: 5),
                         text: '12 May, 11.30 pm',
@@ -53,22 +55,25 @@ class PaymentCardItem extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                    child:Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(Icons.monetization_on,size: 15,color: AppColors.GRAY,),
-                        Content(
-                          padding: EdgeInsets.only(left: 5),
-                          text: 'Cash',
-                          color: AppColors.GRAY,
-                          fontfamily: AppFont.FONT,
-                          fontSize: AppDimen.TEXT_SMALLEST,
-                          fontWeight: FontWeight.w500,
-                        )
-                      ],
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.monetization_on,
+                      size: 15,
+                      color: AppColors.GRAY,
+                    ),
+                    Content(
+                      padding: EdgeInsets.only(left: 5),
+                      text: 'CASH',
+                      color: AppColors.GRAY,
+                      fontfamily: AppFont.FONT,
+                      fontSize: AppDimen.TEXT_SMALLEST,
+                      fontWeight: FontWeight.w500,
                     )
-                ),
+                  ],
+                )),
               ],
             ),
           )

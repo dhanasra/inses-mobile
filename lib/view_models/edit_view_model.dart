@@ -7,14 +7,14 @@ import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/service.dart';
 
 class EditViewModel{
-  static EditViewModel _instance;
+  static EditViewModel? _instance;
 
-  static int type;
+  static int? type;
 
-  static String serviceImage;
+  static String? serviceImage;
   static int rating = 5;
-  static File icon;
-  static File image;
+  static File? icon;
+  static File? image;
   var priceController;
   var nameController;
   var phoneController;
@@ -22,13 +22,13 @@ class EditViewModel{
   var oldPriceController;
   var offerPriceController;
 
-  static ServiceModel service;
-  static CategoryModel category;
-  static OfferModel offer;
+  static ServiceModel? service;
+  static CategoryModel? category;
+  static OfferModel? offer;
 
   factory EditViewModel(App app){
     _instance ??= EditViewModel._internal();
-    return _instance;
+    return _instance!;
   }
 
   EditViewModel._internal(){

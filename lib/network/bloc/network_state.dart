@@ -22,7 +22,7 @@ class Loading extends NetworkState {}
 class Empty extends NetworkState {}
 
 class Error extends NetworkState {
-  final String error;
+  final String? error;
 
   const Error({this.error});
 }
@@ -34,27 +34,27 @@ class AdditionalRemoved extends NetworkState {}
 class RegisterError extends NetworkState {
   final String error;
 
-  const RegisterError({@required this.error}):assert(error!=null);
+  const RegisterError({required this.error});
 
 }
 
 class GotUserDetails extends NetworkState {
-  final String name;
-  final String phone;
+  final String? name;
+  final String? phone;
 
   const GotUserDetails({this.name,this.phone});
 
 }
 
 class GotReviews extends NetworkState {
-  final List<ReviewModel> reviews;
+  final List<ReviewModel>? reviews;
 
   const GotReviews({this.reviews});
 
 }
 
 class GotBooking extends NetworkState {
-  final BookingModel booking;
+  final BookingModel? booking;
   const GotBooking({this.booking});
 
 }
@@ -62,7 +62,7 @@ class GotBooking extends NetworkState {
 class Success extends NetworkState {}
 
 class LoginSuccess extends NetworkState {
-  final String id;
+  final String? id;
   const LoginSuccess({this.id});
 }
 
@@ -76,7 +76,7 @@ class Completed extends NetworkState {}
 class Added extends NetworkState {}
 
 class LoginError extends NetworkState {
-  final String error;
+  final String? error;
 
   const LoginError({@required this.error});
 
@@ -85,7 +85,7 @@ class LoginError extends NetworkState {
 class GotCategories extends NetworkState {
   final List<CategoryModel> categories;
 
-  const GotCategories({@required this.categories}) : assert(categories != null);
+  const GotCategories({required this.categories});
 
   @override
   List<Object> get props => [categories];
@@ -94,7 +94,7 @@ class GotCategories extends NetworkState {
 class GotServices extends NetworkState {
   final List<ServiceModel> services;
 
-  const GotServices({@required this.services}) : assert(services != null);
+  const GotServices({required this.services});
 
   @override
   List<Object> get props => [services];
@@ -103,7 +103,7 @@ class GotServices extends NetworkState {
 class GotOffers extends NetworkState {
   final List<OfferModel> offers;
 
-  const GotOffers({@required this.offers}) : assert(offers != null);
+  const GotOffers({required this.offers});
 
   @override
   List<Object> get props => [offers];
@@ -113,7 +113,7 @@ class GotOffers extends NetworkState {
 class GotPaymentHistory extends NetworkState {
   final List<PaymentHistoryModel> payments;
 
-  const GotPaymentHistory({@required this.payments}) : assert(payments != null);
+  const GotPaymentHistory({required this.payments});
 
   @override
   List<Object> get props => [payments];
@@ -122,7 +122,7 @@ class GotPaymentHistory extends NetworkState {
 class GotBookings extends NetworkState {
   final List<BookingModel> bookings;
 
-  const GotBookings({@required this.bookings}) : assert(bookings != null);
+  const GotBookings({required this.bookings});
 
   @override
   List<Object> get props => [bookings];
@@ -131,7 +131,7 @@ class GotBookings extends NetworkState {
 class GotBookingHistory extends NetworkState {
   final List<BookingModel> bookings;
 
-  const GotBookingHistory({@required this.bookings}) : assert(bookings != null);
+  const GotBookingHistory({required this.bookings});
 
   @override
   List<Object> get props => [bookings];
@@ -144,3 +144,5 @@ class PaymentStatusUpdated extends NetworkState {}
 class PhoneNumberUpdated extends NetworkState {}
 
 class ServiceBooked extends NetworkState {}
+
+class ServiceCancelled extends NetworkState {}

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:inses_app/resources/app_colors.dart';
 
 class ExpandableContainer extends StatelessWidget {
   final bool expanded;
@@ -9,7 +8,7 @@ class ExpandableContainer extends StatelessWidget {
   final Widget child;
 
   ExpandableContainer({
-    @required this.child,
+    required this.child,
     this.collapsedHeight = 0.0,
     this.expandedHeight = 300.0,
     this.expanded = true,

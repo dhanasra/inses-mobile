@@ -1,14 +1,11 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:inses_app/app/app.dart';
-import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
-import 'package:line_icons/line_icons.dart';
 
 import '../main.dart';
 
@@ -23,8 +20,7 @@ class _NoInternetState extends State<NoInternet> {
   Widget build(BuildContext context) {
     return WillPopScope(child: Scaffold(
       body: buildView(),
-    ), onWillPop: ()async{
-    });
+    ), onWillPop: ()async=>false);
   }
 
   Widget buildView(){

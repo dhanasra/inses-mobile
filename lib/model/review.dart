@@ -9,11 +9,11 @@ class ReviewModel extends Equatable {
   
 
   const ReviewModel(
-      {this.name,
-        this.review,
-        this.img,
-        this.date,
-        this.stars
+      {required this.name,
+        required this.review,
+        required this.img,
+        required this.date,
+        required this.stars
       });
 
   @override

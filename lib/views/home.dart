@@ -1,21 +1,14 @@
-import 'dart:convert';
-import 'package:inses_app/database/constants.dart';
-import 'package:inses_app/main.dart';
-import 'package:inses_app/views/splash.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
-import 'package:inses_app/app/app.dart';
-import 'package:inses_app/app/app_routes.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/line.dart';
 import 'package:inses_app/comps/tap_field.dart';
-import 'package:inses_app/database/app_preferences.dart';
-import 'package:inses_app/model/service.dart';
+import 'package:inses_app/database/constants.dart';
+import 'package:inses_app/main.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/app_repository.dart';
 import 'package:inses_app/network/bloc/network_bloc.dart';
@@ -24,19 +17,13 @@ import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
-import 'package:inses_app/utils/url.dart';
-import 'package:inses_app/view_models/home_view_model.dart';
 import 'package:inses_app/widgets/app_drawer.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/location_dialogue.dart';
 import 'package:inses_app/widgets/promise_item.dart';
 import 'package:inses_app/widgets/review_scroll_card.dart';
-import 'package:inses_app/widgets/scroll_card.dart';
-import 'package:inses_app/widgets/search_input_field.dart';
 import 'package:inses_app/widgets/service_item.dart';
 import 'package:inses_app/widgets/sub.dart';
-import 'package:inses_app/widgets/sub_title.dart';
-import 'package:line_icons/line_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Home extends StatefulWidget {
@@ -45,11 +32,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  NetworkBloc bloc;
-  NetworkBloc bloc1;
-  NetworkBloc categoryBloc;
-  NetworkBloc reviewBloc;
-  AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
+  late NetworkBloc bloc;
+  late NetworkBloc bloc1;
+  late NetworkBloc categoryBloc;
+  late NetworkBloc reviewBloc;
+  AppRepository appRepository =
+      AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
 
   @override
@@ -67,80 +55,80 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
-      drawer: AppDrawer(logout),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: Container(
-          color: AppColors.SECONDARY_COLOR,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding:
-                    EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+        key: _scaffoldKey,
+        drawer: AppDrawer(logout),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80),
+          child: Container(
+            color: AppColors.SEC_COLOR,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding:
+                      EdgeInsets.only(left: 15, right: 15, top: 20, bottom: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                       OnTapField(
-                        child: Container(
+                          child: Container(
                             margin: EdgeInsets.only(right: 20),
                             child: Icon(
                               Icons.menu,
-                              color: AppColors.WHITE_1,
-                            ),),
-                            onTap: (){
-                              _scaffoldKey.currentState.openDrawer();
-                            }
-                    ),
-                    Expanded(
-                        child: Row(
-                      children: [
-                        ImageView(
-                          width: 90,
-                          asset: 'logo-h2.png',
-                        ),
-                        Content(
-                          padding: EdgeInsets.only(left: 10, top: 10),
-                          alignment: Alignment.centerLeft,
-                          text: 'Online services',
-                          fontfamily: AppFont.FONT,
-                          color: AppColors.WHITE_3,
-                          fontWeight: FontWeight.w400,
-                          fontSize: AppDimen.TEXT_SMALLEST,
-                        )
-                      ],
-                    ))
-                  ],
+                              color: AppColors.BLACK,
+                            ),
+                          ),
+                          onTap: () {
+                            _scaffoldKey.currentState!.openDrawer();
+                          }),
+                      Expanded(
+                          child: Row(
+                        children: [
+                          ImageView(
+                            asset: 'logo-h1.png',
+                            width: 50,
+                            height: 50,
+                          ),
+                          Content(
+                            padding: EdgeInsets.only(left: 10, top: 10),
+                            alignment: Alignment.centerLeft,
+                            text: 'On Demand Service',
+                            fontfamily: AppFont.FONT,
+                            color: AppColors.BLACK,
+                            fontWeight: FontWeight.w400,
+                            fontSize: AppDimen.TEXT_SMALLEST,
+                          )
+                        ],
+                      ))
+                    ],
+                  ),
                 ),
-              ),
-              Line(
-                width: double.infinity,
-                height: 3,
-                color: AppColors.WHITE_1,
-              ),
-            ],
+                Line(
+                  width: double.infinity,
+                  height: 3,
+                  color: AppColors.WHITE_1,
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-      body: BlocBuilder<NetworkBloc,NetworkState>(
-        bloc: bloc,
-        builder: (context,state){
-          if(state is LogoutSuccess){
-            print("success");
-            Future.delayed(Duration.zero,()async{
-              RestartWidget.restartApp(context);
-            });
-          }
-          return Container(
+        body: BlocBuilder<NetworkBloc, NetworkState>(
+          bloc: bloc,
+          builder: (context, state) {
+            if (state is LogoutSuccess) {
+              print("success");
+              Future.delayed(Duration.zero, () async {
+                RestartWidget.restartApp(context);
+              });
+            }
+            return Container(
               color: AppColors.WHITE,
               child: Container(
                 child: buildView(),
               ),
-          );
-        },
-      )
-    );
+            );
+          },
+        ));
   }
 
   Widget buildView() {
@@ -196,49 +184,53 @@ class _HomeState extends State<Home> {
               )),
               Expanded(
                   child: Container(
-                alignment: Alignment.centerRight,
-                child: OnTapField(
-                  child:  BorderContainer(
-                    radius: 20,
-                    padding:
-                    EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-                    borderColor: AppColors.GRAY,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.phone,
-                          size: 18,
-                          color: AppColors.BLACK,
+                      alignment: Alignment.centerRight,
+                      child: OnTapField(
+                        child: BorderContainer(
+                          radius: 20,
+                          padding: EdgeInsets.only(
+                              left: 10, right: 10, top: 5, bottom: 5),
+                          borderColor: AppColors.GRAY,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.phone,
+                                size: 18,
+                                color: AppColors.BLACK,
+                              ),
+                              Content(
+                                padding: EdgeInsets.only(left: 10),
+                                alignment: Alignment.centerRight,
+                                text: AppConstants.INSES_NUMBER,
+                                fontfamily: AppFont.FONT,
+                                color: AppColors.BLACK,
+                                fontWeight: FontWeight.w400,
+                                fontSize: AppDimen.TEXT_SMALLEST,
+                              )
+                            ],
+                          ),
                         ),
-                        Content(
-                          padding: EdgeInsets.only(left: 10),
-                          alignment: Alignment.centerRight,
-                          text: AppConstants.INSES_NUMBER,
-                          fontfamily: AppFont.FONT,
-                          color: AppColors.BLACK,
-                          fontWeight: FontWeight.w400,
-                          fontSize: AppDimen.TEXT_SMALLEST,
-                        )
-                      ],
-                    ),
-                  ),
-                  onTap: (){
-                    launch("tel://${AppConstants.INSES_NUMBER}");
-                  },
-                )
-              ))
+                        onTap: () {
+                          launch("tel://${AppConstants.INSES_NUMBER}");
+                        },
+                      )))
             ],
           ),
         ),
+        ImageView(
+          width: 90,
+          asset: 'banner.jpg',
+        ),
+
         // SearchInputField(),
-        BlocBuilder<NetworkBloc,NetworkState>(
+        /*   BlocBuilder<NetworkBloc, NetworkState>(
           bloc: bloc1,
-          builder: (context,state){
-            if(state is GotOffers){
+          builder: (context, state) {
+            if (state is GotOffers) {
               return ScrollCard(offers: state.offers);
-            }else if(state is Loading){
+            } else if (state is Loading) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -248,11 +240,15 @@ class _HomeState extends State<Home> {
                   )
                 ],
               );
-            }else{
+            } else {
               return Container();
             }
           },
         ),
+        ImageView(
+          width: 90,
+          asset: 'banner.jpg',
+        ),*/
         Line(
           width: double.infinity,
           height: 10,
@@ -271,10 +267,10 @@ class _HomeState extends State<Home> {
                 AppColors.WHITE,
               ], radius: 0.85, focal: Alignment.center),
             ),
-            child: BlocBuilder<NetworkBloc,NetworkState>(
+            child: BlocBuilder<NetworkBloc, NetworkState>(
               bloc: categoryBloc,
-              builder: (context,state){
-                if(state is Loading){
+              builder: (context, state) {
+                if (state is Loading) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -284,7 +280,7 @@ class _HomeState extends State<Home> {
                       )
                     ],
                   );
-                }else if(state is GotCategories){
+                } else if (state is GotCategories) {
                   return GridView.builder(
                     shrinkWrap: true,
                     itemCount: state.categories.length,
@@ -295,17 +291,16 @@ class _HomeState extends State<Home> {
                       mainAxisSpacing: 0.0,
                     ),
                     itemBuilder: (context, index) {
-                      return ServiceItem( 
+                      return ServiceItem(
                         serviceModel: state.categories[index],
                       );
                     },
                   );
-                }else{
+                } else {
                   return Container();
                 }
               },
-            )
-        ),
+            )),
         Line(
           width: double.infinity,
           height: 10,
@@ -313,7 +308,7 @@ class _HomeState extends State<Home> {
           margin: EdgeInsets.only(top: 20, bottom: 10),
         ),
         Sub(
-          text: 'INSES Promises',
+          text: 'FIXWATT Promises',
         ),
         PromiseItem(
           img: Icon(
@@ -352,12 +347,14 @@ class _HomeState extends State<Home> {
         Sub(
           text: 'Customer stories',
         ),
-        BlocBuilder<NetworkBloc,NetworkState>(
+        BlocBuilder<NetworkBloc, NetworkState>(
           bloc: reviewBloc,
-          builder: (context,state){
-            if(state is GotReviews){
-              return ReviewScrollCard(reviews: state.reviews,);
-            }else if(state is Loading){
+          builder: (context, state) {
+            if (state is GotReviews) {
+              return ReviewScrollCard(
+                reviews: state.reviews!,
+              );
+            } else if (state is Loading) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -367,7 +364,7 @@ class _HomeState extends State<Home> {
                   )
                 ],
               );
-            }else{
+            } else {
               return Container();
             }
           },
@@ -376,28 +373,25 @@ class _HomeState extends State<Home> {
     );
   }
 
-  void logout(){
+  void logout() {
     Future.delayed(Duration.zero, () {
       this.showDialogue();
     });
   }
 
-  showDialogue(){
+  showDialogue() {
     showDialog(
         barrierDismissible: false,
         context: context,
-        builder: (BuildContext context){
+        builder: (BuildContext context) {
           return LocationDialogue(
               title: "Logout",
               description: "Are you want to logout ?",
               text: "Yes",
-              onPressed:(){
+              onPressed: () {
                 bloc.add(Logout());
                 Navigator.of(context).pop();
-              }
-          );
-        }
-    );
+              });
+        });
   }
-
 }

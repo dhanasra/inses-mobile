@@ -4,7 +4,7 @@ class PaymentHistoryModel extends Equatable {
   final String id;
 
   const PaymentHistoryModel(
-      {this.id,});
+      {required this.id,});
 
   @override
   List<Object> get props => [id];

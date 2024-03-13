@@ -8,11 +8,11 @@ class OfferModel extends Equatable {
   final String img;
 
   const OfferModel(
-      {this.old,
-        this.txt,
-        this.img,
-        this.offer,
-        this.id
+      {required this.old,
+        required this.txt,
+        required this.img,
+        required this.offer,
+        required this.id
       });
 
   @override

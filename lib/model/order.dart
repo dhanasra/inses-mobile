@@ -10,12 +10,12 @@ class Order extends Equatable {
 
   const Order(
       {
-        this.date,
-        this.start_time,
-        this.end_time,
-        this.address,
-        this.service_id,
-        this.quantity
+        required this.date,
+        required this.start_time,
+        required this.end_time,
+        required this.address,
+        required this.service_id,
+        required this.quantity
       });
 
   @override

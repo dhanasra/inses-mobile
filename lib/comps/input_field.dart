@@ -1,65 +1,65 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 
 class InputField extends StatefulWidget {
-  final String text;
-  final TextInputType inputType;
-  final Color color;
-  final double fontSize;
-  final FontWeight fontWeight;
-  final EdgeInsetsGeometry padding;
-  final String fontfamily;
-  final bool isObscured;
-  final Color hoverColor;
-  final int errorMaxLines;
+  final String? text;
+  final TextInputType? inputType;
+  final Color? color;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final EdgeInsetsGeometry? padding;
+  final String? fontfamily;
+  final bool? isObscured;
+  final Color? hoverColor;
+  final int? errorMaxLines;
   final Color enabledBorderColor;
   final Color focusedBorderColor;
   final double enabledBorderWidth;
   final double focusedBorderWidth;
-  final Color bgColor;
-  final bool validate;
-  final String initialVal;
-  final double radius;
-  final EdgeInsetsGeometry contentPadding;
-  final AlignmentGeometry alignment;
-  final EdgeInsetsGeometry margin;
+  final Color? bgColor;
+  final bool? validate;
+  final String? initialVal;
+  final double? radius;
+  final EdgeInsetsGeometry? contentPadding;
+  final AlignmentGeometry? alignment;
+  final EdgeInsetsGeometry? margin;
   final TextEditingController controller;
   final double width;
-  final String emptyErrorText;
-  final String patternErrorText;
-  final Color hintColor;
-  final bool isShadow;
-  final Widget prefixIcon;
-  final bool autoFocus;
-  final int sValidate;
-  final int minLength;
-  final bool expands;
-  final int minLine;
-  final int maxLine;
-  final TextAlignVertical textAlignVertical;
-  final int maxLength;
-  final RegExp regExp;
-  final String lengthErrorText;
-  final bool isEnabled;
-  final FocusNode focusNode;
-  final bool isBothEffect;
-  final double height;
+  final String? emptyErrorText;
+  final String? patternErrorText;
+  final Color? hintColor;
+  final bool? isShadow;
+  final Widget? prefixIcon;
+  final bool? autoFocus;
+  final int? sValidate;
+  final int? minLength;
+  final bool? expands;
+  final int? minLine;
+  final int? maxLine;
+  final TextAlignVertical? textAlignVertical;
+  final int? maxLength;
+  final RegExp? regExp;
+  final String? lengthErrorText;
+  final bool? isEnabled;
+  final FocusNode? focusNode;
+  final bool? isBothEffect;
+  final double? height;
+  final Widget? suffixIcon;
 
   InputField(
       {@required this.text,
       this.inputType,
       this.color,
-        this.prefixIcon,
+      this.prefixIcon,
       this.fontSize,
-      this.enabledBorderColor,
-      this.focusedBorderColor,
-      this.enabledBorderWidth,
-      this.focusedBorderWidth,
+      required this.enabledBorderColor,
+      required this.focusedBorderColor,
+      required this.enabledBorderWidth,
+      required this.focusedBorderWidth,
       this.hintColor,
       this.sValidate,
-        this.autoFocus,
+      this.autoFocus,
       this.fontWeight,
       this.padding,
       this.minLine,
@@ -70,7 +70,7 @@ class InputField extends StatefulWidget {
       this.errorMaxLines,
       this.fontfamily,
       this.regExp,
-        this.focusNode,
+      this.focusNode,
       this.validate,
       this.emptyErrorText,
       this.patternErrorText,
@@ -85,11 +85,12 @@ class InputField extends StatefulWidget {
       this.radius,
       this.margin,
       this.contentPadding,
-      @required this.controller,
-      @required this.width,
+      required this.controller,
+      required this.width,
       this.isShadow,
       this.isBothEffect,
-      this.height});
+      this.height,
+      this.suffixIcon});
   @override
   _InputFieldState createState() => _InputFieldState();
 }
@@ -106,7 +107,7 @@ class _InputFieldState extends State<InputField> {
           padding: widget.padding != null ? widget.padding : EdgeInsets.all(0),
           margin: widget.margin != null ? widget.margin : EdgeInsets.all(0),
           child: TextFormField(
-            autofocus: widget.autoFocus,
+            autofocus: widget.autoFocus??false,
             focusNode: widget.focusNode,
             enabled: widget.isEnabled ?? true,
             maxLines: widget.maxLine == 100 ? null : 1,
@@ -114,22 +115,23 @@ class _InputFieldState extends State<InputField> {
             expands: widget.expands ?? false,
             textAlignVertical:
                 widget.textAlignVertical ?? TextAlignVertical.center,
-            validator: (String val) {
+            validator: (String? val) {
+              val = val??'';
               if (val.isEmpty) {
                 return widget.emptyErrorText ?? 'The field Should not be empty';
               } else {
                 if (widget.regExp != null) {
-                  if (!widget.regExp.hasMatch(val))
+                  if (!widget.regExp!.hasMatch(val))
                     return widget.patternErrorText ??
                         'The Email Id is not valid';
                 }
                 if (widget.minLength != null) {
-                  if (widget.minLength > val.length)
+                  if (widget.minLength! > val.length)
                     return widget.lengthErrorText ??
                         'The field Should not be empty';
                 }
                 if (widget.maxLength != null) {
-                  if (widget.maxLength < val.length)
+                  if (widget.maxLength! < val.length)
                     return widget.lengthErrorText ??
                         'The field Should not be empty';
                 }
@@ -137,7 +139,7 @@ class _InputFieldState extends State<InputField> {
                 return null;
               }
             },
-            obscureText: widget.isObscured != null ? widget.isObscured : false,
+            obscureText: widget.isObscured != null ? widget.isObscured! : false,
             controller: widget.controller,
             style: TextStyle(
                 fontFamily: widget.fontfamily,
@@ -145,13 +147,12 @@ class _InputFieldState extends State<InputField> {
                 fontWeight: widget.fontWeight,
                 color: widget.color),
             keyboardType: widget.inputType,
-            decoration: widget.isShadow != null && widget.isShadow
+            decoration: widget.isShadow != null && widget.isShadow!
                 ? InputDecoration(
                     isDense: true,
-                prefixIcon: widget.prefixIcon??null,
+                    prefixIcon: widget.prefixIcon ?? null,
                     errorMaxLines: widget.errorMaxLines,
-                    hintText:
-                            widget.text,
+                    hintText: widget.text,
                     contentPadding: widget.contentPadding ??
                         EdgeInsets.only(left: 10, right: 10),
                     focusedBorder: InputBorder.none,
@@ -168,43 +169,53 @@ class _InputFieldState extends State<InputField> {
                         fontSize: widget.fontSize,
                         fontWeight: widget.fontWeight,
                         color: widget.hintColor),
-                    border: InputBorder.none)
+                    border: InputBorder.none,
+                    /*  suffixIcon: IconButton(
+                        icon: Icon(widget.isObscured
+                            ? Icons.visibility
+                            : Icons.visibility_off),
+                        onPressed: () {
+                          setState(() {
+                            widget.isObscured = !widget.isObscured;
+                          });
+                        }),*/
+                  )
                 : InputDecoration(
                     isDense: true,
-                    prefixIcon: widget.prefixIcon??null,
+                    prefixIcon: widget.prefixIcon ?? null,
+                    // suffixIcon: widget.suffixIcon ?? null,
                     errorMaxLines: widget.errorMaxLines,
                     errorStyle: TextStyle(
                         fontFamily: widget.fontfamily,
                         fontSize: AppDimen.TEXT_MINI,
                         fontWeight: FontWeight.w400,
                         color: AppColors.WARNING_COLOR),
-                    hintText:
-                            widget.text,
+                    hintText: widget.text,
                     contentPadding: widget.contentPadding ??
                         EdgeInsets.only(left: 10, right: 10),
                     errorBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: AppColors.WARNING_COLOR_LIGHT,
                           width: widget.focusedBorderWidth),
-                      borderRadius: BorderRadius.circular(widget.radius),
+                      borderRadius: BorderRadius.circular(widget.radius?? 0),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: AppColors.WARNING_COLOR,
                           width: widget.focusedBorderWidth),
-                      borderRadius: BorderRadius.circular(widget.radius),
+                      borderRadius: BorderRadius.circular(widget.radius?? 0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: widget.focusedBorderColor,
                           width: widget.focusedBorderWidth),
-                      borderRadius: BorderRadius.circular(widget.radius),
+                      borderRadius: BorderRadius.circular(widget.radius?? 0),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: widget.enabledBorderColor,
                           width: widget.enabledBorderWidth),
-                      borderRadius: BorderRadius.circular(widget.radius),
+                      borderRadius: BorderRadius.circular(widget.radius?? 0),
                     ),
                     hintStyle: TextStyle(
                         fontFamily: widget.fontfamily,

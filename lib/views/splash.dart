@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:connectivity/connectivity.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:inses_app/app/app.dart';
@@ -23,7 +22,7 @@ class _SplashState extends State<Splash> {
   final bloc = SplashBloc();
   String _connectionStatus = 'Unknown';
   final Connectivity _connectivity = Connectivity();
-    StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
 
   @override
   void initState() {

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
@@ -7,7 +6,6 @@ import 'package:inses_app/comps/content.dart';
 import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/tap_field.dart';
 import 'package:inses_app/model/category.dart';
-import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -15,9 +13,9 @@ import 'package:inses_app/view_models/order_view_model.dart';
 
 class ServiceItem extends StatelessWidget {
   final CategoryModel serviceModel;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
-  ServiceItem({this.serviceModel,this.onPressed});
+  ServiceItem({required this.serviceModel,this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +53,7 @@ class ServiceItem extends StatelessWidget {
           ),
         ),
         onTap: onPressed??(){
-          OrderViewModel.categoryId = serviceModel.id;
+          OrderViewModel.categoryId = serviceModel.id!;
           OrderViewModel.category = serviceModel.name;
           App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_1);
         }

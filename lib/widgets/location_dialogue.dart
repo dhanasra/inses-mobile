@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
@@ -12,14 +11,14 @@ class LocationDialogue extends StatelessWidget {
   final String description;
   final String text;
   final VoidCallback onPressed;
-  final Icon icon;
+  final Icon? icon;
 
   LocationDialogue({
-    this.text,
-    this.title,
+    required this.text,
+    required this.title,
     this.icon,
-    this.description,
-    this.onPressed
+    required this.description,
+    required this.onPressed
 });
 
   @override

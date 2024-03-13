@@ -1,6 +1,6 @@
 class AppConstants {
   //App
-  static const APP_NAME = 'KARKAI';
+  static const APP_NAME = 'FIXWATT';
 
   // User Info
 
@@ -17,5 +17,5 @@ class AppConstants {
 
   static String INTERNET = 'OK';
 
-  static const INSES_NUMBER ='+91 0452-4267198';
+  static const INSES_NUMBER = '+91 9514510708';
 }

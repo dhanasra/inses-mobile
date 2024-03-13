@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +6,6 @@ import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'grey_mini.dart';
 
@@ -15,7 +13,7 @@ class LaunchSliderItem extends StatelessWidget {
   final String text;
   final String subText;
   final String image;
-  LaunchSliderItem({this.text,this.subText,this.image});
+  LaunchSliderItem({required this.text, required this.subText,required this.image});
   @override
   Widget build(BuildContext context) {
     return Container(

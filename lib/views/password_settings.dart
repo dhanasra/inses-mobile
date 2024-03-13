@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
@@ -15,7 +15,6 @@ import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
-import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/input_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 import 'package:inses_app/widgets/mini_title.dart';
@@ -27,10 +26,10 @@ class PasswordSettings extends StatefulWidget {
 }
 
 class _PasswordSettingsState extends State<PasswordSettings> {
-  NetworkBloc bloc;
+  late NetworkBloc bloc;
   AppRepository appRepository = AppRepository(appApiClient: AppApiClient(httpClient: Client()));
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  ProfileViewModel viewModel;
+  late ProfileViewModel viewModel;
 
   @override
   void initState() {
@@ -161,7 +160,7 @@ class _PasswordSettingsState extends State<PasswordSettings> {
                 fontWeight: FontWeight.w400,
               ),
               onTap: (){
-                if(_formKey.currentState.validate()) {
+                if(_formKey.currentState!.validate()) {
                   bloc.add(UpdatePassword(old:viewModel.oldpasswordController.text,password: viewModel.passwordController.text));
                 }
               },

@@ -6,7 +6,7 @@ class AppColors {
   static const BLACK_1 = Color(0xFF111111);
   static const BLACK_2 = Color(0xFF222222);
   static const BLACK_3 = Color(0xFF333333);
-
+  // #fff4ec
   //white
   static const WHITE = Color(0xFFFFFFFF);
   static const WHITE_1 = Color(0xFFeeeeee);
@@ -14,13 +14,16 @@ class AppColors {
   static const WHITE_3 = Color(0xFFcccccc);
 
   //transparant
-  static const TRANSPARANT = Color(0x00000000);
+  //0x00000000
+  // 0xFF000000
+  static const TRANSPARANT = Color(0xFF000000);
   static const TRANSPARANT_1 = Color(0x22000000);
   static const TRANSPARANT_2 = Color(0x44000000);
   static const TRANSPARANT_3 = Color(0x66000000);
 
-  //gray
-  static const GRAY = Color(0xFF808080);
+  //gray Color(0xFF808080)
+  static const GRAY = Color(0xFF8833FB);
+
   static const GRAY_1 = Color(0xFF909090);
   static const GRAY_2 = Color(0xFFa0a0a0);
   static const GRAY_3 = Color(0xFFb0b0b0);
@@ -30,8 +33,9 @@ class AppColors {
   static const PRIMARY_COLOR = Color(0xFFEB2C30);
   static const PRIMARY_COLOR_LIGHT = Color(0xFF8833FB);
 
-  //secondary color
-  static const SECONDARY_COLOR = Color(0xFF0E4472);
+  //secondary color Color(0xFF0E4472)0xFFe0e0e0 0xFFEB2C30
+  static const SEC_COLOR = Color(0xFFe0e0e0);
+  static const SECONDARY_COLOR = Color(0xFFAFA5F2);
   static const SECONDARY_COLOR_LIGHT = Color(0xFFAFA5F2);
 
   //accent color
@@ -76,5 +80,4 @@ class AppColors {
   static const SCIENCE = Color(0xFF748C26);
   static const GEOGRAPHY = Color(0xFF407BFF);
   static const POLYTICS = Color(0xFF352257);
-
 }

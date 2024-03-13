@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:inses_app/model/additional.dart';
-
 class BookingModel extends Equatable {
   final int id;
   final String name;
@@ -13,21 +11,21 @@ class BookingModel extends Equatable {
   final String startTime;
   final String endTime;
   final String address;
-  final String userName;
-  final String userPhone;
-  final bool reviewed;
+  final String? userName;
+  final String? userPhone;
+  final bool? reviewed;
   final int quantity;
-  final int additionalPrice;
-  final int additionalId;
-  final String additionalDesc;
+  final int? additionalPrice;
+  final int? additionalId;
+  final String? additionalDesc;
   final int totalPrice;
 
   const BookingModel(
-      {this.id,this.startTime,this.endTime,this.address,this.date,this.quantity,this.icon,this.name,this.status,this.totalPrice,
-      this.categoryName,this.userName,this.userPhone,this.payMethod,this.reviewed,this.payStatus,this.additionalId,this.additionalDesc,this.additionalPrice});
+      {required this.id,required this.startTime,required this.endTime,required this.address,required this.date,required this.quantity,required this.icon,required this.name,required this.status,required this.totalPrice,
+      required this.categoryName,this.userName,this.userPhone,required this.payMethod,this.reviewed,required this.payStatus, this.additionalId, this.additionalDesc, this.additionalPrice});
 
   @override
-  List<Object> get props => [id,status,startTime,endTime,address,additionalId,additionalPrice,additionalDesc,date,quantity,icon,name,totalPrice,categoryName,payStatus,payMethod];
+  List<Object> get props => [id,status,startTime,endTime,address,date,quantity,icon,name,totalPrice,categoryName,payStatus,payMethod];
 
   static BookingModel fromJson(dynamic json) {
     return BookingModel(

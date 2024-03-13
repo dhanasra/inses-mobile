@@ -7,8 +7,8 @@ class AreaModel extends Equatable {
 
   const AreaModel(
       {
-        this.area,
-        this.position,
+        required this.area,
+        required this.position,
         });
 
   @override

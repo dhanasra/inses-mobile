@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 class CategoryModel extends Equatable {
-  final int id;
+  final int? id;
   final String name;
   final String image;
 
   const CategoryModel(
       { this.id,
-        this.name,
-        this.image,});
+        required this.name,
+        required this.image,});
 
   @override
   List<Object> get props =>

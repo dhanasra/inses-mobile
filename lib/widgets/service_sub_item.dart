@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/app/app_routes.dart';
@@ -11,13 +11,10 @@ import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
-import 'package:inses_app/widgets/review_scroll_card.dart';
-import 'package:inses_app/widgets/sub.dart';
-
 class ServiceSubItem extends StatelessWidget {
   final ServiceModel service;
-  final VoidCallback onpressed;
-  ServiceSubItem({this.service,this.onpressed});
+  final VoidCallback? onpressed;
+  ServiceSubItem({required this.service, this.onpressed});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,8 +59,8 @@ class ServiceSubItem extends StatelessWidget {
                     OrderViewModel.service = service.name;
                     OrderViewModel.serviceId = service.id;
                     OrderViewModel.serviceIcon = service.icon;
-                    OrderViewModel.serviceImage = service.image;
-                    OrderViewModel.basePrice = service.price;
+                    OrderViewModel.serviceImage = service.image!;
+                    OrderViewModel.basePrice = service.price!;
                     App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_2);
                   }
               ),

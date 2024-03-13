@@ -1,35 +1,25 @@
-import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:inses_app/comps/border_container.dart';
 import 'package:inses_app/comps/content.dart';
-import 'package:inses_app/comps/elevated_button.dart';
-import 'package:inses_app/comps/image_container.dart';
-import 'package:inses_app/comps/image_view.dart';
 import 'package:inses_app/comps/tap_field.dart';
-import 'package:inses_app/comps/two_wave_clipper.dart';
-import 'package:inses_app/model/offer.dart';
 import 'package:inses_app/model/review.dart';
-import 'package:inses_app/model/service.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ReviewScrollCard extends StatefulWidget {
   final List<ReviewModel> reviews;
-  ReviewScrollCard({this.reviews});
+  ReviewScrollCard({required this.reviews});
   @override
   _ReviewScrollCardState createState() => _ReviewScrollCardState();
 }
 
 class _ReviewScrollCardState extends State<ReviewScrollCard> {
   int _currentPage = 0;
-  PageController _pageController;
+  late PageController _pageController;
 
-  List<ReviewModel> scrolls;
+  late List<ReviewModel> scrolls;
 
   @override
   void initState() {
@@ -109,7 +99,7 @@ class _ReviewScrollCardState extends State<ReviewScrollCard> {
     );
   }
 
-  Widget pageItem({ReviewModel review}) {
+  Widget pageItem({required ReviewModel review}) {
     return OnTapField(
         child: Container(
             color: AppColors.WHITE_1,

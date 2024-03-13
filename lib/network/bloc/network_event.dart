@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:inses_app/model/order.dart';
-import 'package:inses_app/views/login.dart';
 
 abstract class NetworkEvent {
   const NetworkEvent();
@@ -9,17 +8,18 @@ abstract class NetworkEvent {
 
 class AddUser extends NetworkEvent {
   final String name;
+  final String email;
   final String phone;
   final String password;
-
-  AddUser({this.name,this.phone,this.password});
+  AddUser({required this.name,required this.email,required this.phone,required this.password});
+  // AddUser({this.name, this.phone, this.password});
 }
 
 class LoginUser extends NetworkEvent {
   final String phone;
   final String password;
 
-  LoginUser({this.phone,this.password});
+  LoginUser({required this.phone,required this.password});
 }
 
 class Logout extends NetworkEvent {}
@@ -32,27 +32,33 @@ class UpdateProfile extends NetworkEvent {
   final String name;
   final String phone;
 
-  UpdateProfile({this.name,this.phone});
+  UpdateProfile({required this.name,required this.phone});
 }
 
 class UpdatePassword extends NetworkEvent {
   final String old;
   final String password;
 
-  UpdatePassword({this.old,this.password});
+  UpdatePassword({required this.old,required this.password});
+}
+
+class ForgetPassword extends NetworkEvent {
+  final String phone;
+  final String password;
+
+  ForgetPassword({required this.phone,required this.password});
 }
 
 class AddUserAddress extends NetworkEvent {
   final String address;
 
-  AddUserAddress({this.address});
+  AddUserAddress({required this.address});
 }
-
 
 class GetCategoryServices extends NetworkEvent {
   final int id;
 
-  GetCategoryServices({this.id});
+  GetCategoryServices({required this.id});
 }
 
 class GetUserAddress extends NetworkEvent {}
@@ -65,51 +71,52 @@ class AddServiceEvent extends NetworkEvent {
   final int categoryId;
   final int price;
   final String name;
-  final File icon;
-  final File image;
+  final File? icon;
+  final File? image;
 
-  AddServiceEvent({this.categoryId,this.name,this.price,this.image,this.icon});
+  AddServiceEvent(
+      {required this.categoryId,required this.name,required this.price, this.image, this.icon});
 }
-
 
 class EditService extends NetworkEvent {
   final int id;
   final int categoryId;
   final int price;
   final String name;
-  final File icon;
-  final File image;
+  final File? icon;
+  final File? image;
 
-  EditService({this.id,this.categoryId,this.name,this.price,this.image,this.icon});
+  EditService(
+      {required this.id,required this.categoryId,required this.name,required this.price, this.image, this.icon});
 }
 
 class DeleteService extends NetworkEvent {
   final int serviceId;
-  DeleteService({this.serviceId});
+  DeleteService({required this.serviceId});
 }
 
 class AddCategoryEvent extends NetworkEvent {
   final String name;
-  final File image;
+  final File? image;
 
-  AddCategoryEvent({this.name,this.image});
+  AddCategoryEvent({required this.name, this.image});
 }
 
 class AddOfferEvent extends NetworkEvent {
   final int price;
   final int offer;
   final String text;
-  final File image;
+  final File? image;
 
-  AddOfferEvent({this.image,this.price,this.text,this.offer});
+  AddOfferEvent({this.image,required this.price,required this.text,required this.offer});
 }
 
 class EditCategory extends NetworkEvent {
   final int categoryId;
   final String name;
-  final File image;
+  final File? image;
 
-  EditCategory({this.name,this.image,this.categoryId});
+  EditCategory({required this.name,this.image,required this.categoryId});
 }
 
 class EditOfferEvent extends NetworkEvent {
@@ -117,20 +124,19 @@ class EditOfferEvent extends NetworkEvent {
   final int old;
   final int price;
   final String txt;
-  final File image;
+  final File? image;
 
-  EditOfferEvent({this.txt,this.image,this.price,this.old,this.id});
+  EditOfferEvent({required this.txt,required this.image,required this.price,required this.old,required this.id});
 }
-
 
 class DeleteCategory extends NetworkEvent {
   final int categoryId;
-  DeleteCategory({this.categoryId});
+  DeleteCategory({required this.categoryId});
 }
 
 class DeleteOffer extends NetworkEvent {
   final int id;
-  DeleteOffer({this.id});
+  DeleteOffer({required this.id});
 }
 
 class GetCategories extends NetworkEvent {}
@@ -143,20 +149,26 @@ class GetBookingHistory extends NetworkEvent {}
 
 class GetReview extends NetworkEvent {}
 
-class AddMessage extends NetworkEvent{
+class AddMessage extends NetworkEvent {
   final String message;
-  AddMessage({this.message});
+  AddMessage({required this.message});
 }
 
-class UpdatePhoneNumber extends NetworkEvent{
+class UpdatePhoneNumber extends NetworkEvent {
   final String number;
-  UpdatePhoneNumber({this.number});
+  UpdatePhoneNumber({required this.number});
 }
 
 class BookService extends NetworkEvent {
   final Order order;
 
-  BookService({this.order});
+  BookService({required this.order});
+}
+
+class CancelService extends NetworkEvent {
+  final int orderId;
+
+  CancelService({required this.orderId});
 }
 
 class UpdatePaymentStatus extends NetworkEvent {
@@ -164,7 +176,7 @@ class UpdatePaymentStatus extends NetworkEvent {
   final String paymentId;
   final String method;
 
-  UpdatePaymentStatus({this.orderId,this.paymentId,this.method});
+  UpdatePaymentStatus({required this.orderId,required this.paymentId,required this.method});
 }
 
 class AddAdditionalCharge extends NetworkEvent {
@@ -172,7 +184,7 @@ class AddAdditionalCharge extends NetworkEvent {
   final int price;
   final String desc;
 
-  AddAdditionalCharge({this.orderId,this.price,this.desc});
+  AddAdditionalCharge({required this.orderId,required this.price,required this.desc});
 }
 
 class AddReview extends NetworkEvent {
@@ -180,26 +192,25 @@ class AddReview extends NetworkEvent {
   final int rating;
   final String comment;
 
-  AddReview({this.id,this.rating,this.comment});
+  AddReview({required this.id,required this.rating,required this.comment});
 }
-
 
 class ApproveOrder extends NetworkEvent {
   final int categoryId;
-  ApproveOrder({this.categoryId});
+  ApproveOrder({required this.categoryId});
 }
 
 class CompleteOrder extends NetworkEvent {
   final int categoryId;
-  CompleteOrder({this.categoryId});
+  CompleteOrder({required this.categoryId});
 }
 
 class GetBookingDetails extends NetworkEvent {
   final int id;
-  GetBookingDetails({this.id});
+  GetBookingDetails({required this.id});
 }
 
 class RemoveAdditionalCharge extends NetworkEvent {
   final int id;
-  RemoveAdditionalCharge({this.id});
+  RemoveAdditionalCharge({required this.id});
 }

@@ -6,7 +6,7 @@ import 'package:inses_app/resources/app_font.dart';
 
 class GreyMini extends StatelessWidget {
   final String text;
-  GreyMini({this.text});
+  GreyMini({required this.text});
   @override
   Widget build(BuildContext context) {
     return Content(

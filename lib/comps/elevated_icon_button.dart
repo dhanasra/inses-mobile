@@ -1,29 +1,28 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ElevatedIconButton extends StatelessWidget {
 
   final String text;
-  final Color color;
+  final Color? color;
   final Color bgColor;
-  final double fontSize;
-  final FontWeight fontWeight;
-  final String fontfamily;
-  final VoidCallback onPressed;
-  final EdgeInsetsGeometry margin;
-  final EdgeInsetsGeometry padding;
+  final double? fontSize;
+  final FontWeight? fontWeight;
+  final String? fontfamily;
+  final VoidCallback? onPressed;
+  final EdgeInsetsGeometry? margin;
+  final EdgeInsetsGeometry? padding;
   final Icon iconData;
 
   ElevatedIconButton({
-    this.iconData,
+    required this.iconData,
     this.margin,
     this.padding,
     this.onPressed,
-    this.text,
+    required this.text,
     this.fontSize,
     this.fontWeight,
     this.fontfamily,
-    this.bgColor,
+    required this.bgColor,
     this.color
   });
 
