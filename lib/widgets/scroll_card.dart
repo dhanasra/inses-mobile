@@ -79,6 +79,9 @@ class _ScrollCardState extends State<ScrollCard> {
   }
 
   Widget pageItem({required OfferModel offer}) {
+
+    print(offer.img);
+
     return OnTapField(
         child: Container(
             padding: EdgeInsets.all(10),

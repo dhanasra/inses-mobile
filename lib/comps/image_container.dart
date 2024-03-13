@@ -29,6 +29,12 @@ class ImageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var link = url;
+    if(url!=null && url!.contains("http://13.233.244.254/")){
+      link = url!.replaceFirst("http://13.233.244.254/", "http://13.126.156.101/");
+    }
+
     return Container(
         child: child,
         width: width,
@@ -37,11 +43,11 @@ class ImageContainer extends StatelessWidget {
         padding: padding,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(radius??0),
-          image: url != null 
+          image: link != null 
           ? DecorationImage(
             colorFilter: new ColorFilter.mode(
                 bgColor??Colors.white, BlendMode.dstATop),
-            image:  NetworkImage(url!),
+            image:  NetworkImage(link),
             fit: BoxFit.cover,
           )
           : DecorationImage(
