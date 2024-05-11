@@ -16,13 +16,13 @@ import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/network/models/user_address.dart';
 import 'package:inses_app/utils/global.dart';
+import 'package:inses_app/utils/url.dart';
 import 'package:inses_app/view_models/home_view_model.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
 
 class AppApiClient {
-  // final _baseUrl = AppUrl.BASE_URL;
-  final _baseUrl = "http://3.109.77.151/api/v2/";
+  final _baseUrl = AppUrl.BASE_URL;
   final http.Client httpClient;
   AppApiClient({required this.httpClient});
 
