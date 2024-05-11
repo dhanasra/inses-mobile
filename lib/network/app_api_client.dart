@@ -1272,14 +1272,33 @@ class AppApiClient {
     if (response.statusCode == 200) {
       int status = json['status'];
       if (status == 200) {
-        List orders = json['data']['orders']['data'];
-        orders.forEach((element) {
+        var status = await AppPreferences().getLoginStatus();
+        bool isAdmin = status == AppConstants.LOGGED_IN_ADMIN;
+
+        List orders =  isAdmin ? json['data']['orders']: json['data']['orders']['data'];
+
+
+        orders.forEach((element)async{
+
+
           try {
+            var useraddress;
+            if(isAdmin){
+              var request =
+              http.Request('GET', Uri.parse('${_baseUrl}user-address/${element['user_address_id']}'));
+              request.headers.addAll(headers);
+              http.StreamedResponse response = await request.send();
+              String responseStr = await response.stream.bytesToString();
+              Map<String, dynamic> json = jsonDecode(responseStr);
+              useraddress = UserAddress.fromMap(json["data"]["userAddress"]);
+            }else{
+              useraddress = UserAddress.fromMap(element['userAddress']);
+            }
             bookings.add(BookingModel(
                 id: element['id'],
                 name: element['service']['name'],
                 categoryName: element['service']['category_name'],
-                userAddress: UserAddress.fromMap(element['userAddress']),
+                userAddress: useraddress,
                 totalPrice: element['total'],
                 startTime: element['start_time'],
                 endTime: element['end_time'],
