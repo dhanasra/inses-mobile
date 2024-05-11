@@ -1,16 +1,22 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/model/bookings.dart';
+import 'package:inses_app/widgets/address_dialog.dart';
 import 'package:intl/intl.dart';
 
 class OrderViewModel {
   static OrderViewModel? _instance;
   late TextEditingController addressController;
   late FocusNode addressFocus;
+  late TextEditingController pincodeController;
+  late FocusNode pincodeFocus;
+  late TextEditingController addressTypController;
+  late FocusNode addressTypeFocus;
+  late ValueNotifier<int?> addressId;
 
   DateFormat dayformatter = DateFormat('MMM');
   DateFormat dateformatter = DateFormat('dd');
@@ -23,6 +29,7 @@ class OrderViewModel {
   static String serviceImage = '' ;
   static String category='';
   static String address = '';
+  static String pincode = '';
   static String service = '';
   static int noOfService = 0;
   static int totalPrice = 0;
@@ -51,6 +58,11 @@ class OrderViewModel {
   void _init() {
     addressFocus = FocusNode();
     addressController = TextEditingController(text: "");
+    pincodeFocus = FocusNode();
+    pincodeController = TextEditingController(text: "");
+    addressTypeFocus = FocusNode();
+    addressTypController = TextEditingController(text: "");
+    addressId = ValueNotifier(null);
 
     addressController.addListener(() {
       String password = addressController.text.toString();
@@ -86,5 +98,22 @@ class OrderViewModel {
       }
     }
   }
+
+
+    showAddressDialogue(BuildContext context, GlobalKey<FormState> formKey) {
+      showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AddressDialogue(
+                formKey: formKey,
+                addressController: addressController,
+                addressTypeController: addressTypController,
+                pincodeController: pincodeController,
+                onPressed: () {
+
+                });
+          });
+    }
 
 }

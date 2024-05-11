@@ -146,7 +146,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       yield Loading();
       try {
         final String response =
-            await appRepository.addUserAddress(event.address);
+            await appRepository.addUserAddress(event.address, event.pincode, addressType: event.addressType);
         if (response == "success") {
           yield Success();
         } else if (response == "Error") {

@@ -13,6 +13,7 @@ class InputField extends StatefulWidget {
   final bool? isObscured;
   final Color? hoverColor;
   final int? errorMaxLines;
+  final Function(String)? onChanged;
   final Color enabledBorderColor;
   final Color focusedBorderColor;
   final double enabledBorderWidth;
@@ -53,6 +54,7 @@ class InputField extends StatefulWidget {
       this.color,
       this.prefixIcon,
       this.fontSize,
+      this.onChanged,
       required this.enabledBorderColor,
       required this.focusedBorderColor,
       required this.enabledBorderWidth,
@@ -113,6 +115,7 @@ class _InputFieldState extends State<InputField> {
             maxLines: widget.maxLine == 100 ? null : 1,
             minLines: widget.minLine == 100 ? null : 1,
             expands: widget.expands ?? false,
+            onChanged: widget.onChanged,
             textAlignVertical:
                 widget.textAlignVertical ?? TextAlignVertical.center,
             validator: (String? val) {

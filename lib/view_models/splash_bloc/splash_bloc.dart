@@ -5,6 +5,8 @@ import 'package:inses_app/database/app_preferences.dart';
 import 'package:inses_app/database/constants.dart';
 import 'package:inses_app/network/app_api_client.dart';
 import 'package:inses_app/network/bloc/network_state.dart' as Net;
+import 'package:inses_app/network/models/user_address.dart';
+import 'package:inses_app/utils/global.dart';
 import 'package:inses_app/utils/url.dart';
 import 'package:inses_app/view_models/home_view_model.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
@@ -44,10 +46,16 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       if (loginStatus == AppConstants.LOGGED_IN || loginStatus==AppConstants.LOGGED_IN_ADMIN) {
         HomeViewModel.loginStatus = loginStatus;
         try {
+          
+          //TODO: Version 2 -> Initializing user address globally
+          List<UserAddress> addresses = await AppApiClient(httpClient: Client()).getUserAddressList();
+          Global.userAddresses.value = addresses;
+          
 
-        String address = await AppApiClient(httpClient: Client()).getUserAddress();
 
-        ProfileViewModel.address = address;
+          String address = await AppApiClient(httpClient: Client()).getUserAddress();
+
+          ProfileViewModel.address = address;
         
           Net.GotUserDetails userDetails = await AppApiClient(
               httpClient: Client()).getUserDetails() as Net.GotUserDetails;

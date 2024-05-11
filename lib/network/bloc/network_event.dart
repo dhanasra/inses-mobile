@@ -50,9 +50,11 @@ class ForgetPassword extends NetworkEvent {
 }
 
 class AddUserAddress extends NetworkEvent {
+  final String? addressType;
   final String address;
+  final String pincode;
 
-  AddUserAddress({required this.address});
+  AddUserAddress({required this.address, required this.pincode, this.addressType});
 }
 
 class GetCategoryServices extends NetworkEvent {

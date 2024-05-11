@@ -26,6 +26,8 @@ import 'package:inses_app/widgets/location_dialogue.dart';
 import 'package:inses_app/widgets/or_item.dart';
 import 'package:inses_app/widgets/sub_title.dart';
 
+import '../widgets/input_item.dart';
+
 class NameFields extends StatefulWidget {
   @override
   _NameFieldsState createState() => _NameFieldsState();
@@ -162,6 +164,19 @@ class _NameFieldsState extends State<NameFields> {
             contentPadding:
                 EdgeInsets.only(top: 15, bottom: 15, left: 10, right: 10),
             width: 400),
+        InputItem(
+          focusNode: _viewmodel.pincodeFocus,
+          controller: _viewmodel.pinCodeController,
+          prefixIcon: Icon(Icons.room),
+          autoFocus: true,
+          margin: EdgeInsets.only(top: 20, left: 20, right: 20),
+          text: 'Pincode',
+          emptyError: 'Pincode should not be empty',
+          patternError: 'Enter a valid pincode',
+          inputType: TextInputType.phone,
+          isObscurred: false,
+          regExp: (RegExp(r'[0-9]')),
+        ),
         BorderContainer(
             radius: 4,
             margin: EdgeInsets.only(left: 15, right: 15, top: 30),
@@ -189,7 +204,9 @@ class _NameFieldsState extends State<NameFields> {
               onTap: () {
                 if (_formKey.currentState!.validate()) {
                   bloc.add(AddUserAddress(
-                      address: _viewmodel.addressController.text));
+                      address: _viewmodel.addressController.text,
+                      pincode: _viewmodel.pinCodeController.text    
+                  ));
                 }
               },
             )),

@@ -43,8 +43,8 @@ class AppRepository {
     return await appApiClient.forgetPassword(phone, password);
   }
 
-  Future<String> addUserAddress(String address) async {
-    return await appApiClient.addUserAddress(address);
+  Future<String> addUserAddress(String address, String pincode, {String? addressType}) async {
+    return await appApiClient.addUserAddress(address, pincode, addressType: addressType);
   }
 
   Future<String> getUserAddress() async {

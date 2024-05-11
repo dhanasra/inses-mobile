@@ -12,7 +12,9 @@ class RegisterViewModel {
   var phoneController;
   var emailController;
   var addressController;
+  var pinCodeController;
   late FocusNode phoneFocus;
+  late FocusNode pincodeFocus;
   late FocusNode emailFocus;
   late FocusNode passwordFocus;
   late FocusNode nameFocus;
@@ -43,9 +45,11 @@ class RegisterViewModel {
     nameFocus = FocusNode();
     addressFocus = FocusNode();
     emailFocus = FocusNode();
+    pincodeFocus = FocusNode();
     passwordController = TextEditingController(text: "");
     nameController = TextEditingController(text: "");
     addressController = TextEditingController(text: "");
+    pinCodeController = TextEditingController(text: "");
     phoneController = TextEditingController(text: "");
     emailController = TextEditingController(text: "");
     passwordController.addListener(() {
@@ -71,6 +75,9 @@ class RegisterViewModel {
       if (fName.isNotEmpty && (fName[0] == " " || fName[0] == "."))
         addressController.text = "";
     });
+
+
+
     emailController.addListener(() {
       String fName = emailController.text.toString();
       if (fName.isNotEmpty && (fName[0] == " " || fName[0] == "."))

@@ -14,13 +14,15 @@ import 'package:inses_app/model/order.dart';
 import 'package:inses_app/model/review.dart';
 import 'package:inses_app/model/service.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
-import 'package:inses_app/utils/url.dart';
+import 'package:inses_app/network/models/user_address.dart';
+import 'package:inses_app/utils/global.dart';
 import 'package:inses_app/view_models/home_view_model.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
 
 class AppApiClient {
-  final _baseUrl = AppUrl.BASE_URL;
+  // final _baseUrl = AppUrl.BASE_URL;
+  final _baseUrl = "http://3.109.77.151/api/v2/";
   final http.Client httpClient;
   AppApiClient({required this.httpClient});
 
@@ -30,7 +32,7 @@ class AppApiClient {
     var request = http.Request('POST', Uri.parse('${_baseUrl}auth/register'));
 
     request.body = jsonEncode(
-        {"name": name, "email": email, "phone": phone, "password": password});
+        {"name": name, "phone": phone, "password": password});
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
@@ -297,14 +299,14 @@ class AppApiClient {
     }
   }
 
-  Future<String> addUserAddress(String address) async {
+  Future<String> addUserAddress(String address, String pincode, {String? addressType}) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     var headers = {
       'x-refresh-token': token,
       'Content-Type': 'application/json'
     };
-    var body = jsonEncode({"address": address});
+    var body = jsonEncode({"address": address, "pincode": pincode, "alternative_phone": null, "address_type": addressType ?? "HOME"});
     var response = await http.post(Uri.parse('${_baseUrl}user-address'),
         body: body, headers: headers);
 
@@ -312,6 +314,40 @@ class AppApiClient {
     print(responseStr);
 
     Map<String, dynamic> json = jsonDecode(responseStr);
+    Global.userAddresses.value = [ ...Global.userAddresses.value, UserAddress.fromMap(json['data']['userAddress'])];
+
+    if (response.statusCode == 200) {
+      int status = json['status'];
+      if (status == 200) {
+        return 'success';
+      }else{
+        return 'Error';
+      }
+    } else {
+      print(response.reasonPhrase);
+      return 'Error';
+    }
+  }
+
+
+  Future<String> deleteUserAddress(String addressId) async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json'
+    };
+    var response = await http.delete(Uri.parse('${_baseUrl}user-address/${addressId}'), headers: headers);
+
+    String responseStr = response.body.toString();
+    print(responseStr);
+
+    Map<String, dynamic> json = jsonDecode(responseStr);
+
+    List<UserAddress> updated = Global.userAddresses.value.where((e) => "${e.id}"!=addressId).toList();
+
+    Global.userAddresses.value = [ ...updated];
+    Global.userAddresses.notifyListeners();
 
     if (response.statusCode == 200) {
       int status = json['status'];
@@ -358,6 +394,40 @@ class AppApiClient {
     } else {
       print(response.reasonPhrase);
       return 'Error';
+    }
+  }
+
+  Future<List<UserAddress>> getUserAddressList() async {
+    String token = await AppPreferences().getRefreshToken();
+    print(token);
+    var headers = {
+      'x-refresh-token': token,
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('GET', Uri.parse('${_baseUrl}user-address'));
+    request.headers.addAll(headers);
+    http.StreamedResponse response = await request.send();
+    String responseStr = await response.stream.bytesToString();
+
+    Map<String, dynamic> json = jsonDecode(responseStr);
+
+    if (response.statusCode == 200) {
+      int status = json['status'];
+      if (status == 200) {
+        try {
+          var data = json['data']['userAddresses'] as List;
+          List<UserAddress> uas = data.map((e) => UserAddress.fromMap(e)).toList();
+          return uas;
+        } catch (e) {
+          print(e);
+          return [];
+        }
+      }else{
+        return [];
+      }
+    } else {
+      print(response.reasonPhrase);
+      return [];
     }
   }
 
@@ -1202,7 +1272,7 @@ class AppApiClient {
     if (response.statusCode == 200) {
       int status = json['status'];
       if (status == 200) {
-        List orders = json['data']['orders'];
+        List orders = json['data']['orders']['data'];
         orders.forEach((element) {
           try {
             bookings.add(BookingModel(
