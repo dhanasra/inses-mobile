@@ -146,8 +146,8 @@ class AppRepository {
     return await appApiClient.deleteAdditional(id);
   }
 
-  Future<String> bookService(Order order) async {
-    return await appApiClient.bookService(order);
+  Future<String> bookService(Order order, int addressId) async {
+    return await appApiClient.bookService(order, addressId);
   }
 
   Future<String> cancelService(int orderId) async {

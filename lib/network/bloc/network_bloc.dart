@@ -521,7 +521,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
     if (event is BookService) {
       yield Loading();
       try {
-        final String response = await appRepository.bookService(event.order);
+        final String response = await appRepository.bookService(event.order, event.addressId);
         if (response == 'success') {
           yield ServiceBooked();
         }

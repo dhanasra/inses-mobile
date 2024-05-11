@@ -1161,7 +1161,7 @@ class AppApiClient {
     }
   }
 
-  Future<String> bookService(Order order) async {
+  Future<String> bookService(Order order, int addressId) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     print(1);
@@ -1180,7 +1180,7 @@ class AppApiClient {
         "date": order.date,
         "start_time": order.start_time,
         "end_time": order.end_time,
-        "address": order.address,
+        "user_address_id": addressId,
         "service_id": order.service_id,
         "quantity": order.quantity
       });
@@ -1279,7 +1279,7 @@ class AppApiClient {
                 id: element['id'],
                 name: element['service']['name'],
                 categoryName: element['service']['category_name'],
-                address: element['address'],
+                userAddress: UserAddress.fromMap(element['userAddress']),
                 totalPrice: element['total'],
                 startTime: element['start_time'],
                 endTime: element['end_time'],
@@ -1289,7 +1289,9 @@ class AppApiClient {
                 icon: element['service']['icon'],
                 date: element['date'],
                 quantity: element['quantity']));
-          } catch (e) {}
+          } catch (e) {
+            print(e);
+          }
         });
         return bookings;
       }else{
@@ -1412,7 +1414,7 @@ class AppApiClient {
             id: json['data']['order']['id'],
             name: json['data']['order']['service']['name'],
             categoryName: json['data']['order']['service']['category_name'],
-            address: json['data']['order']['address'],
+            userAddress: UserAddress.fromMap(json['data']['order']['userAddress']),
             totalPrice: json['data']['order']['total'],
             startTime: json['data']['order']['start_time'],
             endTime: json['data']['order']['end_time'],

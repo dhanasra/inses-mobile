@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:inses_app/network/models/user_address.dart';
 class BookingModel extends Equatable {
   final int id;
   final String name;
@@ -10,7 +11,7 @@ class BookingModel extends Equatable {
   final String date;
   final String startTime;
   final String endTime;
-  final String address;
+  final UserAddress userAddress;
   final String? userName;
   final String? userPhone;
   final bool? reviewed;
@@ -21,11 +22,11 @@ class BookingModel extends Equatable {
   final int totalPrice;
 
   const BookingModel(
-      {required this.id,required this.startTime,required this.endTime,required this.address,required this.date,required this.quantity,required this.icon,required this.name,required this.status,required this.totalPrice,
+      {required this.id,required this.startTime,required this.endTime,required this.userAddress,required this.date,required this.quantity,required this.icon,required this.name,required this.status,required this.totalPrice,
       required this.categoryName,this.userName,this.userPhone,required this.payMethod,this.reviewed,required this.payStatus, this.additionalId, this.additionalDesc, this.additionalPrice});
 
   @override
-  List<Object> get props => [id,status,startTime,endTime,address,date,quantity,icon,name,totalPrice,categoryName,payStatus,payMethod];
+  List<Object> get props => [id,status,startTime,endTime,userAddress,date,quantity,icon,name,totalPrice,categoryName,payStatus,payMethod];
 
   static BookingModel fromJson(dynamic json) {
     return BookingModel(
@@ -42,7 +43,7 @@ class BookingModel extends Equatable {
       startTime: json['startTime'],
         reviewed: json['reviewed'],
         endTime: json['endTime'],
-      address: json['address'],
+      userAddress: UserAddress.fromMap(json['user_address']),
       quantity: json['quantity'],
       totalPrice: json['totalPrice'],
       additionalDesc: json['additionalDesc'],

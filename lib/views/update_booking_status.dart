@@ -374,7 +374,7 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                             Content(
                               color: AppColors.BLACK,
                               margin: EdgeInsets.only(top: 5),
-                              text: OrderViewModel.booking!.address,
+                              text: '${OrderViewModel.booking!.userAddress.address}, ${OrderViewModel.booking!.userAddress.pincode}',
                               fontfamily: AppFont.FONT,
                               fontWeight: FontWeight.w500,
                               fontSize: AppDimen.TEXT_SMALLER,

@@ -5,6 +5,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:inses_app/app/app.dart';
 import 'package:inses_app/model/bookings.dart';
+import 'package:inses_app/utils/global.dart';
 import 'package:inses_app/widgets/address_dialog.dart';
 import 'package:intl/intl.dart';
 
@@ -62,7 +63,7 @@ class OrderViewModel {
     pincodeController = TextEditingController(text: "");
     addressTypeFocus = FocusNode();
     addressTypController = TextEditingController(text: "");
-    addressId = ValueNotifier(null);
+    addressId = ValueNotifier(Global.userAddresses.value.length>0 ? Global.userAddresses.value[0].id: null);
 
     addressController.addListener(() {
       String password = addressController.text.toString();

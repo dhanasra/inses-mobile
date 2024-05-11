@@ -284,7 +284,7 @@ class _BookingDescState extends State<BookingDesc> {
                       Content(
                         color:AppColors.BLACK,
                         margin: EdgeInsets.only(top: 5),
-                        text: OrderViewModel.booking!.address,
+                        text: '${OrderViewModel.booking!.userAddress.address}, ${OrderViewModel.booking!.userAddress.pincode}',
                         overflow: TextOverflow.ellipsis,
                         fontfamily: AppFont.FONT,
                         fontWeight: FontWeight.w500,

@@ -21,6 +21,7 @@ import 'package:inses_app/network/bloc/network_state.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
+import 'package:inses_app/utils/global.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
 import 'package:inses_app/view_models/profile_view_model.dart';
 import 'package:inses_app/widgets/error_item.dart';
@@ -82,6 +83,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                       ),
                       onTap: () {
                         bloc.add(BookService(
+                            addressId: viewModel.addressId.value!,
                             order: Order(
                                 date: OrderViewModel.date!,
                                 start_time: OrderViewModel.startTime,
@@ -127,6 +129,9 @@ class _ServiceSummaryState extends State<ServiceSummary> {
   }
 
   Widget buildView() {
+
+    var selectedAddress = Global.userAddresses.value.firstWhere((element) => element.id==viewModel.addressId.value);
+
     return ListView(
       children: [
         Container(
@@ -187,7 +192,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                   ),
                   Content(
                     color: AppColors.WHITE,
-                    text: '${OrderViewModel.address}',
+                    text: '${selectedAddress.address}, ${selectedAddress.pincode}',
                     overflow: TextOverflow.ellipsis,
                     fontfamily: AppFont.FONT,
                     fontWeight: FontWeight.w500,
