@@ -17,6 +17,8 @@ import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
 import 'package:inses_app/view_models/order_view_model.dart';
+import 'package:inses_app/views/admin_home.dart';
+import 'package:inses_app/views/home.dart';
 import 'package:inses_app/widgets/error_item.dart';
 import 'package:inses_app/widgets/loader.dart';
 
@@ -46,88 +48,100 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        child: Scaffold(
-          appBar: App().appBarBack(
-            context,
-            OrderViewModel.booking!.categoryName,
+    return BlocListener(
+      bloc: bloc,
+      listener: (context, state) {
+        if(state is ServiceCancelled){
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_)=>AdminHome()), (route) => false);
+        }
+      },
+      child: WillPopScope(
+          child: Scaffold(
+            appBar: App().appBarBack(
+              context,
+              OrderViewModel.booking!.categoryName,
+            ),
+            body: Container(
+                padding: EdgeInsets.only(bottom: 0),
+                child: BlocBuilder<NetworkBloc, NetworkState>(
+                  bloc: bloc,
+                  builder: (context, state) {
+                    if (state is Empty || state is Loading) {
+                      return buildView(
+                          OrderViewModel.load4,
+                          OrderViewModel.load3,
+                          OrderViewModel.load1,
+                          OrderViewModel.load2);
+                    } else if (state is Error) {
+                      return ErrorItem();
+                    } else if (state is Approved ||
+                        state is Completed ||
+                        state is PaymentStatusUpdated ||
+                        state is Added ||
+                        state is GotBooking ||
+                        state is AdditionalRemoved) {
+                      if (state is GotBooking) {
+                        OrderViewModel.booking = state.booking;
+                        type = OrderViewModel.booking!.status;
+                        additional =
+                            OrderViewModel.booking!.additionalPrice != 0
+                                ? "ADDED"
+                                : "ADD";
+                        print(additional);
+                      }
+                      if (state is AdditionalRemoved) {
+                        Future.delayed(Duration.zero, () async {
+                          setState(() {
+                            type = "ADD";
+                          });
+                        });
+                        bloc.add(
+                            GetBookingDetails(id: OrderViewModel.booking!.id));
+                      }
+                      if (state is Approved) {
+                        Future.delayed(Duration.zero, () async {
+                          setState(() {
+                            type = "APPROVED";
+                          });
+                        });
+                      }
+                      if (state is Completed) {
+                        Future.delayed(Duration.zero, () async {
+                          setState(() {
+                            type = "COMPLETED";
+                          });
+                        });
+                      }
+                      if (state is PaymentStatusUpdated) {
+                        Future.delayed(Duration.zero, () async {
+                          setState(() {
+                            payType = "UPDATED";
+                          });
+                        });
+                      }
+                      if (state is Added) {
+                        Future.delayed(Duration.zero, () async {
+                          setState(() {
+                            additional = "ADDED";
+                          });
+                        });
+                      }
+                      OrderViewModel.load1 = false;
+                      OrderViewModel.load2 = false;
+                      OrderViewModel.load4 = false;
+                      OrderViewModel.load3 = false;
+                      return buildView(false, false, false, false);
+                    } else {
+                      return Container();
+                    }
+                  },
+                )),
           ),
-          body: Container(
-              padding: EdgeInsets.only(bottom: 0),
-              child: BlocBuilder<NetworkBloc, NetworkState>(
-                bloc: bloc,
-                builder: (context, state) {
-                  if (state is Empty || state is Loading) {
-                    return buildView(OrderViewModel.load4, OrderViewModel.load3,
-                        OrderViewModel.load1, OrderViewModel.load2);
-                  } else if (state is Error) {
-                    return ErrorItem();
-                  } else if (state is Approved ||
-                      state is Completed ||
-                      state is PaymentStatusUpdated ||
-                      state is Added ||
-                      state is GotBooking ||
-                      state is AdditionalRemoved) {
-                    if (state is GotBooking) {
-                      OrderViewModel.booking = state.booking;
-                      type = OrderViewModel.booking!.status;
-                      additional = OrderViewModel.booking!.additionalPrice != 0
-                          ? "ADDED"
-                          : "ADD";
-                      print(additional);
-                    }
-                    if (state is AdditionalRemoved) {
-                      Future.delayed(Duration.zero, () async {
-                        setState(() {
-                          type = "ADD";
-                        });
-                      });
-                      bloc.add(
-                          GetBookingDetails(id: OrderViewModel.booking!.id));
-                    }
-                    if (state is Approved) {
-                      Future.delayed(Duration.zero, () async {
-                        setState(() {
-                          type = "APPROVED";
-                        });
-                      });
-                    }
-                    if (state is Completed) {
-                      Future.delayed(Duration.zero, () async {
-                        setState(() {
-                          type = "COMPLETED";
-                        });
-                      });
-                    }
-                    if (state is PaymentStatusUpdated) {
-                      Future.delayed(Duration.zero, () async {
-                        setState(() {
-                          payType = "UPDATED";
-                        });
-                      });
-                    }
-                    if (state is Added) {
-                      Future.delayed(Duration.zero, () async {
-                        setState(() {
-                          additional = "ADDED";
-                        });
-                      });
-                    }
-                    OrderViewModel.load1 = false;
-                    OrderViewModel.load2 = false;
-                    OrderViewModel.load4 = false;
-                    OrderViewModel.load3 = false;
-                    return buildView(false, false, false, false);
-                  } else {
-                    return Container();
-                  }
-                },
-              )),
-        ),
-        onWillPop: () async {
-          App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
-          return true;
-        });
+          onWillPop: () async {
+            App().setNavigation(context, AppRoutes.APP_HOME_MAIN);
+            return true;
+          }),
+    );
   }
 
   Widget buildView(
@@ -374,7 +388,8 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                             Content(
                               color: AppColors.BLACK,
                               margin: EdgeInsets.only(top: 5),
-                              text: '${OrderViewModel.booking!.userAddress.address}, ${OrderViewModel.booking!.userAddress.pincode}',
+                              text:
+                                  '${OrderViewModel.booking!.userAddress.address}, ${OrderViewModel.booking!.userAddress.pincode}',
                               fontfamily: AppFont.FONT,
                               fontWeight: FontWeight.w500,
                               fontSize: AppDimen.TEXT_SMALLER,
@@ -670,7 +685,39 @@ class _UpdateBookingStatusState extends State<UpdateBookingStatus> {
                                             paymentId: '',
                                             method: payType));
                                       },
-                                    )))
+                                    ))),
+                            BorderContainer(
+                                radius: 4,
+                                margin: EdgeInsets.only(
+                                    left: 15, right: 15, top: 30),
+                                padding: EdgeInsets.only(top: 5, bottom: 5),
+                                borderColor: AppColors.PRIMARY_COLOR,
+                                child: OnTapField(
+                                  child: isLoading
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.max,
+                                          children: [
+                                            Loader(
+                                              margin: EdgeInsets.all(0),
+                                            )
+                                          ],
+                                        )
+                                      : Content(
+                                          padding: EdgeInsets.only(
+                                              top: 10, bottom: 10),
+                                          text: 'CANCEL BOOKING',
+                                          color: AppColors.PRIMARY_COLOR,
+                                          fontfamily: AppFont.FONT,
+                                          fontSize: AppDimen.TEXT_SMALL,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                  onTap: () {
+                                    bloc.add(CancelService(
+                                        orderId: OrderViewModel.orderId!));
+                                  },
+                                )),
                           ],
                         )),
                   )
