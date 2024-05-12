@@ -274,8 +274,8 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
             id: event.id,
             categoryId: event.categoryId,
             price: event.price,
-            icon: event.icon!,
-            image: event.image!);
+            icon: event.icon,
+            image: event.image);
         if (response == "success") {
           yield Success();
         } else if (response == "Error") {

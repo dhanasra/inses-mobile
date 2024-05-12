@@ -94,8 +94,8 @@ class AppRepository {
       required int id,
       required int categoryId,
       required int price,
-      required File icon,
-      required File image}) async {
+      required File? icon,
+      required File? image}) async {
     return await appApiClient.editService(
         name: name,
         id: id,
