@@ -85,6 +85,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                         bloc.add(BookService(
                             addressId: viewModel.addressId.value!,
                             order: Order(
+                                pincode: OrderViewModel.pincode,
                                 date: OrderViewModel.date!,
                                 start_time: OrderViewModel.startTime,
                                 end_time: OrderViewModel.endTime,

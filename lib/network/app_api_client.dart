@@ -128,6 +128,7 @@ class AppApiClient {
 
         String address = await getUserAddress();
         ProfileViewModel.address = address;
+        Global.userAddresses.value = await getUserAddressList();
 
         await AppPreferences().setLoginStatus(
             status: roleId == 1
@@ -169,6 +170,8 @@ class AppApiClient {
     String responseStr = await response.stream.bytesToString();
 
     Map<String, dynamic> json = jsonDecode(responseStr);
+
+    Global.userAddresses.value = [];
 
     if (response.statusCode == 200) {
       int status = json['status'];
@@ -1161,11 +1164,12 @@ class AppApiClient {
     }
   }
 
-  Future<String> bookService(Order order, int addressId) async {
+  Future<String> bookService(Order order, int? addressId) async {
     String token = await AppPreferences().getRefreshToken();
     print(token);
     print(1);
     try {
+      var userAddressId = addressId;
       print(1);
       var headers = {
         'x-refresh-token': token,
@@ -1176,11 +1180,26 @@ class AppApiClient {
 
       request.headers.addAll(headers);
 
+      if(addressId==null){
+        var body = jsonEncode({"address": order.address, "pincode": order.pincode, "alternative_phone": null, "address_type": "HOME"});
+        var response = await http.post(Uri.parse('${_baseUrl}user-address'),
+            body: body, headers: headers);
+
+        String responseStr = response.body.toString();
+        print(responseStr);
+
+        Map<String, dynamic> json = jsonDecode(responseStr);
+        var address = UserAddress.fromMap(json['data']['userAddress']);
+        userAddressId = address.id;
+        Global.userAddresses.value = [ address ];
+      }
+
+
       request.body = jsonEncode({
         "date": order.date,
         "start_time": order.start_time,
         "end_time": order.end_time,
-        "user_address_id": addressId,
+        "user_address_id": userAddressId,
         "service_id": order.service_id,
         "quantity": order.quantity
       });

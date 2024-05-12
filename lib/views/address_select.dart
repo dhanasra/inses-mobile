@@ -88,6 +88,8 @@ class _AddressSelectState extends State<AddressSelect> with AutomaticKeepAliveCl
                 onTap:(){
                     if(_formKey.currentState!.validate()) {
                       OrderViewModel.address = viewModel.addressController.text;
+                      OrderViewModel.pincode = viewModel.pincodeController.text;
+                      
                       App().setNavigation(context, AppRoutes.APP_ORDER_FLOW_4);
                     }
                   }

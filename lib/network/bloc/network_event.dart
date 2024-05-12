@@ -163,7 +163,7 @@ class UpdatePhoneNumber extends NetworkEvent {
 
 class BookService extends NetworkEvent {
   final Order order;
-  final int addressId;
+  final int? addressId;
 
   BookService({required this.order, required this.addressId});
 }

@@ -41,6 +41,7 @@ class NetworkBloc extends Bloc<NetworkEvent, NetworkState> {
       try {
         final String response =
             await appRepository.userLogin(event.phone, event.password);
+
         if (response == "1") {
           yield LoginSuccess(id: "1");
         } else if (response == "2") {
