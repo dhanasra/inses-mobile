@@ -18,6 +18,7 @@ import 'package:inses_app/network/app_repository.dart';
 import 'package:inses_app/network/bloc/network_bloc.dart';
 import 'package:inses_app/network/bloc/network_event.dart';
 import 'package:inses_app/network/bloc/network_state.dart';
+import 'package:inses_app/network/models/user_address.dart';
 import 'package:inses_app/resources/app_colors.dart';
 import 'package:inses_app/resources/app_dimen.dart';
 import 'package:inses_app/resources/app_font.dart';
@@ -83,7 +84,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                       ),
                       onTap: () {
                         bloc.add(BookService(
-                            addressId: viewModel.addressId.value!,
+                            addressId: viewModel.addressId.value,
                             order: Order(
                                 pincode: OrderViewModel.pincode,
                                 date: OrderViewModel.date!,
@@ -131,7 +132,13 @@ class _ServiceSummaryState extends State<ServiceSummary> {
 
   Widget buildView() {
 
-    var selectedAddress = Global.userAddresses.value.firstWhere((element) => element.id==viewModel.addressId.value);
+    UserAddress? selectedAddress;
+    if(viewModel.addressId.value==null){
+      selectedAddress = null;
+    }else{
+      selectedAddress = Global.userAddresses.value.firstWhere((element) => element.id==viewModel.addressId.value);
+    }
+
 
     return ListView(
       children: [
@@ -193,7 +200,7 @@ class _ServiceSummaryState extends State<ServiceSummary> {
                   ),
                   Content(
                     color: AppColors.WHITE,
-                    text: '${selectedAddress.address}, ${selectedAddress.pincode}',
+                    text: '${selectedAddress?.address??viewModel.addressController.text}, ${selectedAddress?.pincode??viewModel.pincodeController.text}',
                     overflow: TextOverflow.ellipsis,
                     fontfamily: AppFont.FONT,
                     fontWeight: FontWeight.w500,
