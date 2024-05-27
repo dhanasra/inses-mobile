@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentChoose extends StatefulWidget {
@@ -8,7 +8,7 @@ class PaymentChoose extends StatefulWidget {
 }
 
 class _PaymentChooseState extends State<PaymentChoose> {
-  static const platform = const MethodChannel("razorpay_flutter");
+  // static const platform = const MethodChannel("razorpay_flutter");
 
   late Razorpay _razorpay;
 
